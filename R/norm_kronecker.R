@@ -30,7 +30,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' # Using internal fire package functions
 #' G <- list(matrix(runif(9),3,3), matrix(runif(4),2,2))
 #' decomp <- fire:::Kronecker_inv_helper(G, alpha = c(0.5, 0.5))
@@ -47,7 +46,6 @@
 #' # Compute cross norms
 #' X_new <- list(matrix(rnorm(6), nrow=3))
 #' Kronecker_norm_cross(X_list, X_new, G, alpha = c(0.5, 0.5))
-#' }
 #'
 #' @name rkhs_norm_kronecker
 #' @keywords internal

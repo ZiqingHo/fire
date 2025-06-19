@@ -31,9 +31,9 @@ NULL
 #' @details
 #' \code{Kronecker_inv_helper}: Special case avoids eigendecomposition when m = 1 and constant = FALSE for efficiency.
 #'
-#' @seealso \code{\link{gmat}}
+#' @seealso \code{\link{gmat}}, \code{\link{fire}}
 #' @examples
-#' \dontrun{
+#' # Kronecker_inv_helper()
 #' # 1D case without constant term
 #' G1 <- list(matrix(c(2,1,1,2), 2))
 #' res1 <- fire:::Kronecker_inv_helper(G1, alpha = 0.5, constant = FALSE)
@@ -42,7 +42,6 @@ NULL
 #' G4 <- list(matrix(c(2,1,1,2),2), matrix(c(3,1,1,3),2),
 #'            matrix(c(4,1,1,4),2), matrix(c(5,1,1,5),2))
 #' res4 <- fire:::Kronecker_inv_helper(G4, alpha = rep(0.5,4), constant = TRUE)
-#' }
 Kronecker_inv_helper <- function(G, alpha, constant = TRUE){
 
   m <- length(G)
@@ -114,10 +113,9 @@ Kronecker_inv_helper <- function(G, alpha, constant = TRUE){
 #' @details  \code{Lambda_inv}:
 #' Computes \eqn{\Lambda^{-1}} where \eqn{\Lambda = \Lambda_1 \otimes \Lambda_2 \otimes ... \otimes \Lambda_m}
 #' @examples
-#' \dontrun{
+#' # Lambda_inv()
 #' L <- list(c(1,2), c(3,4))
 #' inv <- fire:::Lambda_inv(L)
-#' }
 Lambda_inv <- function(L){
 
   m <- length(L)
@@ -142,9 +140,8 @@ Lambda_inv <- function(L){
 #' @param Q Matrix from \code{Kronecker_inv_helper} output
 #'
 #' @examples
-#' \dontrun{
+#' # kron_mv()
 #' result <- fire:::kron_mv(rnorm(8), matrix(rnorm(4),2))
-#' }
 kron_mv <- function(Xvec, Q){
 
   nQ <- ncol(Q)

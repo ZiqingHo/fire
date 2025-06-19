@@ -11,11 +11,11 @@
 #'   \item{\code{mercer}: Mercer kernel with cosine basis}
 #' }
 #'
-#' @name kernels.fire
+#' @name kernels_fire
 #' @aliases fbm cfbm cfbm_sd kronecker_delta rbf polynomial mercer
 NULL
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
 #' @param X Input data (vector or matrix)
 #' @param Hurst Hurst parameter for fbm/cfbm (0 < Hurst ≤ 1)
 #' @return A symmetric positive definite Gram matrix of size n x n where n is the
@@ -26,7 +26,10 @@ NULL
 #'   }
 #' @export
 #' @examples
-#' X <- matrix(rnorm(6), ncol=2)
+#' set.seed(1)
+#' X <- matrix(rnorm(4), ncol=2)
+#'
+#' # Different kernels
 #' fbm(X)
 fbm <- function(X, Hurst = 0.5) {
   # convert vector into matrix if necessary
@@ -82,7 +85,9 @@ fbm <- function(X, Hurst = 0.5) {
 }
 
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
+#' @examples
+#' cfbm(X)
 #' @export
 cfbm <- function(X, Hurst = 0.5) {
   if (is.matrix(X)){
@@ -121,7 +126,9 @@ cfbm <- function(X, Hurst = 0.5) {
 }
 
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
+#' @examples
+#' cfbm_sd(X)
 #' @export
 cfbm_sd <- function(X, Hurst = 0.5){
   if(Hurst >1 || Hurst <= 0){
@@ -154,8 +161,10 @@ cfbm_sd <- function(X, Hurst = 0.5){
   K
 }
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
 #' @param center Logical indicating whether to center the kernel matrix
+#' @examples
+#' kronecker_delta(X)
 #' @export
 kronecker_delta <- function(X, center = F){
 
@@ -199,8 +208,10 @@ kronecker_delta <- function(X, center = F){
 }
 
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
 #' @param lengthscale Bandwidth parameter for RBF kernel
+#' @examples
+#' rbf(X)
 #' @export
 rbf <- function(X, lengthscale = 1, center = F){
   if(all(is.na(X))){
@@ -247,9 +258,11 @@ rbf <- function(X, lengthscale = 1, center = F){
 
 }
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
 #' @param d Degree of polynomial
 #' @param offset Constant offset in polynomial kernel
+#' @examples
+#' polynomial(X, d = 2, offset = 1)
 #' @export
 polynomial <- function(X, d = 1, offset = 0, center = F){
   if(all(is.na(X))){
@@ -296,9 +309,11 @@ polynomial <- function(X, d = 1, offset = 0, center = F){
   }
 }
 
-#' @rdname kernels.fire
+#' @rdname kernels_fire
 #' @param delta Smoothness parameter for Mercer kernel
 #' @param max_terms Maximum number of terms in Mercer series expansion
+#' @examples
+#' mercer(X)
 #' @export
 mercer <- function(X, delta = 1, max_terms = 1000, center = F) {
   if(all(is.na(X))){

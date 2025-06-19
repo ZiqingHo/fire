@@ -26,7 +26,7 @@ sim_dat(
 )
 }
 \arguments{
-\item{kernels}{List of kernel functions for each mode, refer to \code{\link{kernels.fire}}}
+\item{kernels}{List of kernel functions for each mode, may refer to \code{\link{kernels_fire}}}
 
 \item{kernels_param}{List of parameters for each kernel function}
 
@@ -40,7 +40,7 @@ sim_dat(
 
 \item{intercept_x}{Intercept term for covariates}
 
-\item{kernel_iprior}{Type of I-prior kernel ('cfbm', 'rbf', or 'linear')}
+\item{kernel_iprior}{Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly')}
 
 \item{iprior_param}{Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf)}
 
@@ -87,4 +87,7 @@ sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
 alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
 kernel_iprior = 'rbf', os_type = 'Apple', cores = 1)
 
+}
+\seealso{
+\code{\link{kernels_fire}}
 }

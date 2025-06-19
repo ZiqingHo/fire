@@ -17,12 +17,12 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' data(Manure)
-#' idx <- 1:200
-#' mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx], dat_T = list(1:700))
-#' predict(mod, newdata = Manure$absorp[-idx,], Ynew = Manure$y$DM[-idx])
-#' }
+#' idx <- 1:5
+#' mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
+#' dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' predict(mod, newdata = Manure$absorp[idx+10,],
+#' Ynew = Manure$y$DM[idx+10])
 #'
 #' @seealso \code{\link{fire}}
 

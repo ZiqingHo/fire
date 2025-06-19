@@ -33,15 +33,15 @@ The type of plot produced depends on
 the class of the model object \code{fire_fitted} or \code{fire_prediction}
 }
 \examples{
-\dontrun{
 data(Manure)
-idx <- 1:200
-mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx], dat_T = list(1:700))
+idx <- 1:5
+mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 
 Yfitted = fitted(mod)
 plot(Yfitted)
 
-Ypred = predict(mod, newdata = Manure$absorp[-idx,], Ynew = Manure$y$DM[-idx])
+Ypred = predict(mod, newdata = Manure$absorp[idx+10,],
+Ynew = Manure$y$DM[idx+10])
 plot(Ypred)
-}
 }

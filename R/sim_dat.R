@@ -3,14 +3,14 @@
 #' Generates simulated data for multi-dimensional functional regression models using
 #' I-prior methodology.
 #'
-#' @param kernels List of kernel functions for each mode, refer to \code{\link{kernels.fire}}
+#' @param kernels List of kernel functions for each mode, may refer to \code{\link{kernels_fire}}
 #' @param kernels_param List of parameters for each kernel function
 #' @param alpha Vector of scale parameters for \code{kernels}
 #' @param dat_T List of index sets for each mode
 #' @param tau Scale parameter for the I-prior kernel
 #' @param intercept_y Intercept term for response
 #' @param intercept_x Intercept term for covariates
-#' @param kernel_iprior Type of I-prior kernel ('cfbm', 'rbf', or 'linear')
+#' @param kernel_iprior Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly')
 #' @param iprior_param Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf)
 #' @param sigma_v Standard deviation for random effects
 #' @param sigma Noise standard deviation
@@ -27,6 +27,8 @@
 #' \item X: Simulated covariate data
 #' \item y: Simulated response vector
 #' }
+#'
+#' @seealso \code{\link{kernels_fire}}
 #'
 #' @examples
 #' # 2D example

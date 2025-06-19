@@ -7,7 +7,7 @@
 #' @param X Covariate matrix/array
 #' @param Y Response vector
 #' @param dat_T List of index values for each mode
-#' @param kernels List of kernel functions. Refer to \code{\link{kernels.fire}} for available kernel functions
+#' @param kernels List of kernel functions. Refer to \code{\link{kernels_fire}} for available kernel functions
 #' @param kernels_params List of parameters for each kernel
 #' @param center Logical indicating whether to center the kernel matrices in \code{gmat}
 #' @param G List of kernel matrices from \code{gmat}
@@ -25,7 +25,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' # vector covariates
 #' set.seed(1)
 #' X <- matrix(runif(20, 5, 10), ncol = 4) # 5 samples
@@ -36,7 +35,7 @@
 #' init_cfbm <- fire:::pre_initial(X, Y, dat_T,
 #'                         kernels = list(cfbm),
 #'                         kernels_params = list(0.5),
-#'                         Index = Index, constant = F,
+#'                         Index = Index, constant = FALSE,
 #'                         kernel_iprior = "cfbm")
 #'
 #' # 3D covariates
@@ -49,11 +48,10 @@
 #' init_rbf <- fire:::pre_initial(X, Y, dat_T,
 #'                        kernels = list(cfbm, rbf, cfbm),
 #'                        kernels_params = list(0.5, 1, 0.5),
-#'                        Index = Index, constant = T,
+#'                        Index = Index, constant = TRUE,
 #'                        kernel_iprior = "rbf")
-#' }
 #'
-#' @seealso \code{fire_matrix}, \code{fire_tensor} for functions using these initial values
+#' @seealso \code{\link{fire.matrix}}, \code{\link{fire.tensor}}, \code{\link{kernels_fire}}
 #'
 #' @keywords internal
 pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,

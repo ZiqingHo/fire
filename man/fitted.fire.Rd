@@ -34,11 +34,10 @@ The returned object has a \code{print} method that displays:
 Obtain fitted values of FIRe model
 }
 \examples{
-\dontrun{
 data(Manure)
-mod <- fire(X = Manure$absorp, Y = Manure$y$DM, dat_T = list(1:700))
+mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+dat_T = list(1:700),, stop.eps = 2, maxiter = 4)
 fitted(mod)
-}
 
 }
 \seealso{

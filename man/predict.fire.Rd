@@ -38,12 +38,12 @@ The returned object has a \code{print} method that displays:
 Obtain predicted values from \code{fire_matrix} or \code{fire_tensor} object, optionally with test set evaluation.
 }
 \examples{
-\dontrun{
 data(Manure)
-idx <- 1:200
-mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx], dat_T = list(1:700))
-predict(mod, newdata = Manure$absorp[-idx,], Ynew = Manure$y$DM[-idx])
-}
+idx <- 1:5
+mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
+dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+predict(mod, newdata = Manure$absorp[idx+10,],
+Ynew = Manure$y$DM[idx+10])
 
 }
 \seealso{

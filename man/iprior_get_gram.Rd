@@ -36,20 +36,16 @@ A Gram matrix of appropriate dimensions:
 Functions to compute various Gram matrices for I-prior models using RKHS norms.
 }
 \examples{
-\dontrun{
-# Using internal functions
+# Using internal functions to compute pairwise RKHS norm
 G <- list(matrix(c(2,1,1,2),2), matrix(c(3,1,1,3),2))
 X <- list(matrix(rnorm(4),2), matrix(rnorm(4),2))
-
-# Compute RKHS norms
-nmat <- Kronecker_norm_mat(X, G, alpha=c(0.5,0.5))
-ncross <- Kronecker_norm_cross(X, X[1], G, alpha=c(0.5,0.5))
+nmat <- fire:::Kronecker_norm_mat(X, G, alpha=c(0.5,0.5))
+ncross <- fire:::Kronecker_norm_cross(X, X[1], G, alpha=c(0.5,0.5))
 
 # Get Gram matrices
 K_rbf <- rbf_rkhs_kron(nmat)
 K_cfbm <- cfbm_rkhs_kron(nmat)
 K_rbf_cross <- rbf_rkhs_kron_cross(ncross)
 K_cfbm_cross <- cfbm_rkhs_kron_cross(nmat, ncross)
-}
 
 }

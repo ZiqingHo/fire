@@ -28,7 +28,7 @@ pre_initial(
 
 \item{dat_T}{List of index values for each mode}
 
-\item{kernels}{List of kernel functions. Refer to \code{\link{kernels.fire}} for available kernel functions}
+\item{kernels}{List of kernel functions. Refer to \code{\link{kernels_fire}} for available kernel functions}
 
 \item{kernels_params}{List of parameters for each kernel}
 
@@ -61,7 +61,6 @@ Internal function to estimate initial hyperparameters for I-prior EM algorithm.
   Used internally by \code{\link{fire}}. Not exported.
 }
 \examples{
-\dontrun{
 # vector covariates
 set.seed(1)
 X <- matrix(runif(20, 5, 10), ncol = 4) # 5 samples
@@ -72,7 +71,7 @@ Index <- expand.grid(1:5)
 init_cfbm <- fire:::pre_initial(X, Y, dat_T,
                         kernels = list(cfbm),
                         kernels_params = list(0.5),
-                        Index = Index, constant = F,
+                        Index = Index, constant = FALSE,
                         kernel_iprior = "cfbm")
 
 # 3D covariates
@@ -85,12 +84,11 @@ Index <- cbind(Index$T1, Index$T2, Index$T3)
 init_rbf <- fire:::pre_initial(X, Y, dat_T,
                        kernels = list(cfbm, rbf, cfbm),
                        kernels_params = list(0.5, 1, 0.5),
-                       Index = Index, constant = T,
+                       Index = Index, constant = TRUE,
                        kernel_iprior = "rbf")
-}
 
 }
 \seealso{
-\code{fire_matrix}, \code{fire_tensor} for functions using these initial values
+\code{\link{fire.matrix}}, \code{\link{fire.tensor}}, \code{\link{kernels_fire}}
 }
 \keyword{internal}

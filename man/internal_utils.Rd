@@ -35,22 +35,22 @@ Internal helper functions for string and index processing.
   Not intended for direct use by package users.
 }
 \examples{
-\dontrun{
-suffix(1)   # "1st"
-suffix(22)  # "22nd"
-suffix(13)  # "13th"
-}
-\dontrun{
+# suffix()
+fire:::suffix(1)   # "1st"
+fire:::suffix(22)  # "22nd"
+fire:::suffix(13)  # "13th"
+
+# parse_index()
 X <- array(1:8, dim = c(2,2,2))
-parse_index(X, "1,2,")  # Returns X[1,2,]
-parse_index(X, ",1")    # Returns X[,1]
-}
-\dontrun{
+fire:::parse_index(X, "1,2,")  # Returns X[1,2,]
+fire:::parse_index(X, ",1,")    # Returns X[,1,]
+
+# create_index_matrix()
 # Two variables
-create_index_matrix(list(c(1, 2), c(3, 4, 5)))
+fire:::create_index_matrix(list(c(1, 2), c(3, 4, 5)))
 
 # Three variables
-create_index_matrix(list(c(1, 2), c(3, 4), seq(0,1, length.out = 4)))
-}
+fire:::create_index_matrix(list(c(1, 2), c(3, 4), seq(0,1, length.out = 4)))
+
 }
 \keyword{internal}

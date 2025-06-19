@@ -86,7 +86,7 @@ fire(X, Y, ...)
 
 \item{scale}{Logical indicating whether to center the response by subtracting mean(Y)}
 
-\item{kernels}{List of kernel functions for each mode, refer \code{\link{kernels.fire}}}
+\item{kernels}{List of kernel functions for each mode, may refer \code{\link{kernels_fire}} for details}
 
 \item{kernels_params}{List of parameters for each kernel}
 
@@ -138,19 +138,21 @@ This generic function has methods for different input types:
 }
 
 \examples{
-\dontrun{
 # Matrix input
 data(Manure)
-mod1 <- fire(X = Manure$absorp, Y = Manure$y$DM, dat_T = list(1:700))
+mod1 <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 summary(mod1)
 
 # Array input
 data(Housing)
 dat_T <- list(T1 = 1:4, T2 = 1:9)
-mod2 <- fire(X = Housing$X, Y = Housing$y, dat_T = dat_T)
+mod2 <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+kernels = list(kronecker_delta, kronecker_delta),
+kernels_params = list(NA, NA),
+dat_T = dat_T, stop.eps = 2, maxiter = 4)
 summary(mod2)
 }
-}
 \seealso{
-\code{\link{kernels.fire}}, \code{\link{Manure}}, \code{\link{Housing}}
+\code{\link{kernels_fire}}, \code{\link{Manure}}, \code{\link{Housing}}
 }

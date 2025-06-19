@@ -1,7 +1,7 @@
 #' @title Construct Kernel Gram Matrices
 #' @name internal_gmat
 #' @description Internal function to construct Gram matrices for different modes and kernels.
-#'   Used internally by \code{fire_em}. Not exported or intended for direct use.
+#'   Used internally by \code{\link{fire}}. Not exported or intended for direct use.
 #' @keywords internal
 NULL
 
@@ -12,7 +12,7 @@ NULL
 #'   centered fractional Brownian motion (cfbm), radial basis function (rbf),
 #'   Kronecker delta, polynomial, and Mercer-like kernels.
 #'
-#' @param kernels List of kernel functions
+#' @param kernels List of kernel functions. The available kernels can be found in \code{\link{kernels_fire}}
 #' @param kernels_params List of parameters for each kernel:
 #' \itemize{
 #'   \item{For \code{cfbm}/\code{fbm}/\code{cfbm_sd}: Hurst parameter (numeric)}
@@ -26,15 +26,13 @@ NULL
 #'
 #' @return List of Gram matrices corresponding to each kernel
 #'
-#' @seealso \code{\link{kernels.fire}}
+#' @seealso \code{\link{kernels_fire}}
 #'
 #' @examples
-#' \dontrun{
 #' kernels <- list(cfbm, rbf)
 #' params <- list(0.5, 1.0)  # Hurst = 0.5, sigma = 1.0
 #' data <- list(matrix(rnorm(4), ncol=2), matrix(rnorm(6), ncol=3))
-#' G_list <- gmat(kernels, params, data)
-#' }
+#' G_list <- fire:::gmat(kernels, params, data)
 gmat <- function(kernels, kernels_params, dat, center = FALSE) {
   # list of kernel functions g1, g2, g3
   # list of parameters for each kernel (use NA for kernels without parameters)

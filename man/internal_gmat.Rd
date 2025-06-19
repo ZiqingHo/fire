@@ -8,7 +8,7 @@
 gmat(kernels, kernels_params, dat, center = FALSE)
 }
 \arguments{
-\item{kernels}{List of kernel functions}
+\item{kernels}{List of kernel functions. The available kernels can be found in \code{\link{kernels_fire}}}
 
 \item{kernels_params}{List of parameters for each kernel:
 \itemize{
@@ -28,7 +28,7 @@ List of Gram matrices corresponding to each kernel
 }
 \description{
 Internal function to construct Gram matrices for different modes and kernels.
-  Used internally by \code{fire_em}. Not exported or intended for direct use.
+  Used internally by \code{\link{fire}}. Not exported or intended for direct use.
 
 Constructs Gram matrices for each mode using specified kernels and parameters.
   Handles multiple kernel types including fractional Brownian motion (fbm),
@@ -36,14 +36,12 @@ Constructs Gram matrices for each mode using specified kernels and parameters.
   Kronecker delta, polynomial, and Mercer-like kernels.
 }
 \examples{
-\dontrun{
 kernels <- list(cfbm, rbf)
 params <- list(0.5, 1.0)  # Hurst = 0.5, sigma = 1.0
 data <- list(matrix(rnorm(4), ncol=2), matrix(rnorm(6), ncol=3))
-G_list <- gmat(kernels, params, data)
-}
+G_list <- fire:::gmat(kernels, params, data)
 }
 \seealso{
-\code{\link{kernels.fire}}
+\code{\link{kernels_fire}}
 }
 \keyword{internal}

@@ -1,11 +1,11 @@
 #' @title Internal RKHS Norm Utilities
-#' @name internal_sim
+#' @name internal_sim_dat
 #' @description Internal functions for computing RKHS norms and related operations.
-#'   Used internally by \code{sim_dat}. Not exported or intended for direct use.
+#'   Used internally by \code{\link{sim_dat}}. Not exported or intended for direct use.
 #' @keywords internal
 NULL
 
-#' @rdname internal_sim
+#' @rdname internal_sim_dat
 #'
 #' @param X1 Sample matrix or vector
 #' @param X2 Sample matrix or vector
@@ -15,12 +15,10 @@ NULL
 #' @return \code{rkhs_norm}: Numeric value representing the RKHS norm between X and Y
 #'
 #' @examples
-#' \dontrun{
 #' G <- diag(1,4)
-#' rkhs_norm(X1 = matrix(1:4, nrow=2),
+#' fire:::rkhs_norm(X1 = matrix(1:4, nrow=2),
 #'           Ginv = solve(G),
 #'           Index = expand.grid(1:2, 1:2))
-#' }
 rkhs_norm <- function(X1, X2 = NULL, Ginv, Index) {
   # Input validation
   if (!is.matrix(Ginv)) stop("Ginv must be a matrix")
@@ -55,19 +53,17 @@ rkhs_norm <- function(X1, X2 = NULL, Ginv, Index) {
   return(r)
 }
 
-#' @rdname internal_sim
+#' @rdname internal_sim_dat
 #'
 #' @param X Input data (list of samples or matrix where rows are samples)
 #'
 #' @return \code{rkhs_norm_mat}: Symmetric matrix of pairwise RKHS norms
 #'
 #' @examples
-#' \dontrun{
 #' G <- diag(1,4)
-#' rkhs_norm_mat(X = list(matrix(1:4,2), matrix(5:8,2)),
+#' fire:::rkhs_norm_mat(X = list(matrix(1:4,2), matrix(5:8,2)),
 #'               Ginv = solve(G),
 #'               Index = expand.grid(1:2, 1:2))
-#' }
 rkhs_norm_mat <- function(X, Ginv, Index) {
   # Input validation
   if (!(is.list(X) || is.matrix(X))) stop("X must be a list or matrix")
@@ -96,20 +92,18 @@ rkhs_norm_mat <- function(X, Ginv, Index) {
   return(mat)
 }
 
-#' @rdname internal_sim
+#' @rdname internal_sim_dat
 #'
 #' @param Hurst Hurst coefficient in (0, 1]
 #'
 #' @return \code{cfbm_rkhs}: Centered Gram matrix for fractional Brownian motion in RKHS
 #'
 #' @examples
-#' \dontrun{
 #' G <- diag(1,4)
-#' cfbm_rkhs(X = list(matrix(1:4,2), matrix(5:8,2)),
+#' fire:::cfbm_rkhs(X = list(matrix(1:4,2), matrix(5:8,2)),
 #'           Ginv = solve(G),
 #'           Index = expand.grid(1:2, 1:2),
 #'           Hurst = 0.7)
-#' }
 cfbm_rkhs <- function(X, Ginv, Index, Hurst = 0.5) {
   # Input validation
   if (!is.numeric(Hurst) || Hurst <= 0 || Hurst > 1) {
@@ -142,7 +136,7 @@ cfbm_rkhs <- function(X, Ginv, Index, Hurst = 0.5) {
   return(G)
 }
 
-#' @rdname internal_sim
+#' @rdname internal_sim_dat
 #'
 #' @param X_train Training data (list or matrix)
 #' @param X_new New data (list or matrix, same type as X_train)
@@ -150,15 +144,13 @@ cfbm_rkhs <- function(X, Ginv, Index, Hurst = 0.5) {
 #' @return \code{cfbm_rkhs_cross}: Cross-centered covariance matrix
 #'
 #' @examples
-#' \dontrun{
 #' train <- list(matrix(1:4,2), matrix(5:8,2))
 #' new <- list(matrix(9:12,2))
 #' G <- diag(1,4)
-#' cfbm_rkhs_cross(X_train = train,
+#' fire:::cfbm_rkhs_cross(X_train = train,
 #'                 X_new = new,
 #'                 Ginv = solve(G),
 #'                 Index = expand.grid(1:2, 1:2))
-#' }
 cfbm_rkhs_cross <- function(X_train, X_new, Ginv, Index, Hurst = 0.5) {
 
   if(is.list(X_train) != is.list(X_new)){

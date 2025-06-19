@@ -1,6 +1,6 @@
 Package: fire
 Type: Package
-Title: I-prior Regression using RKHS norm
+Title: Functional I-prior Regression using RKHS norm
 Version: 0.1.0
 Authors@R: c(
     person(

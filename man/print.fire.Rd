@@ -29,11 +29,10 @@ The input object (invisibly) for piping. Prints to console:
 Compact display of \code{fire_matrix} or \code{fire_tensor} objects.
 }
 \examples{
-\dontrun{
 data(Manure)
-mod <- fire(X = Manure$absorp, Y = Manure$y$DM, dat_T = list(1:700))
+mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 print(mod)
-}
 
 }
 \seealso{

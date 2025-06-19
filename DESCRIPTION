@@ -12,7 +12,7 @@ Authors@R: c(
 Description: Provide methods to perform functional I-prior regression model with RKHS norm.
     The estimation of hyperparameters is done via EM algorithm.
 License: GPL (>= 3.0)
-Language: en-GB
+Language: en-US
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
@@ -26,7 +26,8 @@ Imports:
   gridExtra,
   ggplot2
 Suggests: 
-    testthat 
+    spelling,
+    testthat
 RoxygenNote: 7.3.2
 URL: https://github.com/ZiqingHo/fire
 BugReports: https://github.com/ZiqingHo/fire/issues

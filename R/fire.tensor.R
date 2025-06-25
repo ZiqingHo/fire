@@ -67,7 +67,7 @@ fire.tensor <- function(X, Y, ...,
     }else if(kernel_iprior == 'linear'){
       iprior_param <- 0
     }else if(kernel_iprior == 'poly'){
-      iprior_param <- c(2, 0)
+      iprior_param <- c(2, mean(Y))
     }
   }
 

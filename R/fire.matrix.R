@@ -112,7 +112,7 @@ fire.matrix <- function(X, Y,...,
       H.tilde <- nmat + iprior_param
     }else if (kernel_iprior == 'poly'){
       if (is.null(iprior_param)) {
-        iprior_param <- c(2, 0)
+        iprior_param <- c(2, mean(Y))
       }
       H.tilde <-  (nmat + iprior_param[2])^iprior_param[1]
     }
@@ -286,7 +286,7 @@ Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
       H.tilde <- nmat + iprior_param
     }else if (kernel_iprior == 'poly'){
       if (is.null(iprior_param)) {
-        iprior_param <- c(2, 0)
+        iprior_param <- c(2, mean(Y))
       }
       H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
     } else {

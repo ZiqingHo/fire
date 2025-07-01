@@ -168,7 +168,7 @@ fire.matrix <- function(X, Y,...,
         diff.loglik = loglik[niter + 1]
       } else {
         diff.loglik = loglik[niter + 1] - loglik[niter]
-        if (loglik[niter + 1] < loglik[niter]) break
+        if (loglik[niter + 1] < loglik[niter] - 0.1) break # numerical optimization may have rounding error
       }
 
       niter = niter + 1
@@ -211,11 +211,23 @@ fire.matrix <- function(X, Y,...,
       stop.eps
     ))
   } else {
-    warning(sprintf(
-      "Did not converge after %d iterations (final rel. change: %.1e)",
-      maxiter,
-      abs(best_result$diff.loglik)
-    ))
+    if(best_result$niter < maxiter) {
+      warning(sprintf(
+        "Stopped early at iteration %d/%d despite non-decreasing mlogLik.
+        Possible convergence to saddle point or very flat region.
+        Final mlogLik: %.3f (rel. change: %.1e)",
+        best_result$niter,
+        maxiter,
+        tail(best_result$mloglik, 1),
+        abs(best_result$diff.loglik)
+      ))
+    } else {
+      warning(sprintf(
+        "Did not converge after %d iterations (final rel. change: %.1e)",
+        maxiter,
+        abs(best_result$diff.loglik)
+      ))
+    }
   }
 
   # Return structured result

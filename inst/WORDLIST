@@ -1,11 +1,16 @@
+AAPL
+AMZN
+AdjClose
 Asymptote
 Damay
 Davrieux
+EBITDA
 FIRe
 Fouad
 Gogé
 Humber
 Lengthscale
+MSFT
 Morvan
 Moussard
 NIR
@@ -14,6 +19,7 @@ Precompute
 Precomputed
 RBF
 RKHS
+TEV
 Thuriès
 Vectorized
 cfbm
@@ -24,6 +30,7 @@ ggplot
 gridExtra
 iprior
 lengthscale
+lr
 nd
 nm
 parallelization

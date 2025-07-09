@@ -2,3 +2,9 @@
 ^\.Rproj\.user$
 ^\.github$
 ^\.RDataTmp$
+^.*\.Rcheck$
+^doc$
+^Meta$
+^\.Rd2pdf.*
+^\.Rhistory$
+^\.httr-oauth$

@@ -9,7 +9,7 @@
 \alias{rbf}
 \alias{polynomial}
 \alias{mercer}
-\title{Kernel Functions for FIRe}
+\title{Kernel Functions for FIRE}
 \usage{
 fbm(X, Hurst = 0.5)
 
@@ -28,7 +28,7 @@ mercer(X, delta = 1, max_terms = 1000, center = F)
 \arguments{
 \item{X}{Input data (vector or matrix)}
 
-\item{Hurst}{Hurst parameter for fbm/cfbm (0 < Hurst ≤ 1)}
+\item{Hurst}{Hurst parameter for fbm/cfbm (between 0 and 1)}
 
 \item{center}{Logical indicating whether to center the kernel matrix}
 

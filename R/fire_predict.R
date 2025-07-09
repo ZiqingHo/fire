@@ -1,10 +1,12 @@
-#' Prediction methods for FIRe models
+#' Prediction methods for FIRE models
 #'
+#' @description
 #' Obtain predicted values from \code{fire_matrix} or \code{fire_tensor} object, optionally with test set evaluation.
 #'
 #' @param object A \code{fire_matrix} or \code{fire_tensor} object
 #' @param newdata New data for prediction
 #' @param Ynew Optional numeric vector of true response values for the \code{newdata}. Must be the same length as the number of rows in \code{newdata}.
+#' @param x A \code{fire_prediction} object to print
 #' @param ... Not used
 #' @return A list of class \code{fire_prediction} containing the predicted values,
 #' and including test RMSE, residuals if \code{Ynew} is provided.
@@ -25,9 +27,26 @@
 #' Ynew = Manure$y$DM[idx+10])
 #'
 #' @seealso \code{\link{fire}}
+#' @name predict.fire
+NULL
 
 #' @rdname predict.fire
 #' @export
+predict <- function(object, ...) {
+  UseMethod("predict")
+}
+
+#' @rdname predict.fire
+#' @export
+predict.fire <- function(object, newdata, Ynew = NULL, ...) {
+  if (inherits(object, "fire_matrix")) {
+    predict.fire_matrix(object, newdata, Ynew, ...)
+  } else if (inherits(object, "fire_tensor")) {
+    predict.fire_tensor(object, newdata, Ynew, ...)
+  }
+}
+
+#' @rdname predict.fire
 predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")
@@ -130,7 +149,6 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
 }
 
 #' @rdname predict.fire
-#' @export
 predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")
@@ -222,10 +240,9 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
 
 
 #' @rdname predict.fire
-#' @param x A \code{fire_prediction} object to print
 #' @export
 print.fire_prediction <- function(x, ...) {
-  cat("FIRe Model Predictions\n")
+  cat("FIRE Model Predictions\n")
   cat("----------------------\n")
   cat(sprintf("Number of predictions: %d\n", length(x$yhat)))
   if (!is.null(x$test_metrics)) {

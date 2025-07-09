@@ -1,8 +1,10 @@
-#' Plot method for FIRe models
+#' Plot method for FIRE models
 #'
+#' @description
 #' The type of plot produced depends on
 #' the class of the model object \code{fire_fitted} or \code{fire_prediction}
 #'
+#' @name plot.fire
 #' @param x A \code{fire_fitted} or \code{fire_prediction} object
 #' @param ... Not used
 #' @return Returns a ggplot object or a gridExtra-arranged plot object.
@@ -30,6 +32,8 @@
 #' Ypred = predict(mod, newdata = Manure$absorp[idx+10,],
 #' Ynew = Manure$y$DM[idx+10])
 #' plot(Ypred)
+#' @seealso \code{\link{fire}}, \code{\link{fitted.fire}}, \code{\link{predict.fire}}
+NULL
 
 #' @rdname plot.fire
 #' @export

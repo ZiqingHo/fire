@@ -1,4 +1,4 @@
-#' @title FIRe Model for Tensor Input
+#' @title FIRE Model for Tensor Input
 #' @param Y A numeric response vector
 #' @param scale Logical indicating whether to center the response by subtracting mean(Y)
 #' @param dat_T List of index sets for each mode

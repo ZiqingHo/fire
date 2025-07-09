@@ -1,7 +1,7 @@
-#' Fit a FIRe model
+#' Fit a FIRE model
 #'
 #' A function to perform functional regression using I-priors and Reproducing Kernel Hilbert Space (RKHS).
-#' The FIRe model parameters are estimated by using EM algorithm.
+#' The FIRE model parameters are estimated by using EM algorithm.
 #'
 #' @details
 #' The \code{fire} function is able to take matrix, data.frame, array and list inputs,

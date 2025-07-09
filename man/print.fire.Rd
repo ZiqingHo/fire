@@ -4,7 +4,7 @@
 \alias{print.fire}
 \alias{print.fire_matrix}
 \alias{print.fire_tensor}
-\title{Print method for FIRe models}
+\title{Print method for FIRE models}
 \usage{
 \method{print}{fire_matrix}(x, ...)
 

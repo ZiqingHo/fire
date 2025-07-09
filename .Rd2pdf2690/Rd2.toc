@@ -1,0 +1,14 @@
+\contentsline {subsection}{fire}{2}{page.2}
+\contentsline {subsection}{fitted.fire\_matrix}{5}{page.5}
+\contentsline {subsection}{Housing}{6}{page.6}
+\contentsline {subsection}{iprior\_get\_gram}{7}{page.7}
+\contentsline {subsection}{kernels\_fire}{8}{page.8}
+\contentsline {subsection}{Manure}{9}{page.9}
+\contentsline {subsection}{plot.fire\_fitted}{10}{page.10}
+\contentsline {subsection}{predict.fire\_matrix}{11}{page.11}
+\contentsline {subsection}{print.fire}{12}{page.12}
+\contentsline {subsection}{sim\_dat}{13}{page.13}
+\contentsline {subsection}{Stock}{14}{page.14}
+\contentsline {subsection}{summary.fire\_matrix}{15}{page.15}
+\contentsline {subsection}{utils\_tensor}{16}{page.16}
+\contentsline {chapter}{Index}{18}{page.18}

@@ -1,9 +1,11 @@
-#' Summary method for FIRe models
+#' Summary method for FIRE models
 #'
+#' @description
 #' Provides a comprehensive summary of \code{fire_matrix} or \code{fire_tensor} object, including estimated parameters,
 #' convergence information, model fit statistics, and kernel specifications.
 #'
 #' @param object A \code{fire_matrix} or \code{fire_tensor} object
+#' @param x A \code{summary.fire_matrix} or \code{summary.fire_tensor} object
 #' @param ... Not used
 #'
 #' @return
@@ -25,9 +27,28 @@
 #' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
 #'  dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 #' summary(mod)
+#'
+#' @seealso \code{\link{fire}}
+#' @name summary.fire
+NULL
 
 #' @rdname summary.fire
 #' @export
+summary <- function(object, ...) {
+  UseMethod("summary")
+}
+
+#' @rdname summary.fire
+#' @export
+summary.fire <- function(object, ...) {
+  if (inherits(object, "fire_matrix")) {
+    summary.fire_matrix(object, ...)
+  } else if (inherits(object, "fire_tensor")) {
+    summary.fire_tensor(object, ...)
+  }
+}
+
+#' @rdname summary.fire
 summary.fire_matrix <- function(object, ...) {
   # Get kernel information from attributes
   kernels <- attr(object, "kernels")
@@ -86,11 +107,10 @@ summary.fire_matrix <- function(object, ...) {
 }
 
 #' @rdname summary.fire
-#' @param x A \code{summary.fire_matrix} or \code{summary.fire_tensor} object
 #' @export
 print.summary.fire_matrix <- function(x, ...) {
   # Header with colored title
-  cat(cli::rule(left = crayon::blue("FIRe Model Summary"),
+  cat(cli::rule(left = crayon::blue("FIRE Model Summary"),
                 width = getOption("width")), "\n")
 
   # Model information
@@ -229,7 +249,7 @@ summary.fire_tensor <- function(object, ...) {
 #' @export
 print.summary.fire_tensor <- function(x, ...) {
   # Header with colored title
-  cat(cli::rule(left = crayon::blue("FIRe Tensor Model Summary"),
+  cat(cli::rule(left = crayon::blue("FIRE Tensor Model Summary"),
                 width = getOption("width")), "\n")
 
   # Model information

@@ -3,7 +3,7 @@
 \docType{package}
 \name{fire-package}
 \alias{fire-package}
-\title{FIRe: Functional I-prior Regression for Vectors and Tensors}
+\title{FIRE: Functional I-prior Regression for Vectors and Tensors}
 \description{
 Implements functional I-prior regression models for:
 \itemize{
@@ -13,7 +13,7 @@ Implements functional I-prior regression models for:
 using reproducing kernel Hilbert spaces (RKHS) with EM algorithm estimation.
 }
 \details{
-The FIRe package provides two specialized implementations:
+The FIRE package provides two specialized implementations:
 
 \strong{1. Vector Covariates} (via \code{\link{fire.matrix}}):
 - For design matrices X of dimension n × p
@@ -37,8 +37,8 @@ The main \code{fire()} dispatches to:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/yourusername/FIRe}
-  \item Report bugs at \url{https://github.com/yourusername/FIRe/issues}
+  \item \url{https://github.com/yourusername/FIRE}
+  \item Report bugs at \url{https://github.com/yourusername/FIRE/issues}
 }
 }
 \author{

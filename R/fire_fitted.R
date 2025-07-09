@@ -1,6 +1,7 @@
-#' Obtain fitted values of FIRe model
-#'
+#' Obtain fitted values of FIRE model
+#' @name fitted.fire
 #' @param object A \code{fire_matrix} or \code{fire_tensor} object
+#' @param x A \code{fire_fitted} object to print
 #' @param ... Not used
 #'
 #' @return A list of class \code{fire_fitted} containing the fitted values,
@@ -20,9 +21,25 @@
 #' fitted(mod)
 #'
 #' @seealso \code{\link{fire}}
+NULL
 
 #' @rdname fitted.fire
 #' @export
+fitted <- function(object, ...) {
+  UseMethod("fitted")
+}
+
+#' @rdname fitted.fire
+#' @export
+fitted.fire <- function(object, ...) {
+  if (inherits(object, "fire_matrix")) {
+    fitted.fire_matrix(object, ...)
+  } else if (inherits(object, "fire_tensor")) {
+    fitted.fire_tensor(object, ...)
+  }
+}
+
+#' @rdname fitted.fire
 fitted.fire_matrix <- function(object, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
@@ -101,7 +118,6 @@ fitted.fire_matrix <- function(object, ...) {
 }
 
 #' @rdname fitted.fire
-#' @export
 fitted.fire_tensor<- function(object, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
@@ -183,10 +199,9 @@ fitted.fire_tensor<- function(object, ...) {
 }
 
 #' @rdname fitted.fire
-#' @param x A \code{fire_fitted} object to print
 #' @export
 print.fire_fitted <- function(x, ...) {
-  cat("FIRe Model Fitted Results\n")
+  cat("FIRE Model Fitted Results\n")
   cat("-------------------------\n")
   cat(sprintf("Training RMSE: %.5f\n", x$rmse))
   cat(sprintf("Intercept: %.4f\n", x$intercept))

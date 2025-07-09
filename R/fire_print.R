@@ -1,4 +1,4 @@
-#' Print method for FIRe models
+#' Print method for FIRE models
 #'
 #' Compact display of \code{fire_matrix} or \code{fire_tensor} objects.
 #'
@@ -27,7 +27,7 @@ NULL
 #' @rdname print.fire
 #' @export
 print.fire_matrix <- function(x, ...) {
-  cat(cli::rule(left = "FIRe Model (Matrix Input)", col = "blue"), "\n")
+  cat(cli::rule(left = "FIRE Model (Matrix Input)", col = "blue"), "\n")
 
   conv_msg <- if (x$converged) {
     cli::col_green(sprintf("Converged in %d iterations", x$niter))
@@ -52,7 +52,7 @@ print.fire_matrix <- function(x, ...) {
 #' @rdname print.fire
 #' @export
 print.fire_tensor <- function(x, ...) {
-  cat(cli::rule(left = "FIRe Model (Tensor Input)", col = "blue"), "\n")
+  cat(cli::rule(left = "FIRE Model (Tensor Input)", col = "blue"), "\n")
 
   conv_msg <- if (x$converged) {
     cli::col_green(sprintf("Converged in %d iterations", x$niter))

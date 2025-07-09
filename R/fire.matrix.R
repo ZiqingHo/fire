@@ -1,4 +1,4 @@
-#' @title FIRe Model for Matrix Input
+#' @title FIRE Model for Matrix Input
 #' @param Y A numeric response vector
 #' @param scale Logical indicating whether to center the response by subtracting mean(Y)
 #' @param dat_T List of index sets for each mode

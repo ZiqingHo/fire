@@ -1,4 +1,4 @@
-#' Kernel Functions for FIRe
+#' Kernel Functions for FIRE
 #'
 #' A collection of kernel functions including:
 #' \itemize{
@@ -17,7 +17,7 @@ NULL
 
 #' @rdname kernels_fire
 #' @param X Input data (vector or matrix)
-#' @param Hurst Hurst parameter for fbm/cfbm (0 < Hurst ≤ 1)
+#' @param Hurst Hurst parameter for fbm/cfbm (between 0 and 1)
 #' @return A symmetric positive definite Gram matrix of size n x n where n is the
 #'   number of observations in X. The matrix has attributes including:
 #'   \itemize{

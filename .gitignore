@@ -1,7 +1,27 @@
+# ----- R Package Temporary Files -----
+.Rd2pdf*       # Rd2pdf temporary files
+*.aux          # LaTeX log files
+*.log
+*.out
+*.toc
+/*.Rcheck/     # R CMD check output
+revdep/        # Reverse dependency check artifacts
+
+# ----- R/RStudio Session Files -----
 .Rproj.user
 .Rhistory
+.RData
 .Rdata
+.Ruserdata
 .httr-oauth
-.DS_Store
-.quarto
-.RDataTmp
+.RDataTmp      # Temporary R data files
+
+# ----- OS/IDE Junk -----
+.DS_Store      # macOS clutter
+.quarto        # Quarto cache
+Thumbs.db      # Windows thumbnail cache
+
+# ----- Build/Test Artifacts -----
+Meta/          # R package metadata (if regenerated)
+doc/           # Built documentation (if not needed)
+*.tar.gz       # Built package tarballs

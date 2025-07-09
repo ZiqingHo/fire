@@ -49,6 +49,7 @@ summary.fire <- function(object, ...) {
 }
 
 #' @rdname summary.fire
+#' @export
 summary.fire_matrix <- function(object, ...) {
   # Get kernel information from attributes
   kernels <- attr(object, "kernels")

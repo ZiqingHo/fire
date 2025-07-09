@@ -40,6 +40,7 @@ fitted.fire <- function(object, ...) {
 }
 
 #' @rdname fitted.fire
+#' @export
 fitted.fire_matrix <- function(object, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
@@ -118,6 +119,7 @@ fitted.fire_matrix <- function(object, ...) {
 }
 
 #' @rdname fitted.fire
+#' @export
 fitted.fire_tensor<- function(object, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")

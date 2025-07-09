@@ -25,3 +25,5 @@ Thumbs.db      # Windows thumbnail cache
 Meta/          # R package metadata (if regenerated)
 doc/           # Built documentation (if not needed)
 *.tar.gz       # Built package tarballs
+.DS_Store
+.quarto

@@ -47,6 +47,7 @@ predict.fire <- function(object, newdata, Ynew = NULL, ...) {
 }
 
 #' @rdname predict.fire
+#' @export
 predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")
@@ -149,6 +150,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
 }
 
 #' @rdname predict.fire
+#' @export
 predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")

@@ -1,0 +1,120 @@
+\begin{theindex}
+
+  \item $*$ {\textbf  {datasets}}
+    \subitem \texttt  {Housing}, \hyperpage{6}
+    \subitem \texttt  {Manure}, \hyperpage{9}
+    \subitem \texttt  {Stock}, \hyperpage{14}
+
+  \indexspace
+
+  \item \texttt  {cfbm} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+  \item \texttt  {cfbm\_rkhs\_kron} \textit  {(\texttt  {iprior\_get\_gram})}, 
+		\hyperpage{7}
+  \item \texttt  {cfbm\_rkhs\_kron\_cross} \textit  {(\texttt  {iprior\_get\_gram})}, 
+		\hyperpage{7}
+  \item \texttt  {cfbm\_sd} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+
+  \indexspace
+
+  \item \texttt  {dat\_unfolding} \textit  {(\texttt  {utils\_tensor})}, 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item \texttt  {fbm} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+  \item \texttt  {fire}, \hyperpage{2}, \hyperindexformat{\textit}{5}, 
+		\hyperindexformat{\textit}{11, 12}
+  \item \texttt  {fire.matrix}, \hyperindexformat{\textit}{4}
+  \item \texttt  {fire.tensor}, \hyperindexformat{\textit}{4}
+  \item \texttt  {fitted.fire\_matrix}, \hyperpage{5}
+  \item \texttt  {fitted.fire\_tensor} \textit  {(\texttt  {fitted.fire\_matrix})}, 
+		\hyperpage{5}
+
+  \indexspace
+
+  \item \texttt  {Housing}, \hyperindexformat{\textit}{4}, 
+		\hyperpage{6}
+
+  \indexspace
+
+  \item \texttt  {iprior\_get\_gram}, \hyperpage{7}
+
+  \indexspace
+
+  \item \texttt  {kernels\_fire}, \hyperindexformat{\textit}{3, 4}, 
+		\hyperpage{8}, \hyperindexformat{\textit}{13, 14}
+  \item \texttt  {kronecker\_delta} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+  \item \texttt  {Kronecker\_norm\_cross}, 
+		\hyperindexformat{\textit}{7}
+  \item \texttt  {Kronecker\_norm\_mat}, \hyperindexformat{\textit}{7}
+
+  \indexspace
+
+  \item \texttt  {Manure}, \hyperindexformat{\textit}{4}, \hyperpage{9}
+  \item \texttt  {mercer} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+
+  \indexspace
+
+  \item \texttt  {plot.fire\_fitted}, \hyperpage{10}
+  \item \texttt  {plot.fire\_prediction} \textit  {(\texttt  {plot.fire\_fitted})}, 
+		\hyperpage{10}
+  \item \texttt  {polynomial} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+  \item \texttt  {predict.fire\_matrix}, \hyperpage{11}
+  \item \texttt  {predict.fire\_tensor} \textit  {(\texttt  {predict.fire\_matrix})}, 
+		\hyperpage{11}
+  \item \texttt  {print.fire}, \hyperpage{12}
+  \item \texttt  {print.fire\_fitted} \textit  {(\texttt  {fitted.fire\_matrix})}, 
+		\hyperpage{5}
+  \item \texttt  {print.fire\_matrix} \textit  {(\texttt  {print.fire})}, 
+		\hyperpage{12}
+  \item \texttt  {print.fire\_prediction} \textit  {(\texttt  {predict.fire\_matrix})}, 
+		\hyperpage{11}
+  \item \texttt  {print.fire\_tensor} \textit  {(\texttt  {print.fire})}, 
+		\hyperpage{12}
+  \item \texttt  {print.summary.fire\_matrix} \textit  {(\texttt  {summary.fire\_matrix})}, 
+		\hyperpage{15}
+  \item \texttt  {print.summary.fire\_tensor} \textit  {(\texttt  {summary.fire\_matrix})}, 
+		\hyperpage{15}
+
+  \indexspace
+
+  \item \texttt  {rbf} \textit  {(\texttt  {kernels\_fire})}, 
+		\hyperpage{8}
+  \item \texttt  {rbf\_rkhs\_kron} \textit  {(\texttt  {iprior\_get\_gram})}, 
+		\hyperpage{7}
+  \item \texttt  {rbf\_rkhs\_kron\_cross} \textit  {(\texttt  {iprior\_get\_gram})}, 
+		\hyperpage{7}
+  \item \texttt  {reshape\_tensor} \textit  {(\texttt  {utils\_tensor})}, 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item \texttt  {sim\_dat}, \hyperpage{13}
+  \item \texttt  {Stock}, \hyperpage{14}
+  \item \texttt  {summary.fire\_matrix}, \hyperpage{15}
+  \item \texttt  {summary.fire\_tensor} \textit  {(\texttt  {summary.fire\_matrix})}, 
+		\hyperpage{15}
+
+  \indexspace
+
+  \item \texttt  {tensor\_sample} \textit  {(\texttt  {utils\_tensor})}, 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item \texttt  {unfolding} \textit  {(\texttt  {utils\_tensor})}, 
+		\hyperpage{16}
+  \item \texttt  {utils\_tensor}, \hyperpage{16}
+
+  \indexspace
+
+  \item \texttt  {vectorize\_tensor} \textit  {(\texttt  {utils\_tensor})}, 
+		\hyperpage{16}
+
+\end{theindex}

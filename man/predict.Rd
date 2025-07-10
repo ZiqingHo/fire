@@ -18,10 +18,10 @@ predict(object, ...)
 \value{
 A list of class `fire_prediction` containing:
 \itemize{
-  \item `yhat`: Predicted values
-  \item `y.actual`: True values (if `Ynew` provided)
-  \item `test_metrics`: RMSE and residuals (if `Ynew` provided)
-  \item `model`: Reference to the original model
+  \item \code{yhat}: Predicted values
+  \item \code{y.actual}: True values (if \code{Ynew} provided)
+  \item \code{test_metrics}: RMSE and residuals (if \code{Ynew} provided)
+  \item \code{model}: Reference to the original model
 }
 }
 \description{

@@ -7,7 +7,7 @@
 #' @param ... Not used.
 #'
 #' @return
-#' An object of class `summary.fire_matrix` or `summary.fire_tensor` containing:
+#' An object of class \code{summary.fire_matrix} or \code{summary.fire_tensor} containing:
 #' \itemize{
 #'   \item Estimated parameters (lambda/alpha, noise, intercept)
 #'   \item Convergence information
@@ -29,7 +29,8 @@ summary <- function(object, ...) {
 #' @description
 #' Detailed summary of FIRE models with matrix input data.
 #'
-#' @inheritParams summary
+#' @param object A model object of class \code{fire_matrix}.
+#' @param ... Not used.
 #'
 #' @examples
 #' data(Manure)
@@ -101,7 +102,7 @@ summary.fire_matrix <- function(object, ...) {
 #' @description
 #' Displays formatted summary output for matrix-based FIRE models.
 #'
-#' @param x A `summary.fire_matrix` object.
+#' @param x A \code{summary.fire_matrix} object.
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.
@@ -176,7 +177,8 @@ print.summary.fire_matrix <- function(x, ...) {
 #' @description
 #' Detailed summary of FIRE models with tensor input data.
 #'
-#' @inheritParams summary
+#' @param object A model object of class \code{fire_tensor}.
+#' @param ... Not used.
 #'
 #' @examples
 #' data(Housing)
@@ -264,7 +266,7 @@ summary.fire_tensor <- function(object, ...) {
 #' @description
 #' Displays formatted summary output for tensor-based FIRE models.
 #'
-#' @param x A `summary.fire_tensor` object.
+#' @param x A \code{summary.fire_tensor} object.
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.

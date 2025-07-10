@@ -7,7 +7,7 @@
 \method{print}{summary.fire_tensor}(x, ...)
 }
 \arguments{
-\item{x}{A `summary.fire_tensor` object.}
+\item{x}{A \code{summary.fire_tensor} object.}
 
 \item{...}{Not used.}
 }

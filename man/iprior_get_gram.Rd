@@ -17,11 +17,11 @@ cfbm_rkhs_kron(nmat, Hurst = 0.5)
 cfbm_rkhs_kron_cross(nmat, nmat_cross, Hurst = 0.5)
 }
 \arguments{
-\item{nmat}{RKHS norm matrix from \code{\link{Kronecker_norm_mat}}}
+\item{nmat}{RKHS norm matrix of training data}
 
 \item{lengthscale}{Lengthscale parameter for RBF kernel}
 
-\item{nmat_cross}{RKHS norm matrix from \code{\link{Kronecker_norm_cross}}}
+\item{nmat_cross}{Matrix of RKHS norm between training and test data}
 
 \item{Hurst}{Hurst coefficient for cfbm kernel}
 }

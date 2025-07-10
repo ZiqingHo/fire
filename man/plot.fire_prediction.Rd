@@ -21,6 +21,6 @@ mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 pred <- predict(mod, newdata = Manure$absorp[6:10,],
                 Ynew = Manure$y$DM[6:10])
-plot(pred)  # Shows actual vs predicted and residuals
+plot(pred)
 
 }

@@ -7,7 +7,7 @@
 \method{summary}{fire_tensor}(object, ...)
 }
 \arguments{
-\item{object}{A model object of class \code{fire_matrix} or \code{fire_tensor}.}
+\item{object}{A model object of class \code{fire_tensor}.}
 
 \item{...}{Not used.}
 }

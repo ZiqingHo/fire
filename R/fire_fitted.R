@@ -6,13 +6,13 @@
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
 #' @param ... Not used.
 #'
-#' @return A list of class `fire_fitted` containing:
+#' @return A list of class \code{fire_fitted} containing:
 #' \itemize{
-#'   \item `yhat`: Fitted values
-#'   \item `rmse`: Training RMSE
-#'   \item `residuals`: Model residuals
-#'   \item `intercept`: Intercept value
-#'   \item `model`: Reference to the original model object
+#'   \item \code{yhat}: Fitted values
+#'   \item \code{rmse}: Training RMSE
+#'   \item \code{residuals}: Model residuals
+#'   \item \code{intercept}: Intercept value
+#'   \item \code{model}: Reference to the original model object
 #' }
 #'
 #' @seealso \code{\link{fire}}
@@ -222,9 +222,9 @@ fitted.fire_tensor<- function(object, ...) {
 #' Print FIRE Fitted Values
 #'
 #' @description
-#' Prints summarized results for `fire_fitted` objects.
+#' Prints summarized results for \code{fire_fitted} objects.
 #'
-#' @param x An object of class `fire_fitted`.
+#' @param x An object of class \code{fire_fitted}.
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.

@@ -8,3 +8,4 @@
 ^\.Rd2pdf.*
 ^\.Rhistory$
 ^\.httr-oauth$
+^README\.Rmd$

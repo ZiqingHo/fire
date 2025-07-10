@@ -12,13 +12,13 @@ fitted(object, ...)
 \item{...}{Not used.}
 }
 \value{
-A list of class `fire_fitted` containing:
+A list of class \code{fire_fitted} containing:
 \itemize{
-  \item `yhat`: Fitted values
-  \item `rmse`: Training RMSE
-  \item `residuals`: Model residuals
-  \item `intercept`: Intercept value
-  \item `model`: Reference to the original model object
+  \item \code{yhat}: Fitted values
+  \item \code{rmse}: Training RMSE
+  \item \code{residuals}: Model residuals
+  \item \code{intercept}: Intercept value
+  \item \code{model}: Reference to the original model object
 }
 }
 \description{

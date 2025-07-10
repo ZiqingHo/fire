@@ -1,4 +1,4 @@
-#' Plot method for FIRE models
+#' Plot Method for FIRE Models
 #'
 #' @description
 #' The type of plot produced depends on
@@ -8,13 +8,13 @@
 #' @param x A \code{fire_fitted} or \code{fire_prediction} object
 #' @param ... Not used
 #'
-#' @return Returns a ggplot object or a gridExtra-arranged plot object.
+#' @return Returns a plot object.
 #'   The exact return depends on the input:
 #'   \itemize{
-#'     \item For \code{fire_fitted} object: Returns a single ggplot object showing residuals vs fitted values
+#'     \item For \code{fire_fitted} object: Returns a single \code{ggplot} object showing residuals vs fitted values
 #'     \item For \code{fire_prediction} object:
 #'       \itemize{
-#'         \item When test data is available: Returns a gridExtra-arranged plot containing both
+#'         \item When test data is available: Returns a \code{gridExtra}-arranged plot containing both
 #'               residuals vs predicted and actual vs predicted plots
 #'         \item When no test data is available: Returns a single \code{ggplot} object showing
 #'               the distribution of predicted values with density overlay
@@ -85,7 +85,7 @@ plot.fire_fitted <- function(x, ...) {
 #'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
 #' pred <- predict(mod, newdata = Manure$absorp[6:10,],
 #'                 Ynew = Manure$y$DM[6:10])
-#' plot(pred)  # Shows actual vs predicted and residuals
+#' plot(pred)
 #'
 #' @export
 plot.fire_prediction <- function(x, ...) {

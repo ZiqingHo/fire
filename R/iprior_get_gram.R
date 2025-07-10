@@ -2,8 +2,8 @@
 #'
 #' @description Functions to compute various Gram matrices for I-prior models using RKHS norms.
 #'
-#' @param nmat RKHS norm matrix from \code{\link{Kronecker_norm_mat}}
-#' @param nmat_cross RKHS norm matrix from \code{\link{Kronecker_norm_cross}}
+#' @param nmat RKHS norm matrix of training data
+#' @param nmat_cross Matrix of RKHS norm between training and test data
 #' @param lengthscale Lengthscale parameter for RBF kernel
 #' @param Hurst Hurst coefficient for cfbm kernel
 #'

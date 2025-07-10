@@ -81,12 +81,12 @@
 #'
 #' @format A list with two components:
 #' \describe{
-#'   \item{features}{A 4-dimensional array [63 days × 8 features × 5 lags × 371 stocks]}
-#'   \item{y}{A vector [63 days] of S&P 500 log returns at the next time point}
+#'   \item{\code{features}}{A 4-dimensional array [63 days × 8 features × 5 lags × 371 stocks]}
+#'   \item{\code{y}}{A vector [63 days] of S&P 500 log returns at the next time point}
 #' }
 #'
 #' @details
-#' \strong{Component features:}
+#' \code{features}:
 #' \itemize{
 #'       \item{Date: Daily from 2023-01-03 to 2023-04-03 (63 trading days)}
 #'       \item{Features: 8 financial metrics:
@@ -105,7 +105,7 @@
 #'       \item{Tickers: 371 S&P 500 component stocks (e.g., "AAPL", "MSFT", "AMZN")}
 #' }
 #'
-#' \strong{Component y:}
+#' \code{y}:
 #' \itemize{
 #'   \item Log-returns of S&P 500 index at next trading day, calculated from adjusted closing prices
 #' }

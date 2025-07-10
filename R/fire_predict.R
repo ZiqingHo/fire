@@ -10,10 +10,10 @@
 #'
 #' @return A list of class `fire_prediction` containing:
 #' \itemize{
-#'   \item `yhat`: Predicted values
-#'   \item `y.actual`: True values (if `Ynew` provided)
-#'   \item `test_metrics`: RMSE and residuals (if `Ynew` provided)
-#'   \item `model`: Reference to the original model
+#'   \item \code{yhat}: Predicted values
+#'   \item \code{y.actual}: True values (if \code{Ynew} provided)
+#'   \item \code{test_metrics}: RMSE and residuals (if \code{Ynew} provided)
+#'   \item \code{model}: Reference to the original model
 #' }
 #'
 #' @seealso \code{\link{fire}}
@@ -255,9 +255,9 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
 #' Print FIRE Predictions
 #'
 #' @description
-#' Summarizes prediction results for `fire_prediction` objects.
+#' Summarizes prediction results for \code{fire_prediction} objects.
 #'
-#' @param x A `fire_prediction` object.
+#' @param x A \code{fire_prediction} object.
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.

@@ -2,7 +2,7 @@
 #' @param Y A numeric response vector
 #' @param scale Logical indicating whether to center the response by subtracting mean(Y)
 #' @param dat_T List of index sets for each mode
-#' @param kernels List of kernel functions for each mode, may refer \code{\link{kernels_fire}} for details
+#' @param kernels List of kernel functions for each mode (Check \code{\link{kernels_fire}} for details)
 #' @param kernels_params List of parameters for each kernel
 #' @param kernel_iprior Type of I-prior kernel
 #' @param iprior_param Parameter for I-prior kernel:

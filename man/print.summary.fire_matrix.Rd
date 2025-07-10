@@ -7,7 +7,7 @@
 \method{print}{summary.fire_matrix}(x, ...)
 }
 \arguments{
-\item{x}{A `summary.fire_matrix` object.}
+\item{x}{A \code{summary.fire_matrix} object.}
 
 \item{...}{Not used.}
 }

@@ -3,7 +3,7 @@
 \name{plot.fire}
 \alias{plot.fire}
 \alias{plot}
-\title{Plot method for FIRE models}
+\title{Plot Method for FIRE Models}
 \usage{
 plot(object, ...)
 }
@@ -13,13 +13,13 @@ plot(object, ...)
 \item{x}{A \code{fire_fitted} or \code{fire_prediction} object}
 }
 \value{
-Returns a ggplot object or a gridExtra-arranged plot object.
+Returns a plot object.
   The exact return depends on the input:
   \itemize{
-    \item For \code{fire_fitted} object: Returns a single ggplot object showing residuals vs fitted values
+    \item For \code{fire_fitted} object: Returns a single \code{ggplot} object showing residuals vs fitted values
     \item For \code{fire_prediction} object:
       \itemize{
-        \item When test data is available: Returns a gridExtra-arranged plot containing both
+        \item When test data is available: Returns a \code{gridExtra}-arranged plot containing both
               residuals vs predicted and actual vs predicted plots
         \item When no test data is available: Returns a single \code{ggplot} object showing
               the distribution of predicted values with density overlay

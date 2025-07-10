@@ -12,7 +12,7 @@ summary(object, ...)
 \item{...}{Not used.}
 }
 \value{
-An object of class `summary.fire_matrix` or `summary.fire_tensor` containing:
+An object of class \code{summary.fire_matrix} or \code{summary.fire_tensor} containing:
 \itemize{
   \item Estimated parameters (lambda/alpha, noise, intercept)
   \item Convergence information

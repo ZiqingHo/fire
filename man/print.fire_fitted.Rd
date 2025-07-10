@@ -7,7 +7,7 @@
 \method{print}{fire_fitted}(x, ...)
 }
 \arguments{
-\item{x}{An object of class `fire_fitted`.}
+\item{x}{An object of class \code{fire_fitted}.}
 
 \item{...}{Not used.}
 }
@@ -15,5 +15,5 @@
 Invisibly returns the input object.
 }
 \description{
-Prints summarized results for `fire_fitted` objects.
+Prints summarized results for \code{fire_fitted} objects.
 }

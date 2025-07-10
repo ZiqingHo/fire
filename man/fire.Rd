@@ -8,7 +8,7 @@
 \alias{fire.list}
 \alias{fire.matrix}
 \alias{fire.tensor}
-\title{Fit a FIRE model}
+\title{Fit a FIRE Model}
 \usage{
 fire(X, Y, ...)
 
@@ -86,7 +86,7 @@ fire(X, Y, ...)
 
 \item{scale}{Logical indicating whether to center the response by subtracting mean(Y)}
 
-\item{kernels}{List of kernel functions for each mode, may refer \code{\link{kernels_fire}} for details}
+\item{kernels}{List of kernel functions for each mode (Check \code{\link{kernels_fire}} for details)}
 
 \item{kernels_params}{List of parameters for each kernel}
 
@@ -125,15 +125,15 @@ A function to perform functional regression using I-priors and Reproducing Kerne
 The FIRE model parameters are estimated by using EM algorithm.
 }
 \details{
-The \code{fire} function is able to take matrix, data.frame, array and list inputs,
+The \code{fire} function is able to take \code{matrix}, \code{data.frame}, \code{array} and \code{list} inputs,
 the syntax is as per the default S3 method.
 }
 \section{Methods}{
 
 This generic function has methods for different input types:
 \itemize{
-  \item \code{\link{fire.matrix}} for matrix/data.frame inputs
-  \item \code{\link{fire.tensor}} for array/list inputs
+  \item \code{\link{fire.matrix}} for \code{matrix} or \code{data.frame} inputs
+  \item \code{\link{fire.tensor}} for \code{array} or \code{list} inputs
 }
 }
 

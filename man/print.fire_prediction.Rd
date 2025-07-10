@@ -7,7 +7,7 @@
 \method{print}{fire_prediction}(x, ...)
 }
 \arguments{
-\item{x}{A `fire_prediction` object.}
+\item{x}{A \code{fire_prediction} object.}
 
 \item{...}{Not used.}
 }
@@ -15,5 +15,5 @@
 Invisibly returns the input object.
 }
 \description{
-Summarizes prediction results for `fire_prediction` objects.
+Summarizes prediction results for \code{fire_prediction} objects.
 }

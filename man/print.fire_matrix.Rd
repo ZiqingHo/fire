@@ -18,6 +18,6 @@ Compact display of matrix-input FIRE models.
 data(Manure)
 mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
-print(mod)  # Or simply type 'mod'
+print(mod)
 
 }

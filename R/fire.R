@@ -1,10 +1,10 @@
-#' Fit a FIRE model
+#' Fit a FIRE Model
 #'
 #' A function to perform functional regression using I-priors and Reproducing Kernel Hilbert Space (RKHS).
 #' The FIRE model parameters are estimated by using EM algorithm.
 #'
 #' @details
-#' The \code{fire} function is able to take matrix, data.frame, array and list inputs,
+#' The \code{fire} function is able to take \code{matrix}, \code{data.frame}, \code{array} and \code{list} inputs,
 #' the syntax is as per the default S3 method.
 #'
 #' @param sample_id The sample mode identifier, either the 1st or last mode
@@ -16,8 +16,8 @@
 #' @section Methods:
 #' This generic function has methods for different input types:
 #' \itemize{
-#'   \item \code{\link{fire.matrix}} for matrix/data.frame inputs
-#'   \item \code{\link{fire.tensor}} for array/list inputs
+#'   \item \code{\link{fire.matrix}} for \code{matrix} or \code{data.frame} inputs
+#'   \item \code{\link{fire.tensor}} for \code{array} or \code{list} inputs
 #' }
 #'
 #' @seealso \code{\link{kernels_fire}}, \code{\link{Manure}}, \code{\link{Housing}}

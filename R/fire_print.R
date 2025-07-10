@@ -1,30 +1,40 @@
-#' Print method for FIRE models
+#' Print FIRE Model Objects
 #'
-#' Compact display of \code{fire_matrix} or \code{fire_tensor} objects.
+#' @description
+#' Compact display of FIRE model objects.
 #'
-#' @param x A \code{fire_matrix} or \code{fire_tensor} object
-#' @param ... Not used
+#' @param x A model object of class \code{fire_matrix} or \code{fire_tensor}.
+#' @param ... Not used.
 #'
 #' @return The input object (invisibly) for piping. Prints to console:
 #' \itemize{
-#' \item{Basic model information}
-#' \item{Convergence status}
-#' \item{Dimensions}
-#' \item{Estimated hyperparameters}
-#' \item{Marginal log-likelihood}
+#'   \item Model type (matrix/tensor)
+#'   \item Convergence status
+#'   \item Data dimensions
+#'   \item Marginal log-likelihood
+#'   \item Estimated hyperparameters
 #' }
+#'
+#' @seealso \code{\link{fire}}
+#' @export
+print <- function(x, ...) {
+  UseMethod("print")
+}
+
+#' Print for \code{fire_matrix} Objects
+#'
+#' @description
+#' Compact display of matrix-input FIRE models.
+#'
+#' @param x A model object of class \code{fire_matrix}.
+#' @param ... Not used.
 #'
 #' @examples
 #' data(Manure)
 #' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
-#'  dat_T = list(1:700), stop.eps = 2, maxiter = 4)
-#' print(mod)
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' print(mod)  # Or simply type 'mod'
 #'
-#' @seealso \code{\link{fire}}
-#' @name print.fire
-NULL
-
-#' @rdname print.fire
 #' @export
 print.fire_matrix <- function(x, ...) {
   cat(cli::rule(left = "FIRE Model (Matrix Input)", col = "blue"), "\n")
@@ -49,7 +59,23 @@ print.fire_matrix <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname print.fire
+#' Print for \code{fire_tensor} Objects
+#'
+#' @description
+#' Compact display of tensor-input FIRE models.
+#'
+#' @param x A model object of class \code{fire_tensor}.
+#' @param ... Not used.
+#'
+#' @examples
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
+#' print(mod)
+#'
 #' @export
 print.fire_tensor <- function(x, ...) {
   cat(cli::rule(left = "FIRE Model (Tensor Input)", col = "blue"), "\n")

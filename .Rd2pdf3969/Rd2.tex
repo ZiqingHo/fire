@@ -1,0 +1,1060 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `fire'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {fire: Functional I-prior Regression using RKHS norm}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {Ziqing Ho}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Functional I-prior Regression using RKHS norm}
+\item[Version]\AsIs{0.1.0}
+\item[Description]\AsIs{Provide methods to perform functional I-prior regression model with RKHS norm.
+The estimation of hyperparameters is done via EM algorithm.}
+\item[License]\AsIs{GPL (>= 3.0)}
+\item[Language]\AsIs{en-US}
+\item[Depends]\AsIs{R (>= 3.5.0)}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{true}
+\item[Imports]\AsIs{MASS,
+parallel,
+cli,
+knitr,
+crayon,
+gridExtra,
+ggplot2}
+\item[Suggests]\AsIs{spelling,
+testthat}
+\item[RoxygenNote]\AsIs{7.3.2}
+\item[URL]\AsIs{}\url{https://github.com/ZiqingHo/fire}\AsIs{}
+\item[BugReports]\AsIs{}\url{https://github.com/ZiqingHo/fire/issues}\AsIs{}
+\end{description}
+\Rdcontents{Contents}
+\HeaderA{fire}{Fit a FIRe model}{fire}
+\methaliasA{fire.array}{fire}{fire.array}
+\methaliasA{fire.data.frame}{fire}{fire.data.frame}
+\methaliasA{fire.default}{fire}{fire.default}
+\methaliasA{fire.list}{fire}{fire.list}
+\methaliasA{fire.matrix}{fire}{fire.matrix}
+\methaliasA{fire.tensor}{fire}{fire.tensor}
+%
+\begin{Description}
+A function to perform functional regression using I-priors and Reproducing Kernel Hilbert Space (RKHS).
+The FIRe model parameters are estimated by using EM algorithm.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+fire(X, Y, ...)
+
+## Default S3 method:
+fire(
+  X,
+  Y,
+  ...,
+  dat_T,
+  scale = TRUE,
+  kernels,
+  kernels_params,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  maxiter = 200,
+  stop.eps = 1e-05,
+  center = FALSE,
+  par_init = NULL,
+  os_type = "Apple",
+  asymptote = TRUE,
+  sample_id = 1
+)
+
+## S3 method for class 'data.frame'
+fire(X, Y, ...)
+
+## S3 method for class 'array'
+fire(X, Y, ...)
+
+## S3 method for class 'list'
+fire(X, Y, ...)
+
+## S3 method for class 'matrix'
+fire(
+  X,
+  Y,
+  ...,
+  dat_T,
+  scale = TRUE,
+  kernels = list(cfbm),
+  kernels_params = list(0.5),
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  maxiter = 200,
+  stop.eps = 1e-05,
+  center = FALSE,
+  par_init = NULL,
+  os_type = "Apple",
+  asymptote = TRUE
+)
+
+## S3 method for class 'tensor'
+fire(
+  X,
+  Y,
+  ...,
+  dat_T,
+  scale = TRUE,
+  kernels,
+  kernels_params,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  maxiter = 200,
+  stop.eps = 1e-05,
+  center = FALSE,
+  par_init = NULL,
+  constant = TRUE,
+  os_type = "Apple",
+  asymptote = TRUE,
+  sample_id = 1
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{X}] A numeric inputs in matrix, data.frame, array or list form
+
+\item[\code{Y}] A numeric response vector
+
+\item[\code{...}] Additional arguments passed to methods
+
+\item[\code{dat\_T}] List of index sets for each mode
+
+\item[\code{scale}] Logical indicating whether to center the response by subtracting mean(Y)
+
+\item[\code{kernels}] List of kernel functions for each mode, may refer \code{\LinkA{kernels\_fire}{kernels.Rul.fire}} for details
+
+\item[\code{kernels\_params}] List of parameters for each kernel
+
+\item[\code{kernel\_iprior}] Type of I-prior kernel
+
+\item[\code{iprior\_param}] Parameter for I-prior kernel:
+\begin{itemize}
+
+\item{} \code{"cfbm"} - Hurst
+\item{} \code{"rbf"} - lengthscale
+\item{} \code{"linear"} - offset
+\item{} \code{"poly"} - degree and offset
+
+\end{itemize}
+
+
+\item[\code{maxiter}] Maximum number of EM iterations
+
+\item[\code{stop.eps}] Convergence tolerance
+
+\item[\code{center}] Logical indicating whether to center the kernel matrix
+
+\item[\code{par\_init}] Optional list of initial parameter values (lambda, noise)
+
+\item[\code{os\_type}] Operating system type for compatibility ("Apple" or "Windows")
+
+\item[\code{asymptote}] Logical to use asymptotic initial values
+
+\item[\code{sample\_id}] The sample mode identifier, either the 1st or last mode
+
+\item[\code{constant}] Logical indicating whether to include the constant kernel term
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+The \code{fire} function is able to take matrix, data.frame, array and list inputs,
+the syntax is as per the default S3 method.
+\end{Details}
+%
+\begin{Value}
+An object of class \code{fire\_matrix} or \code{fire\_tensor}.
+The \code{print()} and \code{summary()} methods show the corresponding model information.
+\end{Value}
+%
+\begin{Section}{Methods}
+
+This generic function has methods for different input types:
+\begin{itemize}
+
+\item{} \code{\LinkA{fire.matrix}{fire.matrix}} for matrix/data.frame inputs
+\item{} \code{\LinkA{fire.tensor}{fire.tensor}} for array/list inputs
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{SeeAlso}
+\code{\LinkA{kernels\_fire}{kernels.Rul.fire}}, \code{\LinkA{Manure}{Manure}}, \code{\LinkA{Housing}{Housing}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# Matrix input
+data(Manure)
+mod1 <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+summary(mod1)
+
+# Array input
+data(Housing)
+dat_T <- list(T1 = 1:4, T2 = 1:9)
+mod2 <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+kernels = list(kronecker_delta, kronecker_delta),
+kernels_params = list(NA, NA),
+dat_T = dat_T, stop.eps = 2, maxiter = 4)
+summary(mod2)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{fitted.fire\_matrix}{Obtain fitted values of FIRe model}{fitted.fire.Rul.matrix}
+\aliasA{fitted.fire\_tensor}{fitted.fire\_matrix}{fitted.fire.Rul.tensor}
+\aliasA{print.fire\_fitted}{fitted.fire\_matrix}{print.fire.Rul.fitted}
+%
+\begin{Description}
+Obtain fitted values of FIRe model
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'fire_matrix'
+fitted(object, ...)
+
+## S3 method for class 'fire_tensor'
+fitted(object, ...)
+
+## S3 method for class 'fire_fitted'
+print(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] A \code{fire\_matrix} or \code{fire\_tensor} object
+
+\item[\code{...}] Not used
+
+\item[\code{x}] A \code{fire\_fitted} object to print
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list of class \code{fire\_fitted} containing the fitted values,
+training RMSE, residuals and intercept.
+
+The returned object has a \code{print} method that displays:
+\begin{itemize}
+
+\item{} Training RMSE
+\item{} Intercept value
+\item{} First few fitted values
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{SeeAlso}
+\code{\LinkA{fire}{fire}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+dat_T = list(1:700),, stop.eps = 2, maxiter = 4)
+fitted(mod)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{Housing}{England Regional Housing Prices}{Housing}
+\keyword{datasets}{Housing}
+%
+\begin{Description}
+A comprehensive dataset of monthly housing prices across England regions.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+Housing
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A list containing:
+\begin{description}
+
+\item[\code{X}] A 3D array of actual monthly prices in £ (132 months × 4 house types × 9 regions)
+\item[\code{y}] London average prices in £
+
+\end{description}
+
+\end{Format}
+%
+\begin{Details}
+\code{X}:
+\begin{itemize}
+
+\item{} \emph{Time Period}: January 2000 - December 2010 (132 months)
+\item{} \emph{House Types}:
+\begin{itemize}
+
+\item{} Detached
+\item{} Semi-Detached
+\item{} Terraced
+\item{} Flats
+
+\end{itemize}
+
+\item{} \emph{Regions}:
+\begin{itemize}
+
+\item{} London
+\item{} East of England
+\item{} South East
+\item{} West Midlands
+\item{} South West
+\item{} East Midlands
+\item{} North West
+\item{} Yorkshire \& Humber
+\item{} North East
+
+\end{itemize}
+
+
+\end{itemize}
+
+
+\code{y}:
+\begin{itemize}
+
+\item{} From February 2000 to January 2011
+\item{} average prices across all property types in London
+
+\end{itemize}
+
+\end{Details}
+%
+\begin{Source}
+HM Land Registry Open Data (2024). UK House Price Index.
+\url{https://landregistry.data.gov.uk/\#ukhpi}.
+Downloaded on 2024-12-24 and processed by package author.
+\end{Source}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Housing)
+
+# Get all detached home prices in London
+london_detached <- Housing$X[, "Detached", "London"]
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{iprior\_get\_gram}{Compute Gram Matrices for I-prior Models}{iprior.Rul.get.Rul.gram}
+\aliasA{cfbm\_rkhs\_kron}{iprior\_get\_gram}{cfbm.Rul.rkhs.Rul.kron}
+\aliasA{cfbm\_rkhs\_kron\_cross}{iprior\_get\_gram}{cfbm.Rul.rkhs.Rul.kron.Rul.cross}
+\aliasA{rbf\_rkhs\_kron}{iprior\_get\_gram}{rbf.Rul.rkhs.Rul.kron}
+\aliasA{rbf\_rkhs\_kron\_cross}{iprior\_get\_gram}{rbf.Rul.rkhs.Rul.kron.Rul.cross}
+%
+\begin{Description}
+Functions to compute various Gram matrices for I-prior models using RKHS norms.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+rbf_rkhs_kron(nmat, lengthscale = 1)
+
+rbf_rkhs_kron_cross(nmat_cross, lengthscale = 1)
+
+cfbm_rkhs_kron(nmat, Hurst = 0.5)
+
+cfbm_rkhs_kron_cross(nmat, nmat_cross, Hurst = 0.5)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{nmat}] RKHS norm matrix from \code{\LinkA{Kronecker\_norm\_mat}{Kronecker.Rul.norm.Rul.mat}}
+
+\item[\code{lengthscale}] Lengthscale parameter for RBF kernel
+
+\item[\code{nmat\_cross}] RKHS norm matrix from \code{\LinkA{Kronecker\_norm\_cross}{Kronecker.Rul.norm.Rul.cross}}
+
+\item[\code{Hurst}] Hurst coefficient for cfbm kernel
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A Gram matrix of appropriate dimensions:
+\begin{itemize}
+
+\item{} For \code{rbf\_rkhs\_kron} and \code{cfbm\_rkhs\_kron}: Square training Gram matrix
+\item{} For \code{rbf\_rkhs\_kron\_cross} and \code{cfbm\_rkhs\_kron\_cross}: Cross Gram matrix between test and training data
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# Using internal functions to compute pairwise RKHS norm
+G <- list(matrix(c(2,1,1,2),2), matrix(c(3,1,1,3),2))
+X <- list(matrix(rnorm(4),2), matrix(rnorm(4),2))
+nmat <- fire:::Kronecker_norm_mat(X, G, alpha=c(0.5,0.5))
+ncross <- fire:::Kronecker_norm_cross(X, X[1], G, alpha=c(0.5,0.5))
+
+# Get Gram matrices
+K_rbf <- rbf_rkhs_kron(nmat)
+K_cfbm <- cfbm_rkhs_kron(nmat)
+K_rbf_cross <- rbf_rkhs_kron_cross(ncross)
+K_cfbm_cross <- cfbm_rkhs_kron_cross(nmat, ncross)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{kernels\_fire}{Kernel Functions for FIRe}{kernels.Rul.fire}
+\aliasA{cfbm}{kernels\_fire}{cfbm}
+\aliasA{cfbm\_sd}{kernels\_fire}{cfbm.Rul.sd}
+\aliasA{fbm}{kernels\_fire}{fbm}
+\aliasA{kronecker\_delta}{kernels\_fire}{kronecker.Rul.delta}
+\aliasA{mercer}{kernels\_fire}{mercer}
+\aliasA{polynomial}{kernels\_fire}{polynomial}
+\aliasA{rbf}{kernels\_fire}{rbf}
+%
+\begin{Description}
+A collection of kernel functions including:
+\begin{itemize}
+
+\item{} \code{fbm}: Fractional Brownian motion kernel
+\item{} \code{cfbm}: Centered fractional Brownian motion kernel
+\item{} \code{cfbm\_sd}: Standardized cfbm kernel
+\item{} \code{kronecker\_delta}: Kronecker delta (identity) kernel
+\item{} \code{rbf}: Radial basis function (squared exponential) kernel
+\item{} \code{polynomial}: Polynomial kernel
+\item{} \code{mercer}: Mercer kernel with cosine basis
+
+\end{itemize}
+
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+fbm(X, Hurst = 0.5)
+
+cfbm(X, Hurst = 0.5)
+
+cfbm_sd(X, Hurst = 0.5)
+
+kronecker_delta(X, center = F)
+
+rbf(X, lengthscale = 1, center = F)
+
+polynomial(X, d = 1, offset = 0, center = F)
+
+mercer(X, delta = 1, max_terms = 1000, center = F)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{X}] Input data (vector or matrix)
+
+\item[\code{Hurst}] Hurst parameter for fbm/cfbm (0 < Hurst ≤ 1)
+
+\item[\code{center}] Logical indicating whether to center the kernel matrix
+
+\item[\code{lengthscale}] Bandwidth parameter for RBF kernel
+
+\item[\code{d}] Degree of polynomial
+
+\item[\code{offset}] Constant offset in polynomial kernel
+
+\item[\code{delta}] Smoothness parameter for Mercer kernel
+
+\item[\code{max\_terms}] Maximum number of terms in Mercer series expansion
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A symmetric positive definite Gram matrix of size n x n where n is the
+number of observations in X. The matrix has attributes including:
+\begin{itemize}
+
+\item{} "kernel" - the type of kernel used
+\item{} "parameters" - the kernel parameters used
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+set.seed(1)
+X <- matrix(rnorm(4), ncol=2)
+
+# Different kernels
+fbm(X)
+cfbm(X)
+cfbm_sd(X)
+kronecker_delta(X)
+rbf(X)
+polynomial(X, d = 2, offset = 1)
+mercer(X)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{Manure}{French Manure Data}{Manure}
+\keyword{datasets}{Manure}
+%
+\begin{Description}
+Combined near-infrared spectra and chemical composition measurements of cattle and poultry manure samples.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+Manure
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A list containing two components:
+\begin{description}
+
+\item[\code{absorp}] A matrix of NIR absorbance spectra (332 samples × 700 wavelengths). Wavelength range: 1100-2500 nm (2 nm resolution)
+\item[\code{y}] A matrix of chemical measurements (332 samples × 3 variables)
+\begin{itemize}
+
+\item{} \code{DM}: Dry matter content (\% of wet weight)
+\item{} \code{NH4}: Total ammonium nitrogen (\% of wet weight)
+\item{} \code{N}: Total nitrogen (\% of wet weight)
+
+\end{itemize}
+
+
+\end{description}
+
+\end{Format}
+%
+\begin{References}
+Gogé, F., Thuriès, L., Fouad, Y., Damay, N., Davrieux, F., Moussard, G., ... \& Morvan, T. (2021).
+Dataset of chemical and near-infrared spectroscopy measurements of fresh and dried poultry and cattle manure.
+\emph{Data in Brief}, 34, 106647. \Rhref{https://doi.org/10.1016/j.dib.2020.106647}{doi:10.1016\slash{}j.dib.2020.106647}
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{plot.fire\_fitted}{Plot method for FIRe models}{plot.fire.Rul.fitted}
+\aliasA{plot.fire\_prediction}{plot.fire\_fitted}{plot.fire.Rul.prediction}
+%
+\begin{Description}
+The type of plot produced depends on
+the class of the model object \code{fire\_fitted} or \code{fire\_prediction}
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'fire_fitted'
+plot(x, ...)
+
+## S3 method for class 'fire_prediction'
+plot(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] A \code{fire\_fitted} or \code{fire\_prediction} object
+
+\item[\code{...}] Not used
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns a ggplot object or a gridExtra-arranged plot object.
+The exact return depends on the input:
+\begin{itemize}
+
+\item{} For \code{fire\_fitted} object: Returns a single ggplot object showing residuals vs fitted values
+\item{} For \code{fire\_prediction} object:
+\begin{itemize}
+
+\item{} When test data is available: Returns a gridExtra-arranged plot containing both
+residuals vs predicted and actual vs predicted plots
+\item{} When no test data is available: Returns a single ggplot object showing
+the distribution of predicted values with density overlay
+
+\end{itemize}
+
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+idx <- 1:5
+mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+
+Yfitted = fitted(mod)
+plot(Yfitted)
+
+Ypred = predict(mod, newdata = Manure$absorp[idx+10,],
+Ynew = Manure$y$DM[idx+10])
+plot(Ypred)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{predict.fire\_matrix}{Prediction methods for FIRe models}{predict.fire.Rul.matrix}
+\aliasA{predict.fire\_tensor}{predict.fire\_matrix}{predict.fire.Rul.tensor}
+\aliasA{print.fire\_prediction}{predict.fire\_matrix}{print.fire.Rul.prediction}
+%
+\begin{Description}
+Obtain predicted values from \code{fire\_matrix} or \code{fire\_tensor} object, optionally with test set evaluation.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'fire_matrix'
+predict(object, newdata, Ynew = NULL, ...)
+
+## S3 method for class 'fire_tensor'
+predict(object, newdata, Ynew = NULL, ...)
+
+## S3 method for class 'fire_prediction'
+print(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] A \code{fire\_matrix} or \code{fire\_tensor} object
+
+\item[\code{newdata}] New data for prediction
+
+\item[\code{Ynew}] Optional numeric vector of true response values for the \code{newdata}. Must be the same length as the number of rows in \code{newdata}.
+
+\item[\code{...}] Not used
+
+\item[\code{x}] A \code{fire\_prediction} object to print
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list of class \code{fire\_prediction} containing the predicted values,
+and including test RMSE, residuals if \code{Ynew} is provided.
+
+The returned object has a \code{print} method that displays:
+\begin{itemize}
+
+\item{} Number of predictions
+\item{} Test RMSE (if available)
+\item{} First few predicted values
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{SeeAlso}
+\code{\LinkA{fire}{fire}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+idx <- 1:5
+mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
+dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+predict(mod, newdata = Manure$absorp[idx+10,],
+Ynew = Manure$y$DM[idx+10])
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{print.fire}{Print method for FIRe models}{print.fire}
+\aliasA{print.fire\_matrix}{print.fire}{print.fire.Rul.matrix}
+\aliasA{print.fire\_tensor}{print.fire}{print.fire.Rul.tensor}
+%
+\begin{Description}
+Compact display of \code{fire\_matrix} or \code{fire\_tensor} objects.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'fire_matrix'
+print(x, ...)
+
+## S3 method for class 'fire_tensor'
+print(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] A \code{fire\_matrix} or \code{fire\_tensor} object
+
+\item[\code{...}] Not used
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The input object (invisibly) for piping. Prints to console:
+\begin{itemize}
+
+\item{} Basic model information
+\item{} Convergence status
+\item{} Dimensions
+\item{} Estimated hyperparameters
+\item{} Marginal log-likelihood
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{SeeAlso}
+\code{\LinkA{fire}{fire}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+print(mod)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{sim\_dat}{Simulate Multi-dimensional Functional Data with I-prior}{sim.Rul.dat}
+%
+\begin{Description}
+Generates simulated data for multi-dimensional functional regression models using
+I-prior methodology.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+sim_dat(
+  kernels,
+  kernels_param,
+  alpha,
+  dat_T,
+  tau = 1,
+  intercept_y = 0,
+  intercept_x = 0,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  sigma_v = 1,
+  sigma = 1,
+  sigma_w = NULL,
+  constant = TRUE,
+  center = FALSE,
+  N,
+  Ntrain,
+  os_type = "Apple",
+  cores = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{kernels}] List of kernel functions for each mode, may refer to \code{\LinkA{kernels\_fire}{kernels.Rul.fire}}
+
+\item[\code{kernels\_param}] List of parameters for each kernel function
+
+\item[\code{alpha}] Vector of scale parameters for \code{kernels}
+
+\item[\code{dat\_T}] List of index sets for each mode
+
+\item[\code{tau}] Scale parameter for the I-prior kernel
+
+\item[\code{intercept\_y}] Intercept term for response
+
+\item[\code{intercept\_x}] Intercept term for covariates
+
+\item[\code{kernel\_iprior}] Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly')
+
+\item[\code{iprior\_param}] Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf)
+
+\item[\code{sigma\_v}] Standard deviation for random effects
+
+\item[\code{sigma}] Noise standard deviation
+
+\item[\code{sigma\_w}] Standard deviation for weights
+
+\item[\code{constant}] Logical indicating whether to include constant kernel term
+
+\item[\code{center}] Whether to center the kernel matrices
+
+\item[\code{N}] Total sample size
+
+\item[\code{Ntrain}] Training sample size
+
+\item[\code{os\_type}] Operating system type ('Apple' or 'Windows')
+
+\item[\code{cores}] Number of cores used in parallel computation
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list containing:
+\begin{itemize}
+
+\item{} X: Simulated covariate data
+\item{} y: Simulated response vector
+
+\end{itemize}
+
+\end{Value}
+%
+\begin{SeeAlso}
+\code{\LinkA{kernels\_fire}{kernels.Rul.fire}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# 2D example
+set.seed(1)
+dat_T <- list(1:3, 1:2)
+sim_dat(kernels = list(cfbm, rbf), kernels_param = list(0.5, 1),
+alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5, os_type = 'Apple', cores = 1)
+
+# 3D example
+set.seed(1)
+dat_T <- list(1:3, 1:2, 1:4)
+sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
+alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
+kernel_iprior = 'rbf', os_type = 'Apple', cores = 1)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{Stock}{S\&P 500 Component Stocks Dataset (Q1 2023)}{Stock}
+\keyword{datasets}{Stock}
+%
+\begin{Description}
+A comprehensive dataset containing daily market data for S\&P 500 component stocks
+and corresponding index returns for Q1 2023.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+Stock
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A list with two components:
+\begin{description}
+
+\item[features] A 4-dimensional array [63 days × 8 features × 5 lags × 371 stocks]
+\item[y] A vector [63 days] of S\&P 500 log returns at the next time point
+
+\end{description}
+
+\end{Format}
+%
+\begin{Details}
+\strong{Component features:}
+\begin{itemize}
+
+\item{} Date: Daily from 2023-01-03 to 2023-04-03 (63 trading days)
+\item{} Features: 8 financial metrics:
+\begin{itemize}
+
+\item{} lr\_AdjClose: Log returns of adjusted closing price
+\item{} lr\_Close: Log returns of closing price
+\item{} lr\_High: Log returns of daily high price
+\item{} lr\_Low: Log returns of daily low price
+\item{} lr\_Open: Log returns of opening price
+\item{} log\_Volume: Logarithm of trading volume
+\item{} PB: Price-to-book ratio
+\item{} TE: TEV/EBITDA
+
+\end{itemize}
+
+
+\item{} Lags: 5 time points (T0 = current day, T1-T4 = previous days)
+\item{} Tickers: 371 S\&P 500 component stocks (e.g., "AAPL", "MSFT", "AMZN")
+
+\end{itemize}
+
+
+\strong{Component y:}
+\begin{itemize}
+
+\item{} Log-returns of S\&P 500 index at next trading day, calculated from adjusted closing prices
+
+\end{itemize}
+
+\end{Details}
+%
+\begin{Source}
+\begin{itemize}
+
+\item{} Yahoo Finance for price/volume data and log returns
+\item{} Capital IQ for fundamental ratios
+
+\end{itemize}
+
+\end{Source}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Stock)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{summary.fire\_matrix}{Summary method for FIRe models}{summary.fire.Rul.matrix}
+\aliasA{print.summary.fire\_matrix}{summary.fire\_matrix}{print.summary.fire.Rul.matrix}
+\aliasA{print.summary.fire\_tensor}{summary.fire\_matrix}{print.summary.fire.Rul.tensor}
+\aliasA{summary.fire\_tensor}{summary.fire\_matrix}{summary.fire.Rul.tensor}
+%
+\begin{Description}
+Provides a comprehensive summary of \code{fire\_matrix} or \code{fire\_tensor} object, including estimated parameters,
+convergence information, model fit statistics, and kernel specifications.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'fire_matrix'
+summary(object, ...)
+
+## S3 method for class 'summary.fire_matrix'
+print(x, ...)
+
+## S3 method for class 'fire_tensor'
+summary(object, ...)
+
+## S3 method for class 'summary.fire_tensor'
+print(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] A \code{fire\_matrix} or \code{fire\_tensor} object
+
+\item[\code{...}] Not used
+
+\item[\code{x}] A \code{summary.fire\_matrix} or \code{summary.fire\_tensor} object
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+For \code{summary.fire\_matrix} and \code{summary.fire\_tensor}:
+Returns an object of class \code{summary.fire\_matrix} or \code{summary.fire\_tensor}
+containing:
+\begin{itemize}
+
+\item{} Estimated parameters
+\item{} Convergence information
+\item{} Model fit statistics
+\item{} Kernel specifications
+\item{} Computation timing
+
+\end{itemize}
+
+
+The \code{print} methods for these objects display nicely formatted output to the console.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(Manure)
+mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
+ dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+summary(mod)
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{utils\_tensor}{Tensor Utility Functions}{utils.Rul.tensor}
+\aliasA{dat\_unfolding}{utils\_tensor}{dat.Rul.unfolding}
+\aliasA{reshape\_tensor}{utils\_tensor}{reshape.Rul.tensor}
+\aliasA{tensor\_sample}{utils\_tensor}{tensor.Rul.sample}
+\aliasA{unfolding}{utils\_tensor}{unfolding}
+\aliasA{vectorize\_tensor}{utils\_tensor}{vectorize.Rul.tensor}
+%
+\begin{Description}
+Collection of helper functions for tensor operations
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+tensor_sample(X, sample_id = 1)
+
+vectorize_tensor(X, Index)
+
+reshape_tensor(Mat, dim, N, Index)
+
+unfolding(X, n, mode = TRUE)
+
+dat_unfolding(X, sample_id = 1, mode = TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{X}] Input tensor
+
+\item[\code{sample\_id}] Sampling mode (1st or last mode)
+
+\item[\code{Index}] Matrix of indices
+
+\item[\code{Mat}] A matrix with N rows, each containing values to be assigned to the corresponding positions in the output tensor
+
+\item[\code{dim}] Dimensions of output tensor
+
+\item[\code{N}] Sample size
+
+\item[\code{n}] Unfolding mode
+
+\item[\code{mode}] Logical to print status message
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+For \code{tensor\_sample}: List of tensor samples
+
+For `vectorize\_tensor`: Vectorized tensor elements
+
+For `reshape\_tensor`: A tensor with specified dimensions and the 1st mode corresponds to sampling mode
+
+For `unfolding`: Unfolded matrix
+
+For `dat\_unfolding`: List of mode-n unfolded matrices
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# tensor_sample()
+X <- array(1:24, dim = c(3,2,4))
+tensor_sample(X, sample_id = 1)
+# vectorize_tensor()
+X <- array(1:8, dim = c(2,2,2))
+idx <- expand.grid(T1 = 1:2, T2 = 1:2, T3 = 1:2)
+vectorize_tensor(X, idx)
+idx <- cbind(rep(1:2,each = 4), rep(c(1,1,2,2),2), rep(1:2, 4))
+vectorize_tensor(X, idx)
+# reshape_tensor()
+N <- 2
+Mat <- matrix(1:12, nrow = N)
+dim <- c(2,3)
+idx <- expand.grid(1:2, 1:3)
+reshape_tensor(Mat, dim, N, idx)
+# unfolding()
+X <- array(1:8, dim = c(2,2,2))
+unfolding(X, 1)
+# dat_unfolding()
+X <- array(1:24, dim = c(3,2,4))
+dat_unfolding(X, sample_id = 1)
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}

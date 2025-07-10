@@ -7,6 +7,7 @@
 #' @name plot.fire
 #' @param x A \code{fire_fitted} or \code{fire_prediction} object
 #' @param ... Not used
+#'
 #' @return Returns a ggplot object or a gridExtra-arranged plot object.
 #'   The exact return depends on the input:
 #'   \itemize{
@@ -15,7 +16,7 @@
 #'       \itemize{
 #'         \item When test data is available: Returns a gridExtra-arranged plot containing both
 #'               residuals vs predicted and actual vs predicted plots
-#'         \item When no test data is available: Returns a single ggplot object showing
+#'         \item When no test data is available: Returns a single \code{ggplot} object showing
 #'               the distribution of predicted values with density overlay
 #'       }
 #'   }
@@ -33,9 +34,26 @@
 #' Ynew = Manure$y$DM[idx+10])
 #' plot(Ypred)
 #' @seealso \code{\link{fire}}, \code{\link{fitted.fire}}, \code{\link{predict.fire}}
-NULL
+#' @export
+plot <- function(object, ...) {
+  UseMethod("plot")
+}
 
-#' @rdname plot.fire
+#' Plot for Fitted FIRE Models
+#'
+#' @description
+#' Generates residuals vs fitted values plot for training data.
+#'
+#' @param x A \code{fire_fitted} object
+#' @param ... Not used
+#'
+#' @examples
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' fit <- fitted(mod)
+#' plot(fit)
+#'
 #' @export
 plot.fire_fitted <- function(x, ...) {
   # Create residuals vs fitted plot
@@ -52,7 +70,23 @@ plot.fire_fitted <- function(x, ...) {
   invisible(p)
 }
 
-#' @rdname plot.fire
+#' Plot for FIRE Predictions
+#'
+#' @description
+#' Generates residuals vs predicted and actual vs predicted plots when test response is provide.
+#' Otherwise, generates the distribution of predicted values with density overlay.
+#'
+#' @param x A \code{fire_prediction} object
+#' @param ... Not used
+#'
+#' @examples
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' pred <- predict(mod, newdata = Manure$absorp[6:10,],
+#'                 Ynew = Manure$y$DM[6:10])
+#' plot(pred)  # Shows actual vs predicted and residuals
+#'
 #' @export
 plot.fire_prediction <- function(x, ...) {
   if (!is.null(x$test_metrics)) {

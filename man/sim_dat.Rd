@@ -4,29 +4,14 @@
 \alias{sim_dat}
 \title{Simulate Multi-dimensional Functional Data with I-prior}
 \usage{
-sim_dat(
-  kernels,
-  kernels_param,
-  alpha,
-  dat_T,
-  tau = 1,
-  intercept_y = 0,
-  intercept_x = 0,
-  kernel_iprior = "cfbm",
-  iprior_param = NULL,
-  sigma_v = 1,
-  sigma = 1,
-  sigma_w = NULL,
-  constant = TRUE,
-  center = FALSE,
-  N,
-  Ntrain,
-  os_type = "Apple",
-  cores = NULL
-)
+sim_dat(N, Ntrain, kernels, kernels_param, alpha, dat_T, control = list())
 }
 \arguments{
-\item{kernels}{List of kernel functions for each mode, may refer to \code{\link{kernels_fire}}}
+\item{N}{Total sample size}
+
+\item{Ntrain}{Training sample size.}
+
+\item{kernels}{List of kernel functions for each mode}
 
 \item{kernels_param}{List of parameters for each kernel function}
 
@@ -34,33 +19,7 @@ sim_dat(
 
 \item{dat_T}{List of index sets for each mode}
 
-\item{tau}{Scale parameter for the I-prior kernel}
-
-\item{intercept_y}{Intercept term for response}
-
-\item{intercept_x}{Intercept term for covariates}
-
-\item{kernel_iprior}{Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly')}
-
-\item{iprior_param}{Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf)}
-
-\item{sigma_v}{Standard deviation for random effects}
-
-\item{sigma}{Noise standard deviation}
-
-\item{sigma_w}{Standard deviation for weights}
-
-\item{constant}{Logical indicating whether to include constant kernel term}
-
-\item{center}{Whether to center the kernel matrices}
-
-\item{N}{Total sample size}
-
-\item{Ntrain}{Training sample size}
-
-\item{os_type}{Operating system type ('Apple' or 'Windows')}
-
-\item{cores}{Number of cores used in parallel computation}
+\item{control}{A list of control parameters (see Details)}
 }
 \value{
 A list containing:
@@ -73,21 +32,35 @@ A list containing:
 Generates simulated data for multi-dimensional functional regression models using
 I-prior methodology.
 }
+\details{
+The \code{control} argument can include the following parameters:
+\itemize{
+  \item \code{tau}: Scale parameter for the I-prior kernel (default: 1)
+  \item \code{intercept_y}: Intercept term for response (default: 0)
+  \item \code{intercept_x}: Intercept term for covariates (default: 0)
+  \item \code{kernel_iprior}: Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly') (default: 'cfbm')
+  \item \code{iprior_param}: Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf) (default: NULL)
+  \item \code{sigma_v}: Standard deviation for random effects (default: 1)
+  \item \code{sigma}: Noise standard deviation (default: 1)
+  \item \code{sigma_w}: Standard deviation for weights (default: NULL, which sets it to 1/sigma)
+  \item \code{constant}: Logical indicating whether to include constant kernel term (default: TRUE)
+  \item \code{center}: Whether to center the kernel matrices (default: FALSE)
+  \item \code{os_type}: Operating system type ('Apple' or 'Windows') (default: 'Apple')
+  \item \code{cores}: Number of cores used in parallel computation (default: NULL)
+}
+}
 \examples{
 # 2D example
 set.seed(1)
 dat_T <- list(1:3, 1:2)
 sim_dat(kernels = list(cfbm, rbf), kernels_param = list(0.5, 1),
-alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5, os_type = 'Apple', cores = 1)
+        alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5)
 
-# 3D example
+# 3D example with control parameters
 set.seed(1)
 dat_T <- list(1:3, 1:2, 1:4)
 sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
-alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
-kernel_iprior = 'rbf', os_type = 'Apple', cores = 1)
+        alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
+        control = list(kernel_iprior = 'rbf', sigma = 0.5))
 
-}
-\seealso{
-\code{\link{kernels_fire}}
 }

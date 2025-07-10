@@ -1,18 +1,21 @@
-#' Obtain fitted values of FIRE model
-#' @name fitted.fire
-#' @param object A \code{fire_matrix} or \code{fire_tensor} object
-#' @param x A \code{fire_fitted} object to print
-#' @param ... Not used
+#' Fitted Values for FIRE Models
 #'
-#' @return A list of class \code{fire_fitted} containing the fitted values,
-#' training RMSE, residuals and intercept.
+#' @description
+#' Computes fitted values for FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
 #'
-#' The returned object has a \code{print} method that displays:
+#' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
+#' @param ... Not used.
+#'
+#' @return A list of class `fire_fitted` containing:
 #' \itemize{
-#'   \item Training RMSE
-#'   \item Intercept value
-#'   \item First few fitted values
+#'   \item `yhat`: Fitted values
+#'   \item `rmse`: Training RMSE
+#'   \item `residuals`: Model residuals
+#'   \item `intercept`: Intercept value
+#'   \item `model`: Reference to the original model object
 #' }
+#'
+#' @seealso \code{\link{fire}}
 #'
 #' @examples
 #' data(Manure)
@@ -20,26 +23,26 @@
 #' dat_T = list(1:700),, stop.eps = 2, maxiter = 4)
 #' fitted(mod)
 #'
-#' @seealso \code{\link{fire}}
-NULL
-
-#' @rdname fitted.fire
 #' @export
 fitted <- function(object, ...) {
   UseMethod("fitted")
 }
 
-#' @rdname fitted.fire
-#' @export
-fitted.fire <- function(object, ...) {
-  if (inherits(object, "fire_matrix")) {
-    fitted.fire_matrix(object, ...)
-  } else if (inherits(object, "fire_tensor")) {
-    fitted.fire_tensor(object, ...)
-  }
-}
 
-#' @rdname fitted.fire
+#' Fitted Values for \code{fire_matrix} Objects
+#'
+#' @description
+#' Computes fitted values for FIRE models with matrix input data.
+#'
+#' @param object A model object of class \code{fire_matrix}.
+#' @param ... Not used.
+#'
+#' @examples
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:5, ], Y = Manure$y$DM[1:5],
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' fitted(mod)
+#'
 #' @export
 fitted.fire_matrix <- function(object, ...) {
   # Extract components from model object
@@ -118,7 +121,23 @@ fitted.fire_matrix <- function(object, ...) {
   return(result)
 }
 
-#' @rdname fitted.fire
+#' Fitted Values for \code{fire_tensor} Objects
+#'
+#' @description
+#' Computes fitted values for FIRE models with tensor input data.
+#'
+#' @param object A model object of class \code{fire_tensor}.
+#' @param ... Not used.
+#'
+#' @examples
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
+#' fitted(mod)
+#'
 #' @export
 fitted.fire_tensor<- function(object, ...) {
   # Extract components from model object
@@ -200,7 +219,16 @@ fitted.fire_tensor<- function(object, ...) {
   return(result)
 }
 
-#' @rdname fitted.fire
+#' Print FIRE Fitted Values
+#'
+#' @description
+#' Prints summarized results for `fire_fitted` objects.
+#'
+#' @param x An object of class `fire_fitted`.
+#' @param ... Not used.
+#'
+#' @return Invisibly returns the input object.
+#'
 #' @export
 print.fire_fitted <- function(x, ...) {
   cat("FIRE Model Fitted Results\n")

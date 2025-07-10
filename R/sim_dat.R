@@ -1,26 +1,32 @@
 #' Simulate Multi-dimensional Functional Data with I-prior
 #'
+#' @description
 #' Generates simulated data for multi-dimensional functional regression models using
 #' I-prior methodology.
 #'
-#' @param kernels List of kernel functions for each mode, may refer to \code{\link{kernels_fire}}
+#' @param N Total sample size
+#' @param Ntrain Training sample size.
+#' @param kernels List of kernel functions for each mode
 #' @param kernels_param List of parameters for each kernel function
 #' @param alpha Vector of scale parameters for \code{kernels}
 #' @param dat_T List of index sets for each mode
-#' @param tau Scale parameter for the I-prior kernel
-#' @param intercept_y Intercept term for response
-#' @param intercept_x Intercept term for covariates
-#' @param kernel_iprior Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly')
-#' @param iprior_param Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf)
-#' @param sigma_v Standard deviation for random effects
-#' @param sigma Noise standard deviation
-#' @param sigma_w Standard deviation for weights
-#' @param constant Logical indicating whether to include constant kernel term
-#' @param center Whether to center the kernel matrices
-#' @param N Total sample size
-#' @param Ntrain Training sample size
-#' @param os_type Operating system type ('Apple' or 'Windows')
-#' @param cores Number of cores used in parallel computation
+#' @param control A list of control parameters (see Details)
+#'
+#' @details The \code{control} argument can include the following parameters:
+#' \itemize{
+#'   \item \code{tau}: Scale parameter for the I-prior kernel (default: 1)
+#'   \item \code{intercept_y}: Intercept term for response (default: 0)
+#'   \item \code{intercept_x}: Intercept term for covariates (default: 0)
+#'   \item \code{kernel_iprior}: Type of I-prior kernel ('cfbm', 'rbf', 'linear' or 'poly') (default: 'cfbm')
+#'   \item \code{iprior_param}: Parameter for I-prior kernel (Hurst for cfbm, lengthscale for rbf) (default: NULL)
+#'   \item \code{sigma_v}: Standard deviation for random effects (default: 1)
+#'   \item \code{sigma}: Noise standard deviation (default: 1)
+#'   \item \code{sigma_w}: Standard deviation for weights (default: NULL, which sets it to 1/sigma)
+#'   \item \code{constant}: Logical indicating whether to include constant kernel term (default: TRUE)
+#'   \item \code{center}: Whether to center the kernel matrices (default: FALSE)
+#'   \item \code{os_type}: Operating system type ('Apple' or 'Windows') (default: 'Apple')
+#'   \item \code{cores}: Number of cores used in parallel computation (default: NULL)
+#' }
 #'
 #' @return A list containing:
 #' \itemize{
@@ -28,43 +34,59 @@
 #' \item y: Simulated response vector
 #' }
 #'
-#' @seealso \code{\link{kernels_fire}}
-#'
 #' @examples
 #' # 2D example
 #' set.seed(1)
 #' dat_T <- list(1:3, 1:2)
 #' sim_dat(kernels = list(cfbm, rbf), kernels_param = list(0.5, 1),
-#' alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5, os_type = 'Apple', cores = 1)
+#'         alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5)
 #'
-#' # 3D example
+#' # 3D example with control parameters
 #' set.seed(1)
 #' dat_T <- list(1:3, 1:2, 1:4)
 #' sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
-#' alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
-#' kernel_iprior = 'rbf', os_type = 'Apple', cores = 1)
+#'         alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
+#'         control = list(kernel_iprior = 'rbf', sigma = 0.5))
 #'
 #' @export
-sim_dat <- function(kernels, kernels_param, alpha,
-                     dat_T, tau = 1, intercept_y = 0, intercept_x = 0, kernel_iprior = 'cfbm', iprior_param = NULL,
-                     sigma_v = 1, sigma = 1, sigma_w = NULL, constant = TRUE, center = FALSE,
-                     N, Ntrain, os_type = 'Apple', cores = NULL){
-  # kernel: kernel function h1, h2
-  # kernels_param: parameters of kernel;cfbm - Hurst; rbf - lengthscale
-  # alpha: alpha1, alpha2, alpha3
-  # dat_T: index of set T, eg: list(1:I1, 1:I2, 1:I3), or list(seq(0,1,length.out = I1))
-  # tau: scale parameter in g(X,X')
-  # intercept_y: add intercept on y
-  # intercept_x: randomly generate the intercept using standard normal distribution for x(t)
-  # sigma_w: sd of normal dist for w_j
-  # kernel_iprior: kernel in iprior
-  # iprior_param: parameter of kernel in iprior
-  # sigma: noise parameter
-  # sigma_v: sd of normal dist for v_j
-  # constant: include the constant kernel (i.e. 1), default is yes
-  # N: sample size
-  # Ntrain: sample size of training set
+sim_dat <- function(N, Ntrain,
+                    kernels, kernels_param, alpha,
+                    dat_T, control = list()){
 
+  # Set default control parameters
+  con <- list(
+    tau = 1,
+    intercept_y = 0,
+    intercept_x = 0,
+    kernel_iprior = 'cfbm',
+    iprior_param = NULL,
+    sigma_v = 1,
+    sigma = 1,
+    sigma_w = NULL,
+    constant = TRUE,
+    center = FALSE,
+    os_type = 'Apple',
+    cores = NULL
+  )
+
+  # Override defaults with user-supplied control parameters
+  con[names(control)] <- control
+
+  # Extract control parameters
+  tau <- con$tau
+  intercept_y <- con$intercept_y
+  intercept_x <- con$intercept_x
+  kernel_iprior <- con$kernel_iprior
+  iprior_param <- con$iprior_param
+  sigma_v <- con$sigma_v
+  sigma <- con$sigma
+  sigma_w <- con$sigma_w
+  constant <- con$constant
+  center <- con$center
+  os_type <- con$os_type
+  cores <- con$cores
+
+  # Rest of the function remains the same...
   m <- length(kernels)
   if(m != length(kernels_param)) stop("kernels and kernels_param must have same length")
   if(m != length(alpha)) stop("kernels and alpha must have same length")

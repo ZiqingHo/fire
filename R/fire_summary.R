@@ -1,54 +1,42 @@
-#' Summary method for FIRE models
+#' Summary of FIRE Models
 #'
 #' @description
-#' Provides a comprehensive summary of \code{fire_matrix} or \code{fire_tensor} object, including estimated parameters,
-#' convergence information, model fit statistics, and kernel specifications.
+#' Generates comprehensive summaries for FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
 #'
-#' @param object A \code{fire_matrix} or \code{fire_tensor} object
-#' @param x A \code{summary.fire_matrix} or \code{summary.fire_tensor} object
-#' @param ... Not used
+#' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
+#' @param ... Not used.
 #'
 #' @return
-#' For \code{summary.fire_matrix} and \code{summary.fire_tensor}:
-#' Returns an object of class \code{summary.fire_matrix} or \code{summary.fire_tensor}
-#' containing:
+#' An object of class `summary.fire_matrix` or `summary.fire_tensor` containing:
 #' \itemize{
-#'   \item Estimated parameters
+#'   \item Estimated parameters (lambda/alpha, noise, intercept)
 #'   \item Convergence information
-#'   \item Model fit statistics
+#'   \item Model fit statistics (log-likelihood, sample size)
 #'   \item Kernel specifications
 #'   \item Computation timing
 #' }
 #'
-#' The \code{print} methods for these objects display nicely formatted output to the console.
-#'
-#' @examples
-#' data(Manure)
-#' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
-#'  dat_T = list(1:700), stop.eps = 2, maxiter = 4)
-#' summary(mod)
-#'
 #' @seealso \code{\link{fire}}
-#' @name summary.fire
-NULL
-
-#' @rdname summary.fire
 #' @export
 summary <- function(object, ...) {
   UseMethod("summary")
 }
 
-#' @rdname summary.fire
-#' @export
-summary.fire <- function(object, ...) {
-  if (inherits(object, "fire_matrix")) {
-    summary.fire_matrix(object, ...)
-  } else if (inherits(object, "fire_tensor")) {
-    summary.fire_tensor(object, ...)
-  }
-}
 
-#' @rdname summary.fire
+
+#' Summary for \code{fire_matrix} Objects
+#'
+#' @description
+#' Detailed summary of FIRE models with matrix input data.
+#'
+#' @inheritParams summary
+#'
+#' @examples
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' summary(mod)
+#'
 #' @export
 summary.fire_matrix <- function(object, ...) {
   # Get kernel information from attributes
@@ -107,7 +95,17 @@ summary.fire_matrix <- function(object, ...) {
   )
 }
 
-#' @rdname summary.fire
+
+#' Print Summary for \code{fire_matrix} Objects
+#'
+#' @description
+#' Displays formatted summary output for matrix-based FIRE models.
+#'
+#' @param x A `summary.fire_matrix` object.
+#' @param ... Not used.
+#'
+#' @return Invisibly returns the input object.
+#'
 #' @export
 print.summary.fire_matrix <- function(x, ...) {
   # Header with colored title
@@ -173,7 +171,22 @@ print.summary.fire_matrix <- function(x, ...) {
   cat(cli::rule(width = getOption("width")))
 }
 
-#' @rdname summary.fire
+#' Summary for \code{fire_tensor} Objects
+#'
+#' @description
+#' Detailed summary of FIRE models with tensor input data.
+#'
+#' @inheritParams summary
+#'
+#' @examples
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
+#' summary(mod)
+#'
 #' @export
 summary.fire_tensor <- function(object, ...) {
   # Get kernel information from attributes
@@ -246,7 +259,16 @@ summary.fire_tensor <- function(object, ...) {
   )
 }
 
-#' @rdname summary.fire
+#' Print Summary for \code{fire_tensor} Objects
+#'
+#' @description
+#' Displays formatted summary output for tensor-based FIRE models.
+#'
+#' @param x A `summary.fire_tensor` object.
+#' @param ... Not used.
+#'
+#' @return Invisibly returns the input object.
+#'
 #' @export
 print.summary.fire_tensor <- function(x, ...) {
   # Header with colored title

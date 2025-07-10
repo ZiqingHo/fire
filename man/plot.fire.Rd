@@ -2,18 +2,15 @@
 % Please edit documentation in R/fire_plot.R
 \name{plot.fire}
 \alias{plot.fire}
-\alias{plot.fire_fitted}
-\alias{plot.fire_prediction}
+\alias{plot}
 \title{Plot method for FIRE models}
 \usage{
-\method{plot}{fire_fitted}(x, ...)
-
-\method{plot}{fire_prediction}(x, ...)
+plot(object, ...)
 }
 \arguments{
-\item{x}{A \code{fire_fitted} or \code{fire_prediction} object}
-
 \item{...}{Not used}
+
+\item{x}{A \code{fire_fitted} or \code{fire_prediction} object}
 }
 \value{
 Returns a ggplot object or a gridExtra-arranged plot object.
@@ -24,7 +21,7 @@ Returns a ggplot object or a gridExtra-arranged plot object.
       \itemize{
         \item When test data is available: Returns a gridExtra-arranged plot containing both
               residuals vs predicted and actual vs predicted plots
-        \item When no test data is available: Returns a single ggplot object showing
+        \item When no test data is available: Returns a single \code{ggplot} object showing
               the distribution of predicted values with density overlay
       }
   }

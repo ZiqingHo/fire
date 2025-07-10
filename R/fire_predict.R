@@ -1,52 +1,45 @@
-#' Prediction methods for FIRE models
+#' Prediction for FIRE Models
 #'
 #' @description
-#' Obtain predicted values from \code{fire_matrix} or \code{fire_tensor} object, optionally with test set evaluation.
+#' Obtain predictions from FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
 #'
-#' @param object A \code{fire_matrix} or \code{fire_tensor} object
-#' @param newdata New data for prediction
-#' @param Ynew Optional numeric vector of true response values for the \code{newdata}. Must be the same length as the number of rows in \code{newdata}.
-#' @param x A \code{fire_prediction} object to print
-#' @param ... Not used
-#' @return A list of class \code{fire_prediction} containing the predicted values,
-#' and including test RMSE, residuals if \code{Ynew} is provided.
+#' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
+#' @param newdata New data for prediction.
+#' @param Ynew Optional true response values for test set evaluation.
+#' @param ... Not used.
 #'
-#' The returned object has a \code{print} method that displays:
+#' @return A list of class `fire_prediction` containing:
 #' \itemize{
-#'   \item Number of predictions
-#'   \item Test RMSE (if available)
-#'   \item First few predicted values
+#'   \item `yhat`: Predicted values
+#'   \item `y.actual`: True values (if `Ynew` provided)
+#'   \item `test_metrics`: RMSE and residuals (if `Ynew` provided)
+#'   \item `model`: Reference to the original model
 #' }
 #'
-#' @examples
-#' data(Manure)
-#' idx <- 1:5
-#' mod <- fire(X = Manure$absorp[idx,], Y = Manure$y$DM[idx],
-#' dat_T = list(1:700), stop.eps = 2, maxiter = 4)
-#' predict(mod, newdata = Manure$absorp[idx+10,],
-#' Ynew = Manure$y$DM[idx+10])
-#'
 #' @seealso \code{\link{fire}}
-#' @name predict.fire
-NULL
-
-#' @rdname predict.fire
 #' @export
 predict <- function(object, ...) {
   UseMethod("predict")
 }
 
-#' @rdname predict.fire
-#' @export
-predict.fire <- function(object, newdata, Ynew = NULL, ...) {
-  if (inherits(object, "fire_matrix")) {
-    predict.fire_matrix(object, newdata, Ynew, ...)
-  } else if (inherits(object, "fire_tensor")) {
-    predict.fire_tensor(object, newdata, Ynew, ...)
-  }
-}
 
-#' @rdname predict.fire
+
+#' Predict for \code{fire_matrix} Objects
+#'
+#' @description
+#' Obtain predictions from FIRE models with matrix input data.
+#'
+#' @param object A model object of class \code{fire_matrix}.
+#' @param newdata New data for prediction.
+#' @param Ynew Optional true response values for test set evaluation.
+#' @param ... Not used.
+#'
+#' @examples
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:5, ], Y = Manure$y$DM[1:5],
+#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' predict(mod, newdata = Manure$absorp[6:10, ])
+#'
 #' @export
 predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
@@ -149,7 +142,25 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   return(result)
 }
 
-#' @rdname predict.fire
+#' Predict for \code{fire_tensor} Objects
+#'
+#' @description
+#' Obtain predictions from FIRE models with tensor input data.
+#'
+#' @param object A model object of class \code{fire_tensor}.
+#' @param newdata New data for prediction.
+#' @param Ynew Optional true response values for test set evaluation.
+#' @param ... Not used.
+#'
+#' @examples
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
+#' predict(mod, newdata = Housing$X[6:10,,])
+#'
 #' @export
 predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
@@ -241,7 +252,16 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
 }
 
 
-#' @rdname predict.fire
+#' Print FIRE Predictions
+#'
+#' @description
+#' Summarizes prediction results for `fire_prediction` objects.
+#'
+#' @param x A `fire_prediction` object.
+#' @param ... Not used.
+#'
+#' @return Invisibly returns the input object.
+#'
 #' @export
 print.fire_prediction <- function(x, ...) {
   cat("FIRE Model Predictions\n")

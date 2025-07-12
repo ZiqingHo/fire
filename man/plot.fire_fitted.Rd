@@ -11,14 +11,19 @@
 
 \item{...}{Not used}
 }
+\value{
+Returns a single \code{ggplot} object showing residuals vs fitted values
+}
 \description{
 Generates residuals vs fitted values plot for training data.
 }
 \examples{
 data(Manure)
 mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
-            dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+            dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 fit <- fitted(mod)
 plot(fit)
-
+}
+\seealso{
+\code{\link{fire}}, \code{\link{fitted.fire}}
 }

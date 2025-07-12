@@ -4,7 +4,7 @@
 \alias{sim_dat}
 \title{Simulate Multi-dimensional Functional Data with I-prior}
 \usage{
-sim_dat(N, Ntrain, kernels, kernels_param, alpha, dat_T, control = list())
+sim_dat(N, Ntrain, kernels, kernels_params, alpha, dat_T, control = list())
 }
 \arguments{
 \item{N}{Total sample size}
@@ -13,7 +13,7 @@ sim_dat(N, Ntrain, kernels, kernels_param, alpha, dat_T, control = list())
 
 \item{kernels}{List of kernel functions for each mode}
 
-\item{kernels_param}{List of parameters for each kernel function}
+\item{kernels_params}{List of parameters for each kernel function}
 
 \item{alpha}{Vector of scale parameters for \code{kernels}}
 
@@ -53,13 +53,13 @@ The \code{control} argument can include the following parameters:
 # 2D example
 set.seed(1)
 dat_T <- list(1:3, 1:2)
-sim_dat(kernels = list(cfbm, rbf), kernels_param = list(0.5, 1),
+sim_dat(kernels = list(cfbm, rbf), kernels_params = list(0.5, 1),
         alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5)
 
 # 3D example with control parameters
 set.seed(1)
 dat_T <- list(1:3, 1:2, 1:4)
-sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
+sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_params = list(0.5, 0.5,0.5),
         alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
         control = list(kernel_iprior = 'rbf', sigma = 0.5))
 

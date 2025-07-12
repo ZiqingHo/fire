@@ -18,6 +18,7 @@ pre_initial(
   iprior_param = NULL,
   constant = TRUE,
   os_type = "Apple",
+  cores = NULL,
   sample_id = 1
 )
 }
@@ -46,6 +47,8 @@ pre_initial(
 
 \item{os_type}{Operating system for parallelization ("Apple" or "Windows")}
 
+\item{cores}{Number of cores for parallel computation (default: detectCores() - 1)}
+
 \item{sample_id}{Which mode represents samples, either the 1st or the last mode}
 }
 \value{
@@ -72,7 +75,7 @@ init_cfbm <- fire:::pre_initial(X, Y, dat_T,
                         kernels = list(cfbm),
                         kernels_params = list(0.5),
                         Index = Index, constant = FALSE,
-                        kernel_iprior = "cfbm")
+                        kernel_iprior = "cfbm", cores = 1)
 
 # 3D covariates
 X <- list(array(runif(20, 5, 10), dim = c(2,2,5)),array(runif(20, 5, 10), dim = c(2,2,5)))
@@ -85,7 +88,7 @@ init_rbf <- fire:::pre_initial(X, Y, dat_T,
                        kernels = list(cfbm, rbf, cfbm),
                        kernels_params = list(0.5, 1, 0.5),
                        Index = Index, constant = TRUE,
-                       kernel_iprior = "rbf")
+                       kernel_iprior = "rbf", cores = 1)
 
 }
 \seealso{

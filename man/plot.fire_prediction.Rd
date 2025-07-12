@@ -11,16 +11,26 @@
 
 \item{...}{Not used}
 }
+\value{
+\itemize{
+   \item When test response data is available: Returns both
+              residuals vs predicted and actual vs predicted plots
+   \item When no test response data is available: Returns a single \code{ggplot} object showing
+              the distribution of predicted values with density overlay
+ }
+}
 \description{
-Generates residuals vs predicted and actual vs predicted plots when test response is provide.
+Generates residuals vs predicted and actual vs predicted plots when test response data is provided.
 Otherwise, generates the distribution of predicted values with density overlay.
 }
 \examples{
 data(Manure)
 mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
-            dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+            dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 pred <- predict(mod, newdata = Manure$absorp[6:10,],
                 Ynew = Manure$y$DM[6:10])
 plot(pred)
-
+}
+\seealso{
+\code{\link{fire}}, \code{\link{predict.fire}}
 }

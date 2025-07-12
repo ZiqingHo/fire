@@ -17,3 +17,6 @@ Invisibly returns the input object.
 \description{
 Summarizes prediction results for \code{fire_prediction} objects.
 }
+\seealso{
+\code{\link{predict.fire}}
+}

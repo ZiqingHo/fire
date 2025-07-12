@@ -1,7 +1,7 @@
 #' Fitted Values for FIRE Models
 #'
 #' @description
-#' Computes fitted values for FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
+#' Computes fitted values for FIRE models with either matrix or tensor input data.
 #'
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
 #' @param ... Not used.
@@ -16,33 +16,26 @@
 #' }
 #'
 #' @seealso \code{\link{fire}}
-#'
 #' @examples
+#' # For matrix input
 #' data(Manure)
 #' mod <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
-#' dat_T = list(1:700),, stop.eps = 2, maxiter = 4)
+#'             dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 #' fitted(mod)
 #'
-#' @export
-fitted <- function(object, ...) {
-  UseMethod("fitted")
-}
-
-
-#' Fitted Values for \code{fire_matrix} Objects
-#'
-#' @description
-#' Computes fitted values for FIRE models with matrix input data.
-#'
-#' @param object A model object of class \code{fire_matrix}.
-#' @param ... Not used.
-#'
-#' @examples
-#' data(Manure)
-#' mod <- fire(X = Manure$absorp[1:5, ], Y = Manure$y$DM[1:5],
-#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#' # For tensor input
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
 #' fitted(mod)
-#'
+#' @name fitted.fire
+NULL
+
+#' @rdname fitted.fire
+#' @method fitted fire_matrix
 #' @export
 fitted.fire_matrix <- function(object, ...) {
   # Extract components from model object
@@ -76,6 +69,7 @@ fitted.fire_matrix <- function(object, ...) {
                              constant = constant,
                              Index = Index,
                              os_type = attr(object, "os_type"),
+                             cores = attr(object, "cores"),
                              sample_id = 1)
 
   # Generate Gram matrix
@@ -112,32 +106,11 @@ fitted.fire_matrix <- function(object, ...) {
     class = c("fire_fitted", "list")
   )
 
-  # Always return visibly for direct calls
-  if (!is.object(result) || sys.nframe() == 1) {
-    print(result)
-    return(invisible(result))
-  }
-
   return(result)
 }
 
-#' Fitted Values for \code{fire_tensor} Objects
-#'
-#' @description
-#' Computes fitted values for FIRE models with tensor input data.
-#'
-#' @param object A model object of class \code{fire_tensor}.
-#' @param ... Not used.
-#'
-#' @examples
-#' data(Housing)
-#' dat_T <- list(T1 = 1:4, T2 = 1:9)
-#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
-#'             kernels = list(kronecker_delta, kronecker_delta),
-#'             kernels_params = list(NA, NA),
-#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
-#' fitted(mod)
-#'
+#' @rdname fitted.fire
+#' @method fitted fire_tensor
 #' @export
 fitted.fire_tensor<- function(object, ...) {
   # Extract components from model object
@@ -174,6 +147,7 @@ fitted.fire_tensor<- function(object, ...) {
                              constant = constant,
                              Index = Index,
                              os_type = attr(object, "os_type"),
+                             cores = attr(object, "cores"),
                              sample_id = sample_id)
 
   # Generate Gram matrix
@@ -210,12 +184,6 @@ fitted.fire_tensor<- function(object, ...) {
     class = c("fire_fitted", "list")
   )
 
-  # Always return visibly for direct calls
-  if (!is.object(result) || sys.nframe() == 1) {
-    print(result)
-    return(invisible(result))
-  }
-
   return(result)
 }
 
@@ -228,17 +196,22 @@ fitted.fire_tensor<- function(object, ...) {
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.
-#'
+#' @method print fire_fitted
+#' @seealso \code{\link{fitted.fire}}
 #' @export
 print.fire_fitted <- function(x, ...) {
   cat("FIRE Model Fitted Results\n")
   cat("-------------------------\n")
   cat(sprintf("Training RMSE: %.5f\n", x$rmse))
   cat(sprintf("Intercept: %.4f\n", x$intercept))
-  cat("\nFirst 6 fitted values:\n")
-  print(head(x$yhat))
+
   if (length(x$yhat) > 6) {
+    cat("\nFirst 6 fitted values:\n")
+    print(head(x$yhat))
     cat(sprintf("[... %d more values not shown]\n", length(x$yhat) - 6))
+  }else{
+    cat("\nThe", length(x$yhat), "fitted values:\n")
+    print(head(x$yhat))
   }
   invisible(x)
 }

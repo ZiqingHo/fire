@@ -7,7 +7,7 @@
 #' @param N Total sample size
 #' @param Ntrain Training sample size.
 #' @param kernels List of kernel functions for each mode
-#' @param kernels_param List of parameters for each kernel function
+#' @param kernels_params List of parameters for each kernel function
 #' @param alpha Vector of scale parameters for \code{kernels}
 #' @param dat_T List of index sets for each mode
 #' @param control A list of control parameters (see Details)
@@ -38,19 +38,19 @@
 #' # 2D example
 #' set.seed(1)
 #' dat_T <- list(1:3, 1:2)
-#' sim_dat(kernels = list(cfbm, rbf), kernels_param = list(0.5, 1),
+#' sim_dat(kernels = list(cfbm, rbf), kernels_params = list(0.5, 1),
 #'         alpha = c(0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5)
 #'
 #' # 3D example with control parameters
 #' set.seed(1)
 #' dat_T <- list(1:3, 1:2, 1:4)
-#' sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_param = list(0.5, 0.5,0.5),
+#' sim_dat(kernels = list(cfbm, cfbm, cfbm), kernels_params = list(0.5, 0.5,0.5),
 #'         alpha = c(0.5, 0.5, 0.5), dat_T = dat_T, N = 10, Ntrain = 5,
 #'         control = list(kernel_iprior = 'rbf', sigma = 0.5))
 #'
 #' @export
 sim_dat <- function(N, Ntrain,
-                    kernels, kernels_param, alpha,
+                    kernels, kernels_params, alpha,
                     dat_T, control = list()){
 
   # Set default control parameters
@@ -88,7 +88,7 @@ sim_dat <- function(N, Ntrain,
 
   # Rest of the function remains the same...
   m <- length(kernels)
-  if(m != length(kernels_param)) stop("kernels and kernels_param must have same length")
+  if(m != length(kernels_params)) stop("kernels and kernels_params must have same length")
   if(m != length(alpha)) stop("kernels and alpha must have same length")
   if(m != length(dat_T)) stop("kernels and dat_T must have same length")
   if(Ntrain >= N) stop("Ntrain must be smaller than N")
@@ -108,7 +108,7 @@ sim_dat <- function(N, Ntrain,
     Index.T <- create_index_matrix(dat_T)
   }
 
-  Gmat.list <- gmat(kernels = kernels, kernels_params = kernels_param, dat = dat_T, center = center)
+  Gmat.list <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
 
   # Construct G matrix for arbitrary m dimensions
   if(m == 1){

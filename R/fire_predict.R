@@ -1,14 +1,14 @@
-#' Prediction for FIRE Models
+#' Predict Method for FIRE Models
 #'
 #' @description
-#' Obtain predictions from FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
+#' Obtain predictions from FIRE models for either matrix or tensor input data.
 #'
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
 #' @param newdata New data for prediction.
 #' @param Ynew Optional true response values for test set evaluation.
 #' @param ... Not used.
 #'
-#' @return A list of class `fire_prediction` containing:
+#' @return A list of class \code{fire_prediction} containing:
 #' \itemize{
 #'   \item \code{yhat}: Predicted values
 #'   \item \code{y.actual}: True values (if \code{Ynew} provided)
@@ -17,29 +17,26 @@
 #' }
 #'
 #' @seealso \code{\link{fire}}
-#' @export
-predict <- function(object, ...) {
-  UseMethod("predict")
-}
-
-
-
-#' Predict for \code{fire_matrix} Objects
-#'
-#' @description
-#' Obtain predictions from FIRE models with matrix input data.
-#'
-#' @param object A model object of class \code{fire_matrix}.
-#' @param newdata New data for prediction.
-#' @param Ynew Optional true response values for test set evaluation.
-#' @param ... Not used.
-#'
 #' @examples
+#' # For matrix input
 #' data(Manure)
 #' mod <- fire(X = Manure$absorp[1:5, ], Y = Manure$y$DM[1:5],
-#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#'             dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 #' predict(mod, newdata = Manure$absorp[6:10, ])
 #'
+#' # For tensor input
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
+#' predict(mod, newdata = Housing$X[6:10,,])
+#' @name predict.fire
+NULL
+
+#' @rdname predict.fire
+#' @method predict fire_matrix
 #' @export
 predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
@@ -57,6 +54,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   os_type <- attr(object, "os_type")
+  cores <- attr(object, "cores")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
 
   # Validate newdata
@@ -83,7 +81,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
                              alpha = c(1),
                              constant = constant,
                              Index = Index,
-                             os_type = os_type,
+                             os_type = os_type, cores = cores,
                              sample_id = 1)
 
   nmat.cross <- Kronecker_norm_cross(Xtrain = X_train,
@@ -92,7 +90,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
                                      alpha = c(1),
                                      constant = constant,
                                      Index = Index,
-                                     os_type = os_type,
+                                     os_type = os_type, cores = cores,
                                      sample_id = 1)
 
   # Generate cross kernel matrix
@@ -134,7 +132,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   )
 
   # Print output automatically when not assigned
-  if (!is.object(result) || sys.nframe() == 1) {
+  if (sys.nframe() == 1) {
     print(result)
     return(invisible(result))
   }
@@ -142,25 +140,8 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   return(result)
 }
 
-#' Predict for \code{fire_tensor} Objects
-#'
-#' @description
-#' Obtain predictions from FIRE models with tensor input data.
-#'
-#' @param object A model object of class \code{fire_tensor}.
-#' @param newdata New data for prediction.
-#' @param Ynew Optional true response values for test set evaluation.
-#' @param ... Not used.
-#'
-#' @examples
-#' data(Housing)
-#' dat_T <- list(T1 = 1:4, T2 = 1:9)
-#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
-#'             kernels = list(kronecker_delta, kronecker_delta),
-#'             kernels_params = list(NA, NA),
-#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
-#' predict(mod, newdata = Housing$X[6:10,,])
-#'
+#' @rdname predict.fire
+#' @method predict fire_tensor
 #' @export
 predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   # Extract components from model object
@@ -179,6 +160,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   os_type <- attr(object, "os_type")
+  cores <- attr(object, "cores")
   sample_id <- attr(object, "sample_id")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
 
@@ -193,7 +175,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
                              alpha = alpha_params,
                              constant = constant,
                              Index = Index,
-                             os_type = os_type,
+                             os_type = os_type, cores = cores,
                              sample_id = sample_id)
 
   nmat.cross <- Kronecker_norm_cross(Xtrain = X_train,
@@ -202,7 +184,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
                                      alpha = alpha_params,
                                      constant = constant,
                                      Index = Index,
-                                     os_type = os_type,
+                                     os_type = os_type, cores = cores,
                                      sample_id = sample_id)
 
   # Generate cross kernel matrix
@@ -243,7 +225,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   )
 
   # Print output automatically when not assigned
-  if (!is.object(result) || sys.nframe() == 1) {
+  if (sys.nframe() == 1) {
     print(result)
     return(invisible(result))
   }
@@ -261,7 +243,8 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.
-#'
+#' @method print fire_prediction
+#' @seealso \code{\link{predict.fire}}
 #' @export
 print.fire_prediction <- function(x, ...) {
   cat("FIRE Model Predictions\n")
@@ -271,10 +254,13 @@ print.fire_prediction <- function(x, ...) {
     cat(sprintf("Test RMSE: %.5f\n", x$test_metrics$rmse))
   }
 
-  cat("\nFirst 6 predicted values:\n")
-  print(head(x$yhat))
   if (length(x$yhat) > 6) {
+    cat("\nFirst 6 predicted values:\n")
+    print(head(x$yhat))
     cat(sprintf("[... %d more values not shown]\n", length(x$yhat) - 6))
+  }else{
+    cat("\nThe",length(x$yhat) , "predicted values:\n")
+    print(head(x$yhat))
   }
   invisible(x)
 }

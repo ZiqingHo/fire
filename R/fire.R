@@ -1,17 +1,38 @@
 #' Fit a FIRE Model
 #'
-#' A function to perform functional regression using I-priors and Reproducing Kernel Hilbert Space (RKHS).
-#' The FIRE model parameters are estimated by using EM algorithm.
+#' A function to perform functional regression using I-priors with Reproducing Kernel Hilbert Space (RKHS) norm.
+#' The FIRE model parameters are estimated using an EM algorithm.
+#'
+#' @param X A numeric input in \code{matrix}, \code{data.frame}, \code{array} or \code{list}
+#' @param Y A numeric response vector
+#' @param dat_T List of index sets for each mode
+#' @param kernels List of kernel functions for each mode (see \code{\link{kernels_fire}})
+#' @param kernels_params List of parameters for each kernel
+#' @param kernel_iprior Type of I-prior kernel
+#' @param iprior_param Parameter for I-prior kernel:
+#' \itemize{
+#'   \item \code{"cfbm"} - Hurst coefficient (default 0.5)
+#'   \item \code{"rbf"} - lengthscale (default 1)
+#'   \item \code{"linear"} - offset (default 0)
+#'   \item \code{"poly"} - degree and offset (default c(2, mean(Y)))
+#' }
+#' @param control A list of control parameters (see Details)
+#' @param ... Additional arguments passed to methods
 #'
 #' @details
-#' The \code{fire} function is able to take \code{matrix}, \code{data.frame}, \code{array} and \code{list} inputs,
-#' the syntax is as per the default S3 method.
-#'
-#' @param sample_id The sample mode identifier, either the 1st or last mode
-#' @param X A numeric inputs in matrix, data.frame, array or list form
-#' @param ... Additional arguments passed to methods
-#' @return An object of class \code{fire_matrix} or \code{fire_tensor}.
-#' The \code{print()} and \code{summary()} methods show the corresponding model information.
+#' The \code{control} argument can include the following parameters:
+#' \itemize{
+#'   \item{\code{scale}: Logical indicating whether to center the response (default TRUE)}
+#'   \item{\code{maxiter}: Maximum number of EM iterations (default 200)}
+#'   \item{\code{stop.eps}: Convergence tolerance (default 1e-5)}
+#'   \item{\code{constant}: Logical indicating whether to include constant kernel term (default TRUE)}
+#'   \item{\code{center}: Logical indicating whether to center the kernel matrix (default FALSE)}
+#'   \item{\code{par_init}: Optional list of initial parameter values (lambda, noise)}
+#'   \item{\code{os_type}: Operating system type for compatibility ("Apple" or "Windows", default "Apple")}
+#'   \item{\code{cores}: Number of cores for parallel computation (default: detectCores() - 1)}
+#'   \item{\code{asymptote}: Logical to use asymptotic initial values (default TRUE)}
+#'   \item{\code{sample_id}: Which mode contains samples (default 1)}
+#' }
 #'
 #' @section Methods:
 #' This generic function has methods for different input types:
@@ -26,7 +47,7 @@
 #' # Matrix input
 #' data(Manure)
 #' mod1 <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
-#'  dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#'  dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 #' summary(mod1)
 #'
 #' # Array input
@@ -35,10 +56,12 @@
 #' mod2 <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
 #' kernels = list(kronecker_delta, kronecker_delta),
 #' kernels_params = list(NA, NA),
-#' dat_T = dat_T, stop.eps = 2, maxiter = 4)
+#' dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
 #' summary(mod2)
 #' @export
-fire <- function(X, Y, ...) {
+fire <- function(X, Y, dat_T, kernels, kernels_params,
+                 kernel_iprior = 'cfbm', iprior_param = NULL,
+                 control = list(), ...) {
   if (missing(Y)) stop("Response vector Y must be provided")
   if (!is.numeric(Y)) stop("Y must be a numeric vector")
   if (anyNA(Y)) stop("NA values detected in Y")
@@ -48,25 +71,21 @@ fire <- function(X, Y, ...) {
 
 #' @name fire
 #' @export
-fire.default <- function(X, Y,...,
-                         dat_T, scale = TRUE,
-                         kernels, kernels_params,
+fire.default <- function(X, Y, dat_T, kernels, kernels_params,
                          kernel_iprior = 'cfbm', iprior_param = NULL,
-                         maxiter = 200, stop.eps = 1e-5, center = FALSE,
-                         par_init = NULL, os_type = "Apple", asymptote = TRUE, sample_id = 1
-                         ) {
-
-
+                         control = list(), ...) {
   supported <- c("matrix", "array", "list", "data.frame")
   stop(
-    "Input type '", class(X)[1], "' not supported. ",
+    "Input type '", class(X)[1], "' not supported.\n",
     "Use one of: ", paste(supported, collapse = ", ")
   )
 }
 
 #' @rdname fire
 #' @export
-fire.data.frame <- function(X, Y, ...) {
+fire.data.frame <- function(X, Y, dat_T, kernels = list(cfbm), kernels_params = list(0.5),
+                            kernel_iprior = 'cfbm', iprior_param = NULL,
+                            control = list(), ...) {
   # Data frame validation
   if (!is.data.frame(X)) stop("X must be a data frame")
   if (nrow(X) != length(Y)) {
@@ -77,7 +96,9 @@ fire.data.frame <- function(X, Y, ...) {
 
   # Convert and delegate to matrix method
   X_mat <- as.matrix(X)
-  result <- fire.matrix(X_mat, Y, ...)
+  result <- fire.matrix(X_mat, Y, dat_T, kernels, kernels_params,
+                        kernel_iprior, iprior_param,
+                        control, ...)
 
   structure(
     result,
@@ -91,7 +112,9 @@ fire.data.frame <- function(X, Y, ...) {
 
 #' @rdname fire
 #' @export
-fire.array <- function(X, Y, ...) {
+fire.array <- function(X, Y, dat_T, kernels, kernels_params,
+                       kernel_iprior = 'cfbm', iprior_param = NULL,
+                       control = list(), ...) {
   # Array validation
   if (!is.array(X)) stop("X must be an array")
   if (!(dim(X)[1] == length(Y) || tail(dim(X), 1) == length(Y))) {
@@ -102,7 +125,9 @@ fire.array <- function(X, Y, ...) {
 
   # Convert to tensor and dispatch
   class(X) <- c("tensor", class(X))
-  result <- fire.tensor(X, Y, ...)
+  result <- fire.tensor(X, Y, dat_T, kernels, kernels_params,
+                        kernel_iprior, iprior_param,
+                        control, ...)
 
   structure(
     result,
@@ -114,7 +139,9 @@ fire.array <- function(X, Y, ...) {
 
 #' @rdname fire
 #' @export
-fire.list <- function(X, Y, ...) {
+fire.list <- function(X, Y, dat_T, kernels, kernels_params,
+                      kernel_iprior = 'cfbm', iprior_param = NULL,
+                      control = list(), ...) {
   # List validation
   if (!is.list(X)) stop("X must be a list")
   if (!all(sapply(X, is.array))) {
@@ -133,7 +160,9 @@ fire.list <- function(X, Y, ...) {
 
   # Convert to tensor and dispatch
   class(X) <- c("tensor", class(X))
-  result <- fire.tensor(X, Y, ...)
+  result <- fire.tensor(X, Y, dat_T, kernels, kernels_params,
+                        kernel_iprior, iprior_param,
+                        control,...)
 
   structure(
     result,

@@ -21,10 +21,9 @@ Imports:
   MASS,
   parallel,
   cli,
-  knitr,
+  patchwork,
   crayon, 
-  gridExtra,
-  ggplot2
+  ggplot2 (>= 3.4.0)
 Suggests: 
     spelling,
     testthat

@@ -1,13 +1,13 @@
-#' Summary of FIRE Models
+#' Summary Method for FIRE Models
 #'
 #' @description
-#' Generates comprehensive summaries for FIRE models of class \code{fire_matrix} or \code{fire_tensor}.
+#' Detailed summary of FIRE models for either matrix or tensor input data.
 #'
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
 #' @param ... Not used.
 #'
 #' @return
-#' An object of class \code{summary.fire_matrix} or \code{summary.fire_tensor} containing:
+#' An object of class \code{summary.fire} containing:
 #' \itemize{
 #'   \item Estimated parameters (lambda/alpha, noise, intercept)
 #'   \item Convergence information
@@ -17,27 +17,26 @@
 #' }
 #'
 #' @seealso \code{\link{fire}}
-#' @export
-summary <- function(object, ...) {
-  UseMethod("summary")
-}
-
-
-
-#' Summary for \code{fire_matrix} Objects
-#'
-#' @description
-#' Detailed summary of FIRE models with matrix input data.
-#'
-#' @param object A model object of class \code{fire_matrix}.
-#' @param ... Not used.
-#'
 #' @examples
+#' # For matrix input
 #' data(Manure)
 #' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
-#'             dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+#'             dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 #' summary(mod)
 #'
+#' # For tensor input
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
+#' summary(mod)
+#' @name summary.fire
+NULL
+
+#' @rdname summary.fire
+#' @method summary fire_matrix
 #' @export
 summary.fire_matrix <- function(object, ...) {
   # Get kernel information from attributes
@@ -89,106 +88,16 @@ summary.fire_matrix <- function(object, ...) {
       kernel_info = list(
         kernels = kernel_names,
         kernel_params = kernel_params,
-        kernel_iprior = kernel_iprior
+        kernel_iprior = kernel_iprior,
+        iprior_param = attr(object, "iprior_param")
       )
     ),
     class = "summary.fire_matrix"
   )
 }
 
-
-#' Print Summary for \code{fire_matrix} Objects
-#'
-#' @description
-#' Displays formatted summary output for matrix-based FIRE models.
-#'
-#' @param x A \code{summary.fire_matrix} object.
-#' @param ... Not used.
-#'
-#' @return Invisibly returns the input object.
-#'
-#' @export
-print.summary.fire_matrix <- function(x, ...) {
-  # Header with colored title
-  cat(cli::rule(left = crayon::blue("FIRE Model Summary"),
-                width = getOption("width")), "\n")
-
-  # Model information
-  cat(crayon::bold("Data Dimensions:"),
-      paste0(x$dimensions[1], " samples x ", x$dimensions[2], " features\n"))
-
-  # Display kernel information with parameters
-  kernel_text <- paste0("RKHS norm: ", x$kernel_info$kernels[1])
-
-  # Add parameters if they exist
-  if (!is.null(x$kernel_info$kernel_params[[1]])) {
-    kernel_text <- paste0(kernel_text, " (",
-                          paste(x$kernel_info$kernel_params[[1]]),
-                          ")")
-  }
-
-  cat(crayon::bold("Kernels:\n"),
-      paste0(kernel_text,
-             " | I-prior: ", x$kernel_info$kernel_iprior, "\n\n"))
-
-  # Coefficients section
-  cat(crayon::bold("Estimated Parameters:"))
-  coef_table <- data.frame(
-    Parameter = c("Lambda", "Noise", "Intercept"),
-    Value = format(unlist(x$coefficients), digits = 4, nsmall = 4),
-    stringsAsFactors = FALSE
-  )
-  print(knitr::kable(coef_table, format = "simple", align = c('l', 'r')))
-  cat("\n")
-
-  # Convergence information
-  cat(crayon::bold("Convergence:\n"))
-  conv_details <- if(x$convergence$converged) {
-    crayon::green(paste0("Converged in ", x$convergence$iterations, " iterations"))
-  } else {
-    crayon::red(paste0("Failed to converge after ", x$convergence$iterations,
-                       "/", x$convergence$maxiter, " iterations"))
-  }
-  cat(paste(" Status:", conv_details), "\n")
-  cat(paste(" Final change:", format(x$convergence$final_change, digits = 4)),
-      paste0("(tolerance = ", format(x$convergence$tolerance, digits = 2), ")\n"))
-
-  # Model fit statistics
-  cat(crayon::bold("\nModel Fit:"))
-  fit_table <- data.frame(
-    Statistic = c("Marginal log-likelihood", "Sample size"),
-    Value = c(format(x$model_fit$mloglik, digits = 4),
-              x$model_fit$n),
-    stringsAsFactors = FALSE
-  )
-  print(knitr::kable(fit_table, format = "simple", align = c('l', 'r')))
-
-  # Timing information
-  cat("\n")
-  cat(crayon::bold("Computation time:"),
-      format(x$timing, digits = 3), "\n")
-
-  # Footer
-  cat(cli::rule(width = getOption("width")))
-}
-
-#' Summary for \code{fire_tensor} Objects
-#'
-#' @description
-#' Detailed summary of FIRE models with tensor input data.
-#'
-#' @param object A model object of class \code{fire_tensor}.
-#' @param ... Not used.
-#'
-#' @examples
-#' data(Housing)
-#' dat_T <- list(T1 = 1:4, T2 = 1:9)
-#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
-#'             kernels = list(kronecker_delta, kronecker_delta),
-#'             kernels_params = list(NA, NA),
-#'             dat_T = dat_T, stop.eps = 2, maxiter = 4)
-#' summary(mod)
-#'
+#' @rdname summary.fire
+#' @method summary fire_tensor
 #' @export
 summary.fire_tensor <- function(object, ...) {
   # Get kernel information from attributes
@@ -261,16 +170,118 @@ summary.fire_tensor <- function(object, ...) {
   )
 }
 
-#' Print Summary for \code{fire_tensor} Objects
+
+#' Print Summary for FIRE Models
 #'
 #' @description
-#' Displays formatted summary output for tensor-based FIRE models.
+#' Displays formatted summary output for FIRE models.
 #'
-#' @param x A \code{summary.fire_tensor} object.
+#' @param x A \code{summary.fire} object (from either matrix or tensor input).
 #' @param ... Not used.
 #'
 #' @return Invisibly returns the input object.
+#' @method print summary.fire
+#' @examples
+#' # Print matrix model summary
+#' data(Manure)
+#' mod <- fire(X = Manure$absorp[1:10,], Y = Manure$y$DM[1:10],
+#'             dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
+#' print(summary(mod))
 #'
+#' # Print tensor model summary
+#' data(Housing)
+#' dat_T <- list(T1 = 1:4, T2 = 1:9)
+#' mod <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
+#'             kernels = list(kronecker_delta, kronecker_delta),
+#'             kernels_params = list(NA, NA),
+#'             dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
+#' print(summary(mod))
+#' @name print.summary.fire
+NULL
+
+#' @rdname print.summary.fire
+#' @method print summary.fire_matrix
+#' @export
+print.summary.fire_matrix <- function(x, ...) {
+  # Header with colored title
+  cat(cli::rule(left = crayon::blue("FIRE Model Summary"),
+                width = getOption("width")), "\n")
+
+  # Model information
+  cat(crayon::bold("Data Dimensions:"),
+      paste0(x$dimensions[1], " samples x ", x$dimensions[2], " features\n"))
+
+  # Display kernel information with parameters
+  kernel_text <- paste0("RKHS norm: ", x$kernel_info$kernels[1])
+
+  # Add parameters if they exist
+  if (!is.null(x$kernel_info$kernel_params[[1]])) {
+    kernel_text <- paste0(kernel_text, " (",
+                          paste(x$kernel_info$kernel_params[[1]]),
+                          ")")
+  }
+
+  cat(crayon::bold("Kernels:\n"),
+      paste0(kernel_text,
+             " | I-prior: ", x$kernel_info$kernel_iprior,
+             if(!is.null(x$kernel_info$iprior_param)) {
+               paste0(" (parameter = ", x$kernel_info$iprior_param, ")")
+             } else {
+               ""
+             },
+             "\n\n"))
+
+  # Coefficients section
+  cat(crayon::bold("\nEstimated Parameters:\n"))
+  cat("               Value\n")
+  cat("---------- ---------\n")
+  cat(sprintf("%-10s %7.4f\n", "lambda", x$coefficients["lambda"]))
+  cat(sprintf("%-10s %7.4f\n", "noise", x$coefficients["noise"]))
+  cat(sprintf("%-10s %7.4f\n", "intercept", x$coefficients["intercept"]))
+
+  # Convergence information
+  cat(crayon::bold("Convergence:\n"))
+  conv_details <- if(x$convergence$converged) {
+    crayon::green(paste0("Converged in ", x$convergence$iterations, " iterations"))
+  } else {
+    crayon::red(paste0("Failed to converge after ", x$convergence$iterations,
+                       "/", x$convergence$maxiter, " iterations"))
+  }
+  cat(paste(" Status:", conv_details), "\n")
+  cat(paste(" Final change:", format(x$convergence$final_change, digits = 4)),
+      paste0("(tolerance = ", format(x$convergence$tolerance, digits = 2), ")\n"))
+
+  # Model fit statistics
+  cat(crayon::bold("\nModel Fit:\n"))
+
+  # Create the header
+  cat(sprintf("%-25s %s\n", "Statistic", "Value"))
+  cat("------------------------ -------\n")
+
+  # Format the values safely
+  format_num <- function(x) {
+    if (is.null(x) || is.na(x)) return("NA")
+    if (x == as.integer(x)) return(as.character(as.integer(x)))
+    format(x, digits = 4, nsmall = 1)
+  }
+
+  # Print the rows
+  cat(sprintf("%-25s %s\n", "Marginal log-likelihood",
+              format_num(x$model_fit$mloglik)))
+  cat(sprintf("%-25s %s\n", "Sample size",
+              format_num(x$model_fit$n)))
+
+  # Timing information
+  cat("\n")
+  cat(crayon::bold("Computation time:"),
+      format(x$timing, digits = 3), "\n")
+
+  # Footer
+  cat(cli::rule(width = getOption("width")))
+}
+
+#' @rdname print.summary.fire
+#' @method print summary.fire_tensor
 #' @export
 print.summary.fire_tensor <- function(x, ...) {
   # Header with colored title
@@ -296,18 +307,18 @@ print.summary.fire_tensor <- function(x, ...) {
   cat(paste(kernel_text, collapse = "\n"), "\n")
   cat("I-prior kernel:", x$kernel_info$kernel_iprior)
   if (!is.null(x$kernel_info$iprior_param)) {
-    cat(" (parameter =", x$kernel_info$iprior_param, ")")
+    cat(" ( parameter =", x$kernel_info$iprior_param, ")")
   }
   cat("\n")
 
   # Coefficients section
-  cat(crayon::bold("Estimated Parameters:"), "\n")
-  coef_table <- data.frame(
-    Value = format(unlist(x$coefficients), digits = 4, nsmall = 4),
-    stringsAsFactors = FALSE
-  )
-  print(knitr::kable(coef_table, format = "simple", align = c('l', 'r')))
-  cat("\n")
+  cat(crayon::bold("\nEstimated Parameters:\n"))
+  cat("               Value\n")
+  cat("---------- ---------\n")
+  cat(sprintf("%-10s %7.4f\n", "alpha", x$coefficients["alpha"]))
+  cat(sprintf("%-10s %7.4f\n", "tau", x$coefficients["tau"]))
+  cat(sprintf("%-10s %7.4f\n", "noise", x$coefficients["noise"]))
+  cat(sprintf("%-10s %7.4f\n", "intercept", x$coefficients["intercept"]))
 
   # Convergence information
   cat(crayon::bold("Convergence:\n"))
@@ -322,14 +333,24 @@ print.summary.fire_tensor <- function(x, ...) {
       paste0("(tolerance = ", format(x$convergence$tolerance, digits = 2), ")\n"))
 
   # Model fit statistics
-  cat(crayon::bold("\nModel Fit:"))
-  fit_table <- data.frame(
-    Statistic = c("Marginal log-likelihood", "Sample size"),
-    Value = c(format(x$model_fit$mloglik, digits = 4),
-              x$model_fit$n),
-    stringsAsFactors = FALSE
-  )
-  print(knitr::kable(fit_table, format = "simple", align = c('l', 'r')))
+  cat(crayon::bold("\nModel Fit:\n"))
+
+  # Create the header
+  cat(sprintf("%-25s %s\n", "Statistic", "Value"))
+  cat("------------------------ -------\n")
+
+  # Format the values safely
+  format_num <- function(x) {
+    if (is.null(x) || is.na(x)) return("NA")
+    if (x == as.integer(x)) return(as.character(as.integer(x)))
+    format(x, digits = 4, nsmall = 1)
+  }
+
+  # Print the rows
+  cat(sprintf("%-25s %s\n", "Marginal log-likelihood",
+              format_num(x$model_fit$mloglik)))
+  cat(sprintf("%-25s %s\n", "Sample size",
+              format_num(x$model_fit$n)))
 
   # Timing information
   cat("\n")

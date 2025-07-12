@@ -17,3 +17,6 @@ Invisibly returns the input object.
 \description{
 Prints summarized results for \code{fire_fitted} objects.
 }
+\seealso{
+\code{\link{fitted.fire}}
+}

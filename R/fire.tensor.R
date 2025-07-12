@@ -1,33 +1,37 @@
 #' @title FIRE Model for Tensor Input
-#' @param Y A numeric response vector
-#' @param scale Logical indicating whether to center the response by subtracting mean(Y)
-#' @param dat_T List of index sets for each mode
-#' @param kernels List of kernel functions for each mode (Check \code{\link{kernels_fire}} for details)
-#' @param kernels_params List of parameters for each kernel
-#' @param kernel_iprior Type of I-prior kernel
-#' @param iprior_param Parameter for I-prior kernel:
-#' \itemize{
-#' \item{\code{"cfbm"}} - Hurst
-#' \item{\code{"rbf"}} - lengthscale
-#' \item{\code{"linear"}} - offset
-#' \item{\code{"poly"}} - degree and offset
-#' }
-#' @param maxiter Maximum number of EM iterations
-#' @param stop.eps Convergence tolerance
-#' @param constant Logical indicating whether to include the constant kernel term
-#' @param center Logical indicating whether to center the kernel matrix
-#' @param par_init Optional list of initial parameter values (lambda, noise)
-#' @param os_type Operating system type for compatibility ("Apple" or "Windows")
-#' @param asymptote Logical to use asymptotic initial values
 #' @rdname fire
 #' @export
-fire.tensor <- function(X, Y, ...,
-                        dat_T, scale = TRUE,
+fire.tensor <- function(X, Y, dat_T,
                         kernels, kernels_params,
                         kernel_iprior = 'cfbm', iprior_param = NULL,
-                        maxiter = 200, stop.eps = 1e-5, center = FALSE,
-                        par_init = NULL, constant = TRUE, os_type = "Apple", asymptote = TRUE, sample_id = 1
-){
+                        control = list(),...) {
+
+  # Set default control parameters
+  con <- list(
+    scale = TRUE,
+    maxiter = 200,
+    stop.eps = 1e-5,
+    constant = TRUE,
+    center = FALSE,
+    par_init = NULL,
+    os_type = "Apple",
+    cores = NULL,
+    asymptote = TRUE,
+    sample_id = 1
+  )
+  # Override defaults with user-supplied control parameters
+  con[names(control)] <- control
+
+  scale = con$scale
+  maxiter = con$maxiter
+  stop.eps = con$stop.eps
+  constant = con$constant
+  center = con$center
+  par_init = con$par_init
+  os_type = con$os_type
+  cores = con$cores
+  asymptote = con$asymptote
+  sample_id = con$sample_id
 
   input_type <- ifelse(is.list(X), 'list', 'array')
 
@@ -43,6 +47,16 @@ fire.tensor <- function(X, Y, ...,
   if(length(kernels) != length(kernels_params)) {
     stop("kernels and kernels_params must be lists of equal length")
   }
+
+  if(is.null(cores)) {
+    cores <- if(interactive()) {
+      max(1, parallel::detectCores() - 1)
+    } else {
+      1  # Default to 1 core during checking/examples
+    }
+  }
+  cores <- min(cores, parallel::detectCores())
+
   # convert the tensor from array into list
   if (!is.list(X)) {
     if (is.array(X)) {
@@ -59,6 +73,13 @@ fire.tensor <- function(X, Y, ...,
     stop("All elements of X must be arrays/matrices")
   }
 
+  # sample size
+  N = length(Y)
+
+  intercept <- if(scale) mean(Y) else 0
+  Y <- Y - intercept
+  Ymean <- mean(Y)
+
   if(is.null(iprior_param)){
     if (kernel_iprior == 'cfbm') {
       iprior_param <- 0.5
@@ -67,20 +88,14 @@ fire.tensor <- function(X, Y, ...,
     }else if(kernel_iprior == 'linear'){
       iprior_param <- 0
     }else if(kernel_iprior == 'poly'){
-      iprior_param <- c(2, mean(Y))
+      iprior_param <- c(2, Ymean)
     }
   }
-
-  # sample size
-  N = length(Y)
-
-  intercept <- if(scale) mean(Y) else 0
-  Y <- Y - intercept
 
   Index <- create_index_matrix(dat_T)
 
   # precompute kernel matrices G_m's
-  G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
+  G <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
 
   if(is.null(par_init)){
     if(asymptote == F){
@@ -94,7 +109,7 @@ fire.tensor <- function(X, Y, ...,
                                     G = G,
                                     Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                     constant = constant,
-                                    os_type = os_type,
+                                    os_type = os_type, cores = cores,
                                     sample_id = sample_id)
       init_points = list(
         list(lambda = pre_init_result$lambda[1], noise = pre_init_result$lambda[2]),
@@ -131,7 +146,7 @@ fire.tensor <- function(X, Y, ...,
 
         nmat = Kronecker_norm_mat(X = X, G = G,
                                   alpha = alpha, constant = constant,
-                                  Index = Index, os_type = os_type, sample_id = sample_id)
+                                  Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
 
         # Generate Gram matrix based on I-prior kernel choice
         if (kernel_iprior == 'cfbm') {
@@ -166,7 +181,7 @@ fire.tensor <- function(X, Y, ...,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   tau = tau, noise = noise,
                   Index = Index, W = W, w = w, constant = constant,
-                  os_type = os_type, sample_id = sample_id,
+                  os_type = os_type, cores = cores, sample_id = sample_id,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
 
@@ -175,7 +190,7 @@ fire.tensor <- function(X, Y, ...,
       alpha = rep(alpha_init, length(kernels))
       nmat = Kronecker_norm_mat(X = X, G = G,
                                 alpha = alpha, constant = constant,
-                                Index = Index, os_type = os_type, sample_id = sample_id)
+                                Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
 
       # Generate Gram matrix based on I-prior kernel choice
       if (kernel_iprior == 'cfbm') {
@@ -195,7 +210,7 @@ fire.tensor <- function(X, Y, ...,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   noise = noise, alpha = alpha_init, H.tilde = H.tilde,
                   Index = Index, W = W, w = w, constant = constant,
-                  os_type = os_type, sample_id = sample_id,
+                  os_type = os_type, cores = cores, sample_id = sample_id,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
       tau = tau_est[niter+1] = res$par
@@ -318,12 +333,14 @@ fire.tensor <- function(X, Y, ...,
     }
   }
   # Return structured result
-  structure(
+  this_call <- match.call()
+
+  output <- structure(
     best_result,
     class = c("fire_tensor"),
     input_type = input_type,
     dimensions = original_dims,
-    call = match.call(),
+    call = this_call,
     timestamp = Sys.time(),
     training_data = X,
     original_response = Y,
@@ -335,6 +352,7 @@ fire.tensor <- function(X, Y, ...,
     dat_T = dat_T,
     center = center,
     os_type = os_type,
+    cores = cores,
     intercept = intercept,
     sample_id = sample_id,
     sample_size = N,
@@ -346,6 +364,9 @@ fire.tensor <- function(X, Y, ...,
       final_change = abs(best_result$diff.loglik)
     )
   )
+
+  return(output)
+
 }
 
 # Keep Qfun_tensor as an unexported internal function in the same file
@@ -354,7 +375,7 @@ Qfun_tensor <- function(X, Y, dat_T,
                         kernel_iprior, iprior_param,
                         tau, noise, alpha,
                         H.tilde = NULL, Index, W, w, constant = TRUE,
-                        os_type = "Apple",
+                        os_type = "Apple", cores = 1,
                         sample_id = 1){
 
   # sample size
@@ -366,7 +387,7 @@ Qfun_tensor <- function(X, Y, dat_T,
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = alpha, constant = constant,
-                              Index = Index, os_type = os_type, sample_id = sample_id)
+                              Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
     if (kernel_iprior == 'cfbm') {
       H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
     } else if (kernel_iprior == 'rbf') {

@@ -1,35 +1,35 @@
 #' @title FIRE Model for Matrix Input
-#' @param Y A numeric response vector
-#' @param scale Logical indicating whether to center the response by subtracting mean(Y)
-#' @param dat_T List of index sets for each mode
-#' @param kernels List of kernel functions for each mode (Check \code{\link{kernels_fire}} for details)
-#' @param kernels_params List of parameters for each kernel
-#' @param kernel_iprior Type of I-prior kernel
-#' @param iprior_param Parameter for I-prior kernel:
-#' \itemize{
-#' \item{\code{"cfbm"}} - Hurst
-#' \item{\code{"rbf"}} - lengthscale
-#' \item{\code{"linear"}} - offset
-#' \item{\code{"poly"}} - degree and offset
-#' }
-#' @param maxiter Maximum number of EM iterations
-#' @param stop.eps Convergence tolerance
-#' @param center Logical indicating whether to center the kernel matrix
-#' @param par_init Optional list of initial parameter values (lambda, noise)
-#' @param os_type Operating system type for compatibility ("Apple" or "Windows")
-#' @param asymptote Logical to use asymptotic initial values
-#'
 #' @rdname fire
 #' @export
-fire.matrix <- function(X, Y,...,
-                        dat_T,scale = TRUE,
-                        kernels = list(cfbm),kernels_params = list(0.5),
-                        kernel_iprior = 'cfbm',iprior_param = NULL,
-                        maxiter = 200,stop.eps = 1e-5,center = FALSE,
-                        par_init = NULL,
-                        os_type = "Apple",
-                        asymptote = TRUE
-                        ) {
+fire.matrix <- function(X, Y, dat_T,
+                        kernels = list(cfbm), kernels_params = list(0.5),
+                        kernel_iprior = 'cfbm', iprior_param = NULL,
+                        control = list(),...) {
+
+  # Set default control parameters
+  con <- list(
+    scale = TRUE,
+    maxiter = 200,
+    stop.eps = 1e-5,
+    center = FALSE,
+    par_init = NULL,
+    os_type = "Apple",
+    cores = NULL,
+    asymptote = TRUE
+  )
+  # Override defaults with user-supplied control parameters
+  con[names(control)] <- control
+
+  scale = con$scale
+  maxiter = con$maxiter
+  stop.eps = con$stop.eps
+  constant = con$constant
+  center = con$center
+  par_init = con$par_init
+  os_type = con$os_type
+  cores = con$cores
+  asymptote = con$asymptote
+  sample_id = con$sample_id
 
   # Input validation
   if (!is.matrix(X)) stop("X must be a matrix")
@@ -42,12 +42,32 @@ fire.matrix <- function(X, Y,...,
   if (!kernel_iprior %in% c("cfbm", "rbf", "linear")) {
     stop("kernel_iprior must be one of: 'cfbm', 'rbf', 'linear'")
   }
-
+  if(is.null(cores)) {
+    cores <- if(interactive()) {
+      max(1, parallel::detectCores() - 1)
+    } else {
+      1  # Default to 1 core during checking/examples
+    }
+  }
+  cores <- min(cores, parallel::detectCores())
   # only work for without constant kernel term
   constant = FALSE
 
   intercept <- if(scale) mean(Y) else 0
   Y <- Y - intercept
+  Ymean <- mean(Y)
+
+  if(is.null(iprior_param)){
+    if (kernel_iprior == 'cfbm') {
+      iprior_param <- 0.5
+    }else if(kernel_iprior == 'rbf'){
+      iprior_param <- 1
+    }else if(kernel_iprior == 'linear'){
+      iprior_param <- 0
+    }else if(kernel_iprior == 'poly'){
+      iprior_param <- c(2, Ymean)
+    }
+  }
 
   N <- length(Y)
   d <- ncol(X)
@@ -59,7 +79,7 @@ fire.matrix <- function(X, Y,...,
                                   kernels = kernels, kernels_params = kernels_params,
                                   Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                   constant = constant,
-                                  os_type = os_type,
+                                  os_type = os_type, cores = cores,
                                   sample_id = 1)
     init_points = list(
       list(lambda = pre_init_result$lambda[1], noise = pre_init_result$lambda[2]),
@@ -93,27 +113,15 @@ fire.matrix <- function(X, Y,...,
     G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = c(1), constant = constant,
-                              Index = Index,  os_type = os_type, sample_id = 1)
+                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
-      if (is.null(iprior_param)) {
-        iprior_param <- 0.5
-      }
       H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
     } else if (kernel_iprior == 'rbf') {
-      if (is.null(iprior_param)) {
-        iprior_param <- 1
-      }
       H.tilde <- rbf_rkhs_kron(nmat = nmat, lengthscale = iprior_param)
     } else if (kernel_iprior == 'linear') {
-      if (is.null(iprior_param)) {
-        iprior_param <- 0
-      }
       H.tilde <- nmat + iprior_param
     }else if (kernel_iprior == 'poly'){
-      if (is.null(iprior_param)) {
-        iprior_param <- c(2, mean(Y))
-      }
       H.tilde <-  (nmat + iprior_param[2])^iprior_param[1]
     }
 
@@ -136,7 +144,7 @@ fire.matrix <- function(X, Y,...,
                   H.tilde = H.tilde,
                   Index = Index,
                   W = W, w = w, constant = constant,
-                  os_type = os_type,
+                  os_type = os_type, cores = cores,
                   method = 'L-BFGS-B',
                   control = list(maxit = 2))
 
@@ -231,9 +239,9 @@ fire.matrix <- function(X, Y,...,
   }
 
   # Return structured result
-  structure(
+  output <- structure(
     best_result,
-    class = c("fire_model", "fire_matrix"),
+    class = c("fire_matrix"),
     input_type = "matrix",
     dimensions = dim(X),
     call = match.call(),
@@ -248,6 +256,7 @@ fire.matrix <- function(X, Y,...,
     dat_T = dat_T,
     center = center,
     os_type = os_type,
+    cores = cores,
     intercept = intercept,
     convergence = list(
       converged = best_result$converged,
@@ -257,13 +266,15 @@ fire.matrix <- function(X, Y,...,
       final_change = abs(best_result$diff.loglik)
     )
   )
+  output
+
 }
 
 # Keep Qfun_matrix as an unexported internal function in the same file
 Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
                         kernel_iprior, iprior_param, lambda, noise,
                         H.tilde = NULL, Index, W, w, constant = TRUE,
-                        os_type = "Apple") {
+                        os_type = "Apple", cores = NULL) {
   stopifnot(
     is.matrix(X),
     is.numeric(Y),
@@ -279,7 +290,7 @@ Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = c(1), constant = constant,
-                              Index = Index,  os_type = os_type, sample_id = 1)
+                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
       if (is.null(iprior_param)) {

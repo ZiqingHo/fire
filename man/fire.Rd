@@ -10,83 +10,98 @@
 \alias{fire.tensor}
 \title{Fit a FIRE Model}
 \usage{
-fire(X, Y, ...)
-
-\method{fire}{default}(
+fire(
   X,
   Y,
-  ...,
   dat_T,
-  scale = TRUE,
   kernels,
   kernels_params,
   kernel_iprior = "cfbm",
   iprior_param = NULL,
-  maxiter = 200,
-  stop.eps = 1e-05,
-  center = FALSE,
-  par_init = NULL,
-  os_type = "Apple",
-  asymptote = TRUE,
-  sample_id = 1
+  control = list(),
+  ...
 )
 
-\method{fire}{data.frame}(X, Y, ...)
-
-\method{fire}{array}(X, Y, ...)
-
-\method{fire}{list}(X, Y, ...)
-
-\method{fire}{matrix}(
+\method{fire}{default}(
   X,
   Y,
-  ...,
   dat_T,
-  scale = TRUE,
+  kernels,
+  kernels_params,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  control = list(),
+  ...
+)
+
+\method{fire}{data.frame}(
+  X,
+  Y,
+  dat_T,
   kernels = list(cfbm),
   kernels_params = list(0.5),
   kernel_iprior = "cfbm",
   iprior_param = NULL,
-  maxiter = 200,
-  stop.eps = 1e-05,
-  center = FALSE,
-  par_init = NULL,
-  os_type = "Apple",
-  asymptote = TRUE
+  control = list(),
+  ...
+)
+
+\method{fire}{array}(
+  X,
+  Y,
+  dat_T,
+  kernels,
+  kernels_params,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  control = list(),
+  ...
+)
+
+\method{fire}{list}(
+  X,
+  Y,
+  dat_T,
+  kernels,
+  kernels_params,
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  control = list(),
+  ...
+)
+
+\method{fire}{matrix}(
+  X,
+  Y,
+  dat_T,
+  kernels = list(cfbm),
+  kernels_params = list(0.5),
+  kernel_iprior = "cfbm",
+  iprior_param = NULL,
+  control = list(),
+  ...
 )
 
 \method{fire}{tensor}(
   X,
   Y,
-  ...,
   dat_T,
-  scale = TRUE,
   kernels,
   kernels_params,
   kernel_iprior = "cfbm",
   iprior_param = NULL,
-  maxiter = 200,
-  stop.eps = 1e-05,
-  center = FALSE,
-  par_init = NULL,
-  constant = TRUE,
-  os_type = "Apple",
-  asymptote = TRUE,
-  sample_id = 1
+  control = list(),
+  ...
 )
 }
 \arguments{
-\item{X}{A numeric inputs in matrix, data.frame, array or list form}
+\item{X}{A numeric input in \code{matrix}, \code{data.frame}, \code{array} or \code{list}}
 
 \item{Y}{A numeric response vector}
 
-\item{...}{Additional arguments passed to methods}
-
 \item{dat_T}{List of index sets for each mode}
 
-\item{scale}{Logical indicating whether to center the response by subtracting mean(Y)}
-
-\item{kernels}{List of kernel functions for each mode (Check \code{\link{kernels_fire}} for details)}
+\item{kernels}{List of kernel functions for each mode (see \code{\link{kernels_fire}})}
 
 \item{kernels_params}{List of parameters for each kernel}
 
@@ -94,39 +109,34 @@ fire(X, Y, ...)
 
 \item{iprior_param}{Parameter for I-prior kernel:
 \itemize{
-\item{\code{"cfbm"}} - Hurst
-\item{\code{"rbf"}} - lengthscale
-\item{\code{"linear"}} - offset
-\item{\code{"poly"}} - degree and offset
+  \item \code{"cfbm"} - Hurst coefficient (default 0.5)
+  \item \code{"rbf"} - lengthscale (default 1)
+  \item \code{"linear"} - offset (default 0)
+  \item \code{"poly"} - degree and offset (default c(2, mean(Y)))
 }}
 
-\item{maxiter}{Maximum number of EM iterations}
+\item{control}{A list of control parameters (see Details)}
 
-\item{stop.eps}{Convergence tolerance}
-
-\item{center}{Logical indicating whether to center the kernel matrix}
-
-\item{par_init}{Optional list of initial parameter values (lambda, noise)}
-
-\item{os_type}{Operating system type for compatibility ("Apple" or "Windows")}
-
-\item{asymptote}{Logical to use asymptotic initial values}
-
-\item{sample_id}{The sample mode identifier, either the 1st or last mode}
-
-\item{constant}{Logical indicating whether to include the constant kernel term}
-}
-\value{
-An object of class \code{fire_matrix} or \code{fire_tensor}.
-The \code{print()} and \code{summary()} methods show the corresponding model information.
+\item{...}{Additional arguments passed to methods}
 }
 \description{
-A function to perform functional regression using I-priors and Reproducing Kernel Hilbert Space (RKHS).
-The FIRE model parameters are estimated by using EM algorithm.
+A function to perform functional regression using I-priors with Reproducing Kernel Hilbert Space (RKHS) norm.
+The FIRE model parameters are estimated using an EM algorithm.
 }
 \details{
-The \code{fire} function is able to take \code{matrix}, \code{data.frame}, \code{array} and \code{list} inputs,
-the syntax is as per the default S3 method.
+The \code{control} argument can include the following parameters:
+\itemize{
+  \item{\code{scale}: Logical indicating whether to center the response (default TRUE)}
+  \item{\code{maxiter}: Maximum number of EM iterations (default 200)}
+  \item{\code{stop.eps}: Convergence tolerance (default 1e-5)}
+  \item{\code{constant}: Logical indicating whether to include constant kernel term (default TRUE)}
+  \item{\code{center}: Logical indicating whether to center the kernel matrix (default FALSE)}
+  \item{\code{par_init}: Optional list of initial parameter values (lambda, noise)}
+  \item{\code{os_type}: Operating system type for compatibility ("Apple" or "Windows", default "Apple")}
+  \item{\code{cores}: Number of cores for parallel computation (default: detectCores() - 1)}
+  \item{\code{asymptote}: Logical to use asymptotic initial values (default TRUE)}
+  \item{\code{sample_id}: Which mode contains samples (default 1)}
+}
 }
 \section{Methods}{
 
@@ -141,7 +151,7 @@ This generic function has methods for different input types:
 # Matrix input
 data(Manure)
 mod1 <- fire(X = Manure$absorp[1:5,], Y = Manure$y$DM[1:5],
- dat_T = list(1:700), stop.eps = 2, maxiter = 4)
+ dat_T = list(1:700), control = list(stop.eps = 2, maxiter = 4))
 summary(mod1)
 
 # Array input
@@ -150,7 +160,7 @@ dat_T <- list(T1 = 1:4, T2 = 1:9)
 mod2 <- fire(X = Housing$X[1:5,,], Y = Housing$y[1:5,2],
 kernels = list(kronecker_delta, kronecker_delta),
 kernels_params = list(NA, NA),
-dat_T = dat_T, stop.eps = 2, maxiter = 4)
+dat_T = dat_T, control = list(stop.eps = 2, maxiter = 4))
 summary(mod2)
 }
 \seealso{

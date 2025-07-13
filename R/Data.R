@@ -115,6 +115,7 @@
 #'   \item{Yahoo Finance for price/volume data and log returns}
 #'   \item{Capital IQ for fundamental ratios}
 #' }
+#' Downloaded on 2024-12-18 and processed by package author.
 #'
 #' @examples
 #' data(Stock)

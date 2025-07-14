@@ -8,7 +8,7 @@
 A list containing:
 \describe{
   \item{\code{X}}{A 3D array of actual monthly prices in £ (132 months × 4 house types × 9 regions)}
-  \item{\code{y}}{London average prices in £}
+  \item{\code{y}}{London's next month's average prices across all property types (£)}
 }
 }
 \source{
@@ -49,8 +49,8 @@ A comprehensive dataset of monthly housing prices across England regions.
 
 \code{y}:
 \itemize{
-  \item From February 2000 to January 2011
-  \item average prices across all property types in London
+  \item Month: From February 2000 to January 2011
+  \item Price: Next month's average prices across all property types in London
 }
 }
 \examples{

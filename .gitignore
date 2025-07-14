@@ -27,3 +27,4 @@ doc/           # Built documentation (if not needed)
 *.tar.gz       # Built package tarballs
 .DS_Store
 .quarto
+fire_workflow.tex

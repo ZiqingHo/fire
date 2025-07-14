@@ -1,0 +1,40 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `fire'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {fire: Functional I-prior Regression using RKHS norm}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {Ziqing Ho}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Functional I-prior Regression using RKHS norm}
+\item[Version]\AsIs{0.1.0}
+\item[Description]\AsIs{Provide methods to perform functional I-prior regression model with RKHS norm.
+The estimation of hyperparameters is done via EM algorithm.}
+\item[License]\AsIs{GPL (>= 3.0)}
+\item[Language]\AsIs{en-US}
+\item[Depends]\AsIs{R (>= 3.5.0)}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{true}
+\item[Imports]\AsIs{MASS,
+parallel,
+cli,
+patchwork,
+crayon,
+ggplot2 (>= 3.4.0)}
+\item[Suggests]\AsIs{spelling,
+testthat}
+\item[RoxygenNote]\AsIs{7.3.2}
+\item[URL]\AsIs{}\url{https://github.com/ZiqingHo/fire}\AsIs{}
+\item[BugReports]\AsIs{}\url{https://github.com/ZiqingHo/fire/issues}\AsIs{}
+\end{description}
+\Rdcontents{Contents}

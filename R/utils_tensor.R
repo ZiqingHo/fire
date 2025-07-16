@@ -48,7 +48,7 @@ tensor_sample <- function(X, sample_id = 1) {
 #' @rdname utils_tensor
 #' @param X Input tensor
 #' @param Index Matrix of indices
-#' @return For `vectorize_tensor`: Vectorized tensor elements
+#' @return For \code{vectorize_tensor}: Vectorized tensor elements
 #' @export
 #' @examples
 #' # vectorize_tensor()
@@ -109,7 +109,7 @@ vectorize_tensor <- function(X, Index) {
 #' @param dim Dimensions of output tensor
 #' @param N Sample size
 #' @param Index Matrix of indices
-#' @return For `reshape_tensor`: A tensor with specified dimensions and the 1st mode corresponds to sampling mode
+#' @return For \code{reshape_tensor}: A tensor with specified dimensions and the 1st mode corresponds to sampling mode
 #' @export
 #' @examples
 #' # reshape_tensor()
@@ -188,7 +188,7 @@ reshape_tensor <- function(Mat, dim, N, Index) {
 #' @rdname utils_tensor
 #' @param n Unfolding mode
 #' @param mode Logical to print status message
-#' @return For `unfolding`: Unfolded matrix
+#' @return For \code{unfolding}: Unfolded matrix
 #' @export
 #' @examples
 #' # unfolding()
@@ -214,7 +214,7 @@ unfolding <- function(X, n, mode = TRUE) {
 #' @rdname utils_tensor
 #' @param X Input tensor
 #' @param sample_id Sampling mode (1st or last mode)
-#' @return For `dat_unfolding`: List of mode-n unfolded matrices
+#' @return For \code{dat_unfolding}: List of mode-n unfolded matrices
 #' @export
 #' @examples
 #' # dat_unfolding()

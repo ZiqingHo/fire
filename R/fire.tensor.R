@@ -285,11 +285,16 @@ fire.tensor <- function(X, Y, dat_T,
 
       if (current_converged) {
         converged_flag <- TRUE
-        if (i == length(init_points)) {
-          message("Convergence achieved with the 2nd initial point.")
-        } else {
-          message("Convergence achieved with the 1st initial point. Skipping remaining initial point.")
+        if(is.null(par_init)){
+          if (i == 2) {
+            message("Convergence achieved with the 2nd set of initial points.")
+          } else {
+            message("Convergence achieved with the 1st set of initial points. Skipping the remaining sets of initial points.")
+          }
+        }else{
+          message("Convergence achieved with the initial points that you set.")
         }
+
         break
       }
     }

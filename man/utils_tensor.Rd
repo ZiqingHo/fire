@@ -39,13 +39,13 @@ dat_unfolding(X, sample_id = 1, mode = TRUE)
 \value{
 For \code{tensor_sample}: List of tensor samples
 
-For `vectorize_tensor`: Vectorized tensor elements
+For \code{vectorize_tensor}: Vectorized tensor elements
 
-For `reshape_tensor`: A tensor with specified dimensions and the 1st mode corresponds to sampling mode
+For \code{reshape_tensor}: A tensor with specified dimensions and the 1st mode corresponds to sampling mode
 
-For `unfolding`: Unfolded matrix
+For \code{unfolding}: Unfolded matrix
 
-For `dat_unfolding`: List of mode-n unfolded matrices
+For \code{dat_unfolding}: List of mode-n unfolded matrices
 }
 \description{
 Collection of helper functions for tensor operations

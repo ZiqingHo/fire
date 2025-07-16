@@ -28,3 +28,4 @@ doc/           # Built documentation (if not needed)
 .DS_Store
 .quarto
 fire_workflow.tex
+.Rd2pdf*

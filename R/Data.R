@@ -74,49 +74,29 @@
 #' data(Manure)
 "Manure"
 
-##' S&P 500 Component Stocks Dataset (Q1 2023)
+#' PeMS Highway Traffic Data
 #'
-#' A comprehensive dataset containing daily market data for S&P 500 component stocks
-#' and corresponding index returns for Q1 2023.
+#' Hourly traffic speed measurements from California highway sensors.
 #'
-#' @format A list with two components:
+#' @format A 3-way tensor (array) with dimensions:
 #' \describe{
-#'   \item{\code{features}}{A 4-dimensional array [63 days × 8 features × 5 lags × 371 stocks]}
-#'   \item{\code{y}}{A vector [63 days] of S&P 500 log returns at the next time point}
+#'   \item{Hours}{24 hours of daily measurements}
+#'   \item{Days}{44 days of observations (weekdays of May-June 2012)}
+#'   \item{Sensors}{288 sensor stations in District 7}
 #' }
 #'
 #' @details
-#' \code{features}:
-#' \itemize{
-#'       \item{Date: Daily from 2023-01-03 to 2023-04-03 (63 trading days)}
-#'       \item{Features: 8 financial metrics:
-#'         \itemize{
-#'           \item{lr_AdjClose: Log returns of adjusted closing price}
-#'           \item{lr_Close: Log returns of closing price}
-#'           \item{lr_High: Log returns of daily high price}
-#'           \item{lr_Low: Log returns of daily low price}
-#'           \item{lr_Open: Log returns of opening price}
-#'           \item{log_Volume: Logarithm of trading volume}
-#'           \item{PB: Price-to-book ratio}
-#'           \item{TE: TEV/EBITDA}
-#'         }
-#'       }
-#'       \item{Lags: 5 time points (T0 = current day, T1-T4 = previous days)}
-#'       \item{Tickers: 371 S&P 500 component stocks (e.g., "AAPL", "MSFT", "AMZN")}
-#' }
-#'
-#' \code{y}:
-#' \itemize{
-#'   \item Log-returns of S&P 500 index at next trading day, calculated from adjusted closing prices
-#' }
+#' Processed from the original PeMSD7 dataset containing raw 5-minutes measurements aggregated to hourly intervals
 #'
 #' @source
-#' \itemize{
-#'   \item{Yahoo Finance for price/volume data and log returns}
-#'   \item{Capital IQ for fundamental ratios}
-#' }
-#' Downloaded on 2024-12-18 and processed by package author.
+#' Downloaded on 2025-07-19 and processed by package author.
+#'
+#' @references
+#' B. Yu, H. Yin, and Z. Zhu, "Spatio-temporal graph convolutional networks:
+#' A deep learning framework for traffic forecasting," in Proc. IJCAI, 2018, pp. 3634–3640.
 #'
 #' @examples
-#' data(Stock)
-"Stock"
+#' data(PeMS)
+"PeMS"
+
+

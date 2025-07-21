@@ -303,8 +303,22 @@ fire.tensor <- function(X, Y, dat_T,
   # Clean up results in case we broke out early
   results <- results[!sapply(results, is.null)]
 
-  # Select the result with the maximum log-likelihood
-  max_loglik_index = which.max(sapply(results, function(res) max(res$mloglik, na.rm = TRUE)))
+  # Select the best result based on convergence status and log-likelihood
+  if (length(results) == 2) {
+    # Check convergence status
+    conv2 <- results[[2]]$niter < maxiter && abs(results[[2]]$diff.loglik) < stop.eps
+
+    if (conv2) {
+      max_loglik_index <- 2  # Second converged (first didn't), so we pick it regardless of mloglik
+    } else {
+      # Neither converged, pick the one with higher mloglik
+      max_loglik_index <- which.max(sapply(results, function(res) max(res$mloglik, na.rm = TRUE)))
+    }
+  } else {
+    # Only one result (either first converged or only one init point)
+    max_loglik_index <- 1
+  }
+
   best_result = results[[max_loglik_index]]
 
   # Add chosen initial values to the final result

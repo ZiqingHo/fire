@@ -143,8 +143,8 @@ sim_dat <- function(N, Ntrain,
   }
 
   if(m == 1){
-    nmat <- Kronecker_norm_mat(X = X[1:Ntrain,], G = Gmat.list, alpha = alpha, Index = Index, constant = constant, os_type = os_type, sample_id = 1)
-    nmat.cross <- Kronecker_norm_cross(Xtrain = X[1:Ntrain,], Xnew = X[-c(1:Ntrain),], G = Gmat.list, alpha = alpha, Index = Index, constant = constant, os_type = os_type, sample_id = 1)
+    nmat <- Kronecker_norm_mat(X = X[1:Ntrain,], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
+    nmat.cross <- Kronecker_norm_cross(Xtrain = X[1:Ntrain,], Xnew = X[-c(1:Ntrain),], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
   }else{
     X.list <- tensor_sample(X, sample_id = 1)
     X.train <- X.list[1:Ntrain]

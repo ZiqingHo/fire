@@ -82,7 +82,7 @@
 #' \describe{
 #'   \item{Hours}{24 hours of daily measurements}
 #'   \item{Days}{44 days of observations (weekdays of May-June 2012)}
-#'   \item{Sensors}{288 sensor stations in District 7}
+#'   \item{Sensors}{228 sensor stations in District 7}
 #' }
 #'
 #' @details

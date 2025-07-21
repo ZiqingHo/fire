@@ -80,9 +80,15 @@
 #'
 #' @format A 3-way tensor (array) with dimensions:
 #' \describe{
-#'   \item{Hours}{24 hours of daily measurements}
-#'   \item{Days}{44 days of observations (weekdays of May-June 2012)}
-#'   \item{Sensors}{228 sensor stations in District 7}
+#'   \item{X}{A 3-way tensor (array) with dimensions:
+#'     \itemize{
+#'       \item{Hours: 24 hours of daily measurements}
+#'       \item{Days: 43 days of observations (weekdays of May-June 2012)}
+#'       \item{Sensors: 228 sensor stations in District 7}
+#'     }
+#'   }
+#'   \item{y}{A vector containing the average traffic speed of 228 sensors
+#'            during the morning peak hours (6-9am) on the 44th day}
 #' }
 #'
 #' @details

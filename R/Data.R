@@ -74,35 +74,3 @@
 #' data(Manure)
 "Manure"
 
-#' PeMS Highway Traffic Data
-#'
-#' Hourly traffic speed measurements from California highway sensors.
-#'
-#' @format A 3-way tensor (array) with dimensions:
-#' \describe{
-#'   \item{X}{A 3-way tensor (array) with dimensions:
-#'     \itemize{
-#'       \item{Hours: 24 hours of daily measurements}
-#'       \item{Days: 43 days of observations (weekdays of May-June 2012)}
-#'       \item{Sensors: 228 sensor stations in District 7}
-#'     }
-#'   }
-#'   \item{y}{A vector containing the average traffic speed of 228 sensors
-#'            during the morning peak hours (6-9am) on the 44th day}
-#' }
-#'
-#' @details
-#' Processed from the original PeMSD7 dataset containing raw 5-minutes measurements aggregated to hourly intervals
-#'
-#' @source
-#' Downloaded on 2025-07-19 and processed by package author.
-#'
-#' @references
-#' B. Yu, H. Yin, and Z. Zhu, "Spatio-temporal graph convolutional networks:
-#' A deep learning framework for traffic forecasting," in Proc. IJCAI, 2018, pp. 3634–3640.
-#'
-#' @examples
-#' data(PeMS)
-"PeMS"
-
-

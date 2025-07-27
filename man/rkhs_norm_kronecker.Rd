@@ -52,7 +52,7 @@ Kronecker_norm_cross(
 
 \item{L_inv}{Inverse eigenvalues from internal \code{\link{Lambda_inv}}}
 
-\item{constant}{Logical indicating whether to include constant kernel term}
+\item{constant}{Logical indicating whether to include constant kernel term in g}
 
 \item{Index}{Matrix of indices for tensor vectorization}
 

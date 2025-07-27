@@ -14,7 +14,8 @@
 #' @param Index Matrix of indices for tensor vectorization
 #' @param kernel_iprior Kernel function for iprior model
 #' @param iprior_param  Parameter of kernel in iprior
-#' @param constant Logical indicating whether to include constant kernel term
+#' @param constant_g Logical indicating whether to include constant kernel term in g
+#' @param constant_h Logical indicating whether to include constant kernel term in h
 #' @param os_type Operating system for parallelization ("Apple" or "Windows")
 #' @param cores Number of cores for parallel computation (default: detectCores() - 1)
 #' @param sample_id Which mode represents samples, either the 1st or the last mode
@@ -36,7 +37,7 @@
 #' init_cfbm <- fire:::pre_initial(X, Y, dat_T,
 #'                         kernels = list(cfbm),
 #'                         kernels_params = list(0.5),
-#'                         Index = Index, constant = FALSE,
+#'                         Index = Index, constant_g = FALSE, constant_h = FALSE,
 #'                         kernel_iprior = "cfbm", cores = 1)
 #'
 #' # 3D covariates
@@ -49,7 +50,7 @@
 #' init_rbf <- fire:::pre_initial(X, Y, dat_T,
 #'                        kernels = list(cfbm, rbf, cfbm),
 #'                        kernels_params = list(0.5, 1, 0.5),
-#'                        Index = Index, constant = TRUE,
+#'                        Index = Index, constant_g = TRUE, constant_h = FALSE,
 #'                        kernel_iprior = "rbf", cores = 1)
 #'
 #' @seealso \code{\link{fire.matrix}}, \code{\link{fire.tensor}}, \code{\link{kernels_fire}}
@@ -58,7 +59,7 @@
 pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
                         G = NULL,
                         Index, kernel_iprior = 'cfbm', iprior_param = NULL,
-                        constant = TRUE, os_type = "Apple", cores = NULL, sample_id = 1) {
+                        constant_g = TRUE, constant_h = FALSE, os_type = "Apple", cores = NULL, sample_id = 1) {
 
   m <- length(kernels)
   N <- length(Y)
@@ -77,7 +78,7 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
   }
 
   nmat <- Kronecker_norm_mat(X = X, G = G, alpha = rep(1, length(kernels)),
-                             constant = constant, Index = Index,
+                             constant = constant_g, Index = Index,
                              os_type = os_type, cores = cores, sample_id = sample_id)
 
   # Generate Gram matrix based on I-prior kernel choice
@@ -96,6 +97,10 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
   } else {
     stop(paste("Unsupported kernel_iprior:", kernel_iprior,
                "- must be 'cfbm', 'rbf', or 'linear'"))
+  }
+
+  if(constant_h){
+    H.tilde = 1 + H.tilde
   }
 
   # Eigendecomposition

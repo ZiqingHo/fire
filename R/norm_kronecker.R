@@ -10,7 +10,7 @@
 #' @param L_inv Inverse eigenvalues from internal \code{\link{Lambda_inv}}
 #' @param alpha Vector of scale parameters
 #' @param Index Matrix of indices for tensor vectorization
-#' @param constant Logical indicating whether to include constant kernel term
+#' @param constant Logical indicating whether to include constant kernel term in g
 #' @param os_type Parallelization backend ("Windows" or "Apple")
 #' @param cores Number of cores used for parallel computation
 #' @param sample_id Mode representing samples, either 1st or last mode

@@ -22,7 +22,8 @@
 #'   \item \code{sigma_v}: Standard deviation for random effects (default: 1)
 #'   \item \code{sigma}: Noise standard deviation (default: 1)
 #'   \item \code{sigma_w}: Standard deviation for weights (default: NULL, which sets it to 1/sigma)
-#'   \item \code{constant}: Logical indicating whether to include constant kernel term (default: TRUE)
+#'   \item \code{constant_g}: Logical indicating whether to include constant kernel term in g (default: TRUE)
+#'   \item \code{constant_h}: Logical indicating whether to include constant kernel term in h (default: FALSE)
 #'   \item \code{center}: Whether to center the kernel matrices (default: FALSE)
 #'   \item \code{os_type}: Operating system type ('Apple' or 'Windows') (default: 'Apple')
 #'   \item \code{cores}: Number of cores used in parallel computation (default: NULL)
@@ -63,7 +64,8 @@ sim_dat <- function(N, Ntrain,
     sigma_v = 1,
     sigma = 1,
     sigma_w = NULL,
-    constant = TRUE,
+    constant_g = TRUE,
+    constant_h = FALSE,
     center = FALSE,
     os_type = 'Apple',
     cores = NULL
@@ -81,7 +83,8 @@ sim_dat <- function(N, Ntrain,
   sigma_v <- con$sigma_v
   sigma <- con$sigma
   sigma_w <- con$sigma_w
-  constant <- con$constant
+  constant_g <- con$constant_g
+  constant_h <- con$constant_h
   center <- con$center
   os_type <- con$os_type
   cores <- con$cores
@@ -112,13 +115,13 @@ sim_dat <- function(N, Ntrain,
 
   # Construct G matrix for arbitrary m dimensions
   if(m == 1){
-  G <- if(constant) matrix(1, ncol = d[1], nrow = d[1]) + alpha[1]^2 * Gmat.list[[1]]
+  G <- if(constant_g) matrix(1, ncol = d[1], nrow = d[1]) + alpha[1]^2 * Gmat.list[[1]]
   else alpha[1]^2 * Gmat.list[[1]]
   }else{
-    G <- if(constant) matrix(1, ncol = d[1], nrow = d[1]) + alpha[1]^2 * Gmat.list[[1]]
+    G <- if(constant_g) matrix(1, ncol = d[1], nrow = d[1]) + alpha[1]^2 * Gmat.list[[1]]
     else alpha[1]^2 * Gmat.list[[1]]
     for(j in 2:m) {
-      if(constant) {
+      if(constant_g) {
         G_j <- matrix(1, ncol = d[j], nrow = d[j]) + alpha[j]^2 * Gmat.list[[j]]
       } else {
         G_j <- alpha[j]^2 * Gmat.list[[j]]
@@ -143,14 +146,14 @@ sim_dat <- function(N, Ntrain,
   }
 
   if(m == 1){
-    nmat <- Kronecker_norm_mat(X = X[1:Ntrain,], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
-    nmat.cross <- Kronecker_norm_cross(Xtrain = X[1:Ntrain,], Xnew = X[-c(1:Ntrain),], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
+    nmat <- Kronecker_norm_mat(X = X[1:Ntrain,], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant_g, os_type = os_type, sample_id = 1)
+    nmat.cross <- Kronecker_norm_cross(Xtrain = X[1:Ntrain,], Xnew = X[-c(1:Ntrain),], G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant_g, os_type = os_type, sample_id = 1)
   }else{
     X.list <- tensor_sample(X, sample_id = 1)
     X.train <- X.list[1:Ntrain]
     X.test <- X.list[-c(1:Ntrain)]
-    nmat <- Kronecker_norm_mat(X = X.train, G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
-    nmat.cross <- Kronecker_norm_cross(Xtrain = X.train, Xnew = X.test, G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant, os_type = os_type, sample_id = 1)
+    nmat <- Kronecker_norm_mat(X = X.train, G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant_g, os_type = os_type, sample_id = 1)
+    nmat.cross <- Kronecker_norm_cross(Xtrain = X.train, Xnew = X.test, G = Gmat.list, alpha = alpha, Index = Index.T, constant = constant_g, os_type = os_type, sample_id = 1)
   }
 
   if (kernel_iprior == 'cfbm') {
@@ -183,6 +186,10 @@ sim_dat <- function(N, Ntrain,
                "- must be 'cfbm', 'rbf', 'linear' or 'poly'"))
   }
 
+  if(constant_h){
+    H <- 1 + H
+    Hcross <- 1 + Hcross
+  }
   w <- rnorm(Ntrain, mean = 0, sd = sigma_w)
   ## generate f(X_n) = Hw, n = 1,...,N
   Y.train <- as.vector(H %*% w)

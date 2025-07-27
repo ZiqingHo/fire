@@ -49,7 +49,8 @@ fitted.fire_matrix <- function(object, ...) {
   kernels_params <- attr(object, "kernels_params")
   kernel_iprior <- attr(object, "kernel_iprior")
   iprior_param <- attr(object, "iprior_param")
-  constant <- attr(object, "constant")
+  constant_g <- attr(object, "constant_g")
+  constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
@@ -66,7 +67,7 @@ fitted.fire_matrix <- function(object, ...) {
   nmat <- Kronecker_norm_mat(X = X,
                              G = G,
                              alpha = c(1),
-                             constant = constant,
+                             constant = constant_g,
                              Index = Index,
                              os_type = attr(object, "os_type"),
                              cores = attr(object, "cores"),
@@ -83,6 +84,10 @@ fitted.fire_matrix <- function(object, ...) {
     H.tilde <- nmat + iprior_param
   } else if (kernel_iprior == 'poly'){
     H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
+  }
+
+  if(constant_h){
+    H.tilde <- 1 + H.tilde
   }
 
   # Calculate fitted values and metrics
@@ -125,7 +130,8 @@ fitted.fire_tensor<- function(object, ...) {
   kernels_params <- attr(object, "kernels_params")
   kernel_iprior <- attr(object, "kernel_iprior")
   iprior_param <- attr(object, "iprior_param")
-  constant <- attr(object, "constant")
+  constant_g <- attr(object, "constant_g")
+  constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   os_type <- attr(object, "os_type")
@@ -144,7 +150,7 @@ fitted.fire_tensor<- function(object, ...) {
   nmat <- Kronecker_norm_mat(X = X,
                              G = G,
                              alpha = alpha_params,
-                             constant = constant,
+                             constant = constant_g,
                              Index = Index,
                              os_type = attr(object, "os_type"),
                              cores = attr(object, "cores"),
@@ -161,6 +167,10 @@ fitted.fire_tensor<- function(object, ...) {
     H.tilde <- nmat + iprior_param
   } else if (kernel_iprior == 'poly'){
     H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
+  }
+
+  if(constant_h){
+    H.tilde <- 1 + H.tilde
   }
 
   # Calculate fitted values and metrics

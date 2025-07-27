@@ -12,6 +12,7 @@ fire.matrix <- function(X, Y, dat_T,
     maxiter = 200,
     stop.eps = 1e-5,
     center = FALSE,
+    constant_h = FALSE,
     par_init = NULL,
     os_type = "Apple",
     cores = NULL,
@@ -23,7 +24,7 @@ fire.matrix <- function(X, Y, dat_T,
   scale = con$scale
   maxiter = con$maxiter
   stop.eps = con$stop.eps
-  constant = con$constant
+  constant_h = con$constant_h
   center = con$center
   par_init = con$par_init
   os_type = con$os_type
@@ -51,7 +52,7 @@ fire.matrix <- function(X, Y, dat_T,
   }
   cores <- min(cores, parallel::detectCores())
   # only work for without constant kernel term
-  constant = FALSE
+  constant_g = FALSE
 
   intercept <- if(scale) mean(Y) else 0
   Y <- Y - intercept
@@ -78,7 +79,7 @@ fire.matrix <- function(X, Y, dat_T,
     pre_init_result = pre_initial(X = X, Y = Y, dat_T = dat_T,
                                   kernels = kernels, kernels_params = kernels_params,
                                   Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
-                                  constant = constant,
+                                  constant_g = constant_g, constant_h = constant_h,
                                   os_type = os_type, cores = cores,
                                   sample_id = 1)
     init_points = list(
@@ -112,7 +113,7 @@ fire.matrix <- function(X, Y, dat_T,
     # Precompute G and H.tilde
     G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
     nmat = Kronecker_norm_mat(X = X, G = G,
-                              alpha = c(1), constant = constant,
+                              alpha = c(1), constant = constant_g,
                               Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
@@ -123,6 +124,10 @@ fire.matrix <- function(X, Y, dat_T,
       H.tilde <- nmat + iprior_param
     }else if (kernel_iprior == 'poly'){
       H.tilde <-  (nmat + iprior_param[2])^iprior_param[1]
+    }
+
+    if(constant_h){
+      H.tilde <- 1 + H.tilde
     }
 
     # Start iteration
@@ -143,7 +148,7 @@ fire.matrix <- function(X, Y, dat_T,
                   noise = noise,
                   H.tilde = H.tilde,
                   Index = Index,
-                  W = W, w = w, constant = constant,
+                  W = W, w = w, constant_g = constant_g, constant_h = constant_h,
                   os_type = os_type, cores = cores,
                   method = 'L-BFGS-B',
                   control = list(maxit = 2))
@@ -252,7 +257,8 @@ fire.matrix <- function(X, Y, dat_T,
     kernels_params = kernels_params,
     kernel_iprior = kernel_iprior,
     iprior_param = iprior_param,
-    constant = constant,
+    constant_g = constant_g,
+    constant_h = constant_h,
     dat_T = dat_T,
     center = center,
     os_type = os_type,
@@ -273,15 +279,8 @@ fire.matrix <- function(X, Y, dat_T,
 # Keep Qfun_matrix as an unexported internal function in the same file
 Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
                         kernel_iprior, iprior_param, lambda, noise,
-                        H.tilde = NULL, Index, W, w, constant = TRUE,
+                        H.tilde = NULL, Index, W, w, constant_g = TRUE, constant_h = FALSE,
                         os_type = "Apple", cores = NULL) {
-  stopifnot(
-    is.matrix(X),
-    is.numeric(Y),
-    is.list(dat_T),
-    is.numeric(lambda) && lambda > 0,
-    is.numeric(noise) && noise > 0
-  )
 
   # sample size
   N = length(Y)
@@ -289,7 +288,7 @@ Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
   # use cfbm to construct gram matrix H without scale parameter tau
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
-                              alpha = c(1), constant = constant,
+                              alpha = c(1), constant = constant_g,
                               Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
@@ -315,7 +314,14 @@ Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
     } else {
       stop(paste("Unsupported kernel_iprior:", kernel_iprior,
                  "- must be 'cfbm', 'rbf', 'linear' or 'poly"))
-    }}
+    }
+    if(constant_h){
+      H.tilde <- 1 + H.tilde
+    }
+    }
+
+
+
   H = lambda^2 * H.tilde
   H.eigen = eigen(H)
   U = H.eigen$values

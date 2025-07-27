@@ -37,16 +37,11 @@ The main \code{fire()} dispatches to:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/yourusername/FIRE}
-  \item Report bugs at \url{https://github.com/yourusername/FIRE/issues}
+  \item \url{https://github.com/ziqingho/FIRE}
+  \item Report bugs at \url{https://github.com/ziqingho/FIRE/issues}
 }
 }
 \author{
 \strong{Maintainer}: Ziqing Ho \email{hoziqing@hotmail.com}
-
-Contributors:
-\itemize{
-  \item Additional contributors (if any)
-}
 }
 \keyword{internal}

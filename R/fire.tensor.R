@@ -11,7 +11,8 @@ fire.tensor <- function(X, Y, dat_T,
     scale = TRUE,
     maxiter = 200,
     stop.eps = 1e-5,
-    constant = TRUE,
+    constant_g = TRUE,
+    constant_h = FALSE,
     center = FALSE,
     par_init = NULL,
     os_type = "Apple",
@@ -25,7 +26,8 @@ fire.tensor <- function(X, Y, dat_T,
   scale = con$scale
   maxiter = con$maxiter
   stop.eps = con$stop.eps
-  constant = con$constant
+  constant_g = con$constant_g
+  constant_h = con$constant_h
   center = con$center
   par_init = con$par_init
   os_type = con$os_type
@@ -108,7 +110,7 @@ fire.tensor <- function(X, Y, dat_T,
                                     kernels = kernels, kernels_params = kernels_params,
                                     G = G,
                                     Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
-                                    constant = constant,
+                                    constant_g = constant_g, constant_h = constant_h,
                                     os_type = os_type, cores = cores,
                                     sample_id = sample_id)
       init_points = list(
@@ -145,7 +147,7 @@ fire.tensor <- function(X, Y, dat_T,
         alpha = rep(alpha_init, length(kernels))
 
         nmat = Kronecker_norm_mat(X = X, G = G,
-                                  alpha = alpha, constant = constant,
+                                  alpha = alpha, constant = constant_g,
                                   Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
 
         # Generate Gram matrix based on I-prior kernel choice
@@ -160,6 +162,10 @@ fire.tensor <- function(X, Y, dat_T,
         } else {
           stop(paste("Unsupported kernel_iprior:", kernel_iprior,
                      "- must be 'cfbm', 'rbf', 'linear' or 'poly"))
+        }
+
+        if(constant_h){
+          H.tilde <- 1 + H.tilde
         }
 
         H =  tau^2 * H.tilde
@@ -180,7 +186,7 @@ fire.tensor <- function(X, Y, dat_T,
                   G = G, kernels = kernels, kernels_params = kernels_params,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   tau = tau, noise = noise,
-                  Index = Index, W = W, w = w, constant = constant,
+                  Index = Index, W = W, w = w, constant_g = constant_g, constant_h = constant_h,
                   os_type = os_type, cores = cores, sample_id = sample_id,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
@@ -189,7 +195,7 @@ fire.tensor <- function(X, Y, dat_T,
 
       alpha = rep(alpha_init, length(kernels))
       nmat = Kronecker_norm_mat(X = X, G = G,
-                                alpha = alpha, constant = constant,
+                                alpha = alpha, constant = constant_g,
                                 Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
 
       # Generate Gram matrix based on I-prior kernel choice
@@ -203,13 +209,17 @@ fire.tensor <- function(X, Y, dat_T,
         H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
       }
 
+      if(constant_h){
+        H.tilde <- 1 + H.tilde
+      }
+
       # update tau
       res = optim(par = tau, fn = Qfun_tensor,
                   X = X, Y = Y , dat_T = dat_T,
                   G = G, kernels = kernels, kernels_params = kernels_params,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   noise = noise, alpha = alpha_init, H.tilde = H.tilde,
-                  Index = Index, W = W, w = w, constant = constant,
+                  Index = Index, W = W, w = w, constant_g = constant_g, constant_h = constant_h,
                   os_type = os_type, cores = cores, sample_id = sample_id,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
@@ -371,7 +381,8 @@ fire.tensor <- function(X, Y, dat_T,
     kernels_params = kernels_params,
     kernel_iprior = kernel_iprior,
     iprior_param = iprior_param,
-    constant = constant,
+    constant_g = constant_g,
+    constant_h = constant_h,
     dat_T = dat_T,
     center = center,
     os_type = os_type,
@@ -397,7 +408,7 @@ Qfun_tensor <- function(X, Y, dat_T,
                         G, kernels, kernels_params,
                         kernel_iprior, iprior_param,
                         tau, noise, alpha,
-                        H.tilde = NULL, Index, W, w, constant = TRUE,
+                        H.tilde = NULL, Index, W, w, constant_g = TRUE, constant_h = FALSE,
                         os_type = "Apple", cores = 1,
                         sample_id = 1){
 
@@ -409,7 +420,7 @@ Qfun_tensor <- function(X, Y, dat_T,
   # use cfbm to construct gram matrix H without scale parameter tau
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
-                              alpha = alpha, constant = constant,
+                              alpha = alpha, constant = constant_g,
                               Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
     if (kernel_iprior == 'cfbm') {
       H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
@@ -423,6 +434,10 @@ Qfun_tensor <- function(X, Y, dat_T,
       stop(paste("Unsupported kernel_iprior:", kernel_iprior,
                  "- must be 'cfbm', 'rbf', 'linear' or 'poly"))
     }}
+
+  if(constant_h){
+    H.tilde <- 1 + H.tilde
+  }
 
   H = tau^2 * H.tilde
   H.eigen = eigen(H)

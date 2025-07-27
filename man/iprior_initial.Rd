@@ -16,7 +16,8 @@ pre_initial(
   Index,
   kernel_iprior = "cfbm",
   iprior_param = NULL,
-  constant = TRUE,
+  constant_g = TRUE,
+  constant_h = FALSE,
   os_type = "Apple",
   cores = NULL,
   sample_id = 1
@@ -43,7 +44,9 @@ pre_initial(
 
 \item{iprior_param}{Parameter of kernel in iprior}
 
-\item{constant}{Logical indicating whether to include constant kernel term}
+\item{constant_g}{Logical indicating whether to include constant kernel term in g}
+
+\item{constant_h}{Logical indicating whether to include constant kernel term in h}
 
 \item{os_type}{Operating system for parallelization ("Apple" or "Windows")}
 
@@ -74,7 +77,7 @@ Index <- expand.grid(1:5)
 init_cfbm <- fire:::pre_initial(X, Y, dat_T,
                         kernels = list(cfbm),
                         kernels_params = list(0.5),
-                        Index = Index, constant = FALSE,
+                        Index = Index, constant_g = FALSE, constant_h = FALSE,
                         kernel_iprior = "cfbm", cores = 1)
 
 # 3D covariates
@@ -87,7 +90,7 @@ Index <- cbind(Index$T1, Index$T2, Index$T3)
 init_rbf <- fire:::pre_initial(X, Y, dat_T,
                        kernels = list(cfbm, rbf, cfbm),
                        kernels_params = list(0.5, 1, 0.5),
-                       Index = Index, constant = TRUE,
+                       Index = Index, constant_g = TRUE, constant_h = FALSE,
                        kernel_iprior = "rbf", cores = 1)
 
 }

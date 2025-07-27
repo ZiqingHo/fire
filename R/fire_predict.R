@@ -50,7 +50,8 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   kernels_params <- attr(object, "kernels_params")
   kernel_iprior <- attr(object, "kernel_iprior")
   iprior_param <- attr(object, "iprior_param")
-  constant <- attr(object, "constant")
+  constant_g <- attr(object, "constant_g")
+  constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   os_type <- attr(object, "os_type")
@@ -79,7 +80,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   nmat <- Kronecker_norm_mat(X = X_train,
                              G = G,
                              alpha = c(1),
-                             constant = constant,
+                             constant = constant_g,
                              Index = Index,
                              os_type = os_type, cores = cores,
                              sample_id = 1)
@@ -88,7 +89,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
                                      Xnew = newdata,
                                      G = G,
                                      alpha = c(1),
-                                     constant = constant,
+                                     constant = constant_g,
                                      Index = Index,
                                      os_type = os_type, cores = cores,
                                      sample_id = 1)
@@ -110,6 +111,10 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
     }
 
 
+  if(constant_h){
+    Hcross.tilde <- 1 + Hcross.tilde
+
+  }
   # Calculate predictions
   Ypred <- as.vector(intercept + lambda^2 * Hcross.tilde %*% w)
 
@@ -156,7 +161,8 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   kernels_params <- attr(object, "kernels_params")
   kernel_iprior <- attr(object, "kernel_iprior")
   iprior_param <- attr(object, "iprior_param")
-  constant <- attr(object, "constant")
+  constant_g <- attr(object, "constant_g")
+  constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
   os_type <- attr(object, "os_type")
@@ -173,7 +179,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   nmat <- Kronecker_norm_mat(X = X_train,
                              G = G,
                              alpha = alpha_params,
-                             constant = constant,
+                             constant = constant_g,
                              Index = Index,
                              os_type = os_type, cores = cores,
                              sample_id = sample_id)
@@ -182,7 +188,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
                                      Xnew = newdata,
                                      G = G,
                                      alpha = alpha_params,
-                                     constant = constant,
+                                     constant = constant_g,
                                      Index = Index,
                                      os_type = os_type, cores = cores,
                                      sample_id = sample_id)
@@ -203,6 +209,9 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
     Hcross.tilde <- (nmat.cross  + iprior_param[2])^iprior_param[1]
   }
 
+  if(constant_h){
+    Hcross.tilde <- 1 + Hcross.tilde
+  }
   # Calculate predictions
   Ypred <- as.vector(intercept + tau^2 * Hcross.tilde %*% w)
 

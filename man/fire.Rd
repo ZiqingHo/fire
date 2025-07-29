@@ -137,7 +137,7 @@ The \code{control} argument can include the following parameters:
   \item{\code{cores}: Number of cores for parallel computation (default: detectCores() - 1)}
   \item{\code{asymptote}: Logical to use asymptotic initial values (default TRUE)}
   \item{\code{sample_id}: Which mode contains samples (default 1)}
-  \item{\code{epsilon}}: Small positive constant in initialisation of EM algorithm
+  \item{\code{epsilon}: Small positive constant in initialisation of EM algorithm (default 1)}
 }
 }
 \section{Methods}{

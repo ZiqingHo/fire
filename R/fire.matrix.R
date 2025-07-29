@@ -17,7 +17,7 @@ fire.matrix <- function(X, Y, dat_T,
     os_type = "Apple",
     cores = NULL,
     asymptote = TRUE,
-    epsilon = 1e-6
+    epsilon = 1
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control

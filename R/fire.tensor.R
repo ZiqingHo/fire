@@ -19,7 +19,7 @@ fire.tensor <- function(X, Y, dat_T,
     cores = NULL,
     asymptote = TRUE,
     sample_id = 1,
-    epsilon = 1e-6
+    epsilon = 1
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control

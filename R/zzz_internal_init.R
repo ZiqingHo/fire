@@ -114,7 +114,11 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
   vt.y <- crossprod(V, Y)
   lambda.tilde <- sqrt((1/N) * sum((vt.y^2) / U^2))
   sigma <- sqrt((1/N) * sum(vt.y^2))
+  if(is.null(epsilon)){
+    epsilon = min(lambda.tilde,sigma)/10
+  }
   lambda <- sqrt(sigma * epsilon)
+
 
   return(list(lambda = c(sqrt(epsilon * lambda.tilde), epsilon),
               sigma = c(lambda, sigma)))

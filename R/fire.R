@@ -26,13 +26,14 @@
 #'   \item{\code{maxiter}: Maximum number of EM iterations (default 200)}
 #'   \item{\code{stop.eps}: Convergence tolerance (default 1e-5)}
 #'   \item{\code{constant_g}: Logical indicating whether to include constant kernel term in g (default TRUE)}
-#'   \item{\code{constant_h}: Logical indicating whether to include constant kernel term in h (default TRUE)}
+#'   \item{\code{constant_h}: Logical indicating whether to include constant kernel term in h (default FALSE)}
 #'   \item{\code{center}: Logical indicating whether to center the kernel matrix (default FALSE)}
 #'   \item{\code{par_init}: Optional list of initial parameter values (lambda, noise)}
 #'   \item{\code{os_type}: Operating system type for compatibility ("Apple" or "Windows", default "Apple")}
 #'   \item{\code{cores}: Number of cores for parallel computation (default: detectCores() - 1)}
 #'   \item{\code{asymptote}: Logical to use asymptotic initial values (default TRUE)}
 #'   \item{\code{sample_id}: Which mode contains samples (default 1)}
+#'   \item{\code{epsilon}}: Small positive constant in initialisation of EM algorithm
 #' }
 #'
 #' @section Methods:

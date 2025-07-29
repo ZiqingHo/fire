@@ -18,7 +18,8 @@ fire.tensor <- function(X, Y, dat_T,
     os_type = "Apple",
     cores = NULL,
     asymptote = TRUE,
-    sample_id = 1
+    sample_id = 1,
+    epsilon = 1e-6
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control
@@ -34,6 +35,7 @@ fire.tensor <- function(X, Y, dat_T,
   cores = con$cores
   asymptote = con$asymptote
   sample_id = con$sample_id
+  epsilon = con$epsilon
 
   input_type <- ifelse(is.list(X), 'list', 'array')
 
@@ -112,7 +114,7 @@ fire.tensor <- function(X, Y, dat_T,
                                     Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                     constant_g = constant_g, constant_h = constant_h,
                                     os_type = os_type, cores = cores,
-                                    sample_id = sample_id)
+                                    sample_id = sample_id, epsilon = epsilon)
       init_points = list(
         list(lambda = pre_init_result$lambda[1], noise = pre_init_result$lambda[2]),
         list(lambda = pre_init_result$sigma[1], noise = pre_init_result$sigma[2])

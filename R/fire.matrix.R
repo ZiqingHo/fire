@@ -16,7 +16,8 @@ fire.matrix <- function(X, Y, dat_T,
     par_init = NULL,
     os_type = "Apple",
     cores = NULL,
-    asymptote = TRUE
+    asymptote = TRUE,
+    epsilon = 1e-6
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control
@@ -30,7 +31,7 @@ fire.matrix <- function(X, Y, dat_T,
   os_type = con$os_type
   cores = con$cores
   asymptote = con$asymptote
-  sample_id = con$sample_id
+  epsilon = con$epsilon
 
   # Input validation
   if (!is.matrix(X)) stop("X must be a matrix")
@@ -81,7 +82,7 @@ fire.matrix <- function(X, Y, dat_T,
                                   Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                   constant_g = constant_g, constant_h = constant_h,
                                   os_type = os_type, cores = cores,
-                                  sample_id = 1)
+                                  sample_id = 1, epsilon = epsilon)
     init_points = list(
       list(lambda = pre_init_result$lambda[1], noise = pre_init_result$lambda[2]),
       list(lambda = pre_init_result$sigma[1], noise = pre_init_result$sigma[2])

@@ -19,6 +19,7 @@
 #' @param os_type Operating system for parallelization ("Apple" or "Windows")
 #' @param cores Number of cores for parallel computation (default: detectCores() - 1)
 #' @param sample_id Which mode represents samples, either the 1st or the last mode
+#' @param epsilon Small positive constant in initialisation of EM algorithm
 #'
 #' @return List containing two vectors of the initial values for EM algorithm:
 #' \itemize{
@@ -59,7 +60,8 @@
 pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
                         G = NULL,
                         Index, kernel_iprior = 'cfbm', iprior_param = NULL,
-                        constant_g = TRUE, constant_h = FALSE, os_type = "Apple", cores = NULL, sample_id = 1) {
+                        constant_g = TRUE, constant_h = FALSE, os_type = "Apple", cores = NULL, sample_id = 1,
+                        epsilon = 1e-6) {
 
   m <- length(kernels)
   N <- length(Y)
@@ -112,9 +114,8 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
   vt.y <- crossprod(V, Y)
   lambda.tilde <- sqrt((1/N) * sum((vt.y^2) / U^2))
   sigma <- sqrt((1/N) * sum(vt.y^2))
-  epsilon <- 1e-6
   lambda <- sqrt(sigma * epsilon)
 
-  return(list(lambda = c(sqrt(lambda.tilde), epsilon),
+  return(list(lambda = c(sqrt(epsilon * lambda.tilde), epsilon),
               sigma = c(lambda, sigma)))
 }

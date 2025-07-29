@@ -20,7 +20,8 @@ pre_initial(
   constant_h = FALSE,
   os_type = "Apple",
   cores = NULL,
-  sample_id = 1
+  sample_id = 1,
+  epsilon = 1e-06
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ pre_initial(
 \item{cores}{Number of cores for parallel computation (default: detectCores() - 1)}
 
 \item{sample_id}{Which mode represents samples, either the 1st or the last mode}
+
+\item{epsilon}{Small positive constant in initialisation of EM algorithm}
 }
 \value{
 List containing two vectors of the initial values for EM algorithm:

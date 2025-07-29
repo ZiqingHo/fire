@@ -10,7 +10,7 @@ fire.tensor <- function(X, Y, dat_T,
   con <- list(
     scale = TRUE,
     maxiter = 200,
-    stop.eps = 1e-5,
+    stop.eps = 1e-3,
     constant_g = TRUE,
     constant_h = FALSE,
     center = FALSE,

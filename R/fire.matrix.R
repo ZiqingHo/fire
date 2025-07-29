@@ -10,7 +10,7 @@ fire.matrix <- function(X, Y, dat_T,
   con <- list(
     scale = TRUE,
     maxiter = 200,
-    stop.eps = 1e-5,
+    stop.eps = 1e-3,
     center = FALSE,
     constant_h = FALSE,
     par_init = NULL,

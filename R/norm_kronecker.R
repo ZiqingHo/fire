@@ -167,6 +167,17 @@ rkhs_norm_kron <- function(X, Y = NULL, G_list, L_inv = NULL, constant = TRUE, I
       return(sum(L_inv * X1^2))
     }else{
     # Apply Kronecker products sequentially for arbitrary m > 3
+      dim_list = dim(X)
+
+      # vectorize tensors X and Y
+      X_vec = vectorize_tensor(X, Index)
+      if(is.null(Y)){
+        Y_vec = rep(0, prod(dim_list))
+      }else{
+        Y_vec = vectorize_tensor(Y, Index)
+      }
+      tnsr = X_vec - Y_vec
+
     result <- tnsr
     for (i in m:1) {
       Q <- G_list[[paste0("Q", i)]]

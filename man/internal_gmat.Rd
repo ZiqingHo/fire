@@ -12,7 +12,7 @@ gmat(kernels, kernels_params, dat, center = FALSE, std = FALSE)
 
 \item{kernels_params}{List of parameters for each kernel:
 \itemize{
-  \item{For \code{cfbm}/\code{fbm}/\code{cfbm_sd}: Hurst parameter (numeric)}
+  \item{For \code{cfbm}/\code{fbm}: Hurst parameter (numeric)}
   \item{For \code{rbf}: lengthscale (numeric)}
   \item{For \code{polynomial}: degree `d` and offset (numeric vector length 2)}
   \item{For \code{kronecker_delta}: none (use NA)}

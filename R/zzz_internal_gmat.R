@@ -15,7 +15,7 @@ NULL
 #' @param kernels List of kernel functions. The available kernels can be found in \code{\link{kernels_fire}}
 #' @param kernels_params List of parameters for each kernel:
 #' \itemize{
-#'   \item{For \code{cfbm}/\code{fbm}/\code{cfbm_sd}: Hurst parameter (numeric)}
+#'   \item{For \code{cfbm}/\code{fbm}: Hurst parameter (numeric)}
 #'   \item{For \code{rbf}: lengthscale (numeric)}
 #'   \item{For \code{polynomial}: degree `d` and offset (numeric vector length 2)}
 #'   \item{For \code{kronecker_delta}: none (use NA)}
@@ -64,10 +64,7 @@ gmat <- function(kernels, kernels_params, dat, center = FALSE, std = FALSE){
     } else if (identical(kernel_func, fbm)) {
       # For fbm kernel, pass Hurst parameter
       kernel_func(dat[[i]], Hurst = param[[1]], std = std)
-    }else if (identical(kernel_func, cfbm_sd)) {
-      # For cfbm_sd kernel, pass Hurst parameter
-      kernel_func(dat[[i]], Hurst = param[[1]], std = std)
-    } else if (identical(kernel_func, rbf)) {
+    }else if (identical(kernel_func, rbf)) {
       # For rbf kernel, pass sigma parameter
       kernel_func(dat[[i]], lengthscale = param[[1]], center = center, std = std)
     } else if (identical(kernel_func, kronecker_delta)) {

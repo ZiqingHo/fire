@@ -62,7 +62,6 @@ A collection of kernel functions including:
 \itemize{
   \item{\code{fbm}: Fractional Brownian motion kernel}
   \item{\code{cfbm}: Centered fractional Brownian motion kernel}
-  \item{\code{cfbm_sd}: Standardized cfbm kernel}
   \item{\code{kronecker_delta}: Kronecker delta (identity) kernel}
   \item{\code{rbf}: Radial basis function (squared exponential) kernel}
   \item{\code{polynomial}: Polynomial kernel}

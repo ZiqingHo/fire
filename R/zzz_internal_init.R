@@ -10,6 +10,7 @@
 #' @param kernels List of kernel functions. Refer to \code{\link{kernels_fire}} for available kernel functions
 #' @param kernels_params List of parameters for each kernel
 #' @param center Logical indicating whether to center the kernel matrices in \code{gmat}
+#' @param std Logical indicating whether to standardise the kernel matrices in \code{gmat}
 #' @param G List of kernel matrices from \code{gmat}
 #' @param Index Matrix of indices for tensor vectorization
 #' @param kernel_iprior Kernel function for iprior model
@@ -57,7 +58,7 @@
 #' @seealso \code{\link{fire.matrix}}, \code{\link{fire.tensor}}, \code{\link{kernels_fire}}
 #'
 #' @keywords internal
-pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
+pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE, std = TRUE,
                         G = NULL,
                         Index, kernel_iprior = 'cfbm', iprior_param = NULL,
                         constant_g = TRUE, constant_h = FALSE, os_type = "Apple", cores = NULL, sample_id = 1,
@@ -76,7 +77,7 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE,
   # Compute Gram matrix and norm matrix
   if(is.null(G)){
     G <- gmat(kernels = kernels, kernels_params = kernels_params,
-              dat = dat_T, center = center)
+              dat = dat_T, center = center, std = std)
   }
 
   nmat <- Kronecker_norm_mat(X = X, G = G, alpha = rep(1, length(kernels)),

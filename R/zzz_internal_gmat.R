@@ -16,13 +16,15 @@ NULL
 #' @param kernels_params List of parameters for each kernel:
 #' \itemize{
 #'   \item{For \code{cfbm}/\code{fbm}/\code{cfbm_sd}: Hurst parameter (numeric)}
-#'   \item{For \code{rbf}: sigma (numeric)}
+#'   \item{For \code{rbf}: lengthscale (numeric)}
 #'   \item{For \code{polynomial}: degree `d` and offset (numeric vector length 2)}
 #'   \item{For \code{kronecker_delta}: none (use NA)}
 #'   \item{For \code{mercer}: delta parameter (numeric)}
+#'   \item{For \code{matern}: nu, lengthsalce and sigma (numeric vector length 3)}
 #'   }
 #' @param dat List of data corresponding to each mode (one element per kernel)
-#' @param center Logical indicating whether to center the kernel matrices
+#' @param center Logical indicating whether to center the kernel matrix
+#' @param std Logical indicating whether to standardise the kernel matrix
 #'
 #' @return List of Gram matrices corresponding to each kernel
 #'
@@ -33,7 +35,7 @@ NULL
 #' params <- list(0.5, 1.0)  # Hurst = 0.5, sigma = 1.0
 #' data <- list(matrix(rnorm(4), ncol=2), matrix(rnorm(6), ncol=3))
 #' G_list <- fire:::gmat(kernels, params, data)
-gmat <- function(kernels, kernels_params, dat, center = FALSE) {
+gmat <- function(kernels, kernels_params, dat, center = FALSE, std = FALSE){
   # list of kernel functions g1, g2, g3
   # list of parameters for each kernel (use NA for kernels without parameters)
   # list of data corresponding to each mode
@@ -58,25 +60,28 @@ gmat <- function(kernels, kernels_params, dat, center = FALSE) {
     # Call the kernel function with the data and parameter (if applicable)
     if (identical(kernel_func, cfbm)) {
       # For cfbm kernel, pass Hurst parameter
-      kernel_func(dat[[i]], Hurst = param)
+      kernel_func(dat[[i]], Hurst = param, std = std)
     } else if (identical(kernel_func, fbm)) {
       # For fbm kernel, pass Hurst parameter
-      kernel_func(dat[[i]], Hurst = param[[1]])
+      kernel_func(dat[[i]], Hurst = param[[1]], std = std)
     }else if (identical(kernel_func, cfbm_sd)) {
       # For cfbm_sd kernel, pass Hurst parameter
-      kernel_func(dat[[i]], Hurst = param[[1]])
+      kernel_func(dat[[i]], Hurst = param[[1]], std = std)
     } else if (identical(kernel_func, rbf)) {
       # For rbf kernel, pass sigma parameter
-      kernel_func(dat[[i]], lengthscale = param[[1]], center = center)
+      kernel_func(dat[[i]], lengthscale = param[[1]], center = center, std = std)
     } else if (identical(kernel_func, kronecker_delta)) {
       # For kronecker_delta kernel, no parameter is needed
-      kernel_func(dat[[i]], center = center)
+      kernel_func(dat[[i]], center = center, std = std)
     }else if (identical(kernel_func, polynomial)) {
       # For polynomial kernel, pass d parameter, offset parameter
-      kernel_func(X = dat[[i]], d = param[[1]], offset = param[[2]], center = center)
+      kernel_func(X = dat[[i]], d = param[[1]], offset = param[[2]], center = center, std = std)
     }else if (identical(kernel_func, mercer)) {
       # For mercer-like kernel, pass delta and max_term parameters
-      kernel_func(dat[[i]], delta = param[[1]])
+      kernel_func(dat[[i]], delta = param[[1]], std = std)
+    }else if (identical(kernel_func, matern)) {
+      # For matern kernel, pass nu, lengthscale, sigma parameters
+      kernel_func(dat[[i]], nu = param[[1]], lengthscale = param[[2]], sigma = param[[3]], std = std)
     } else {
       stop("Unsupported kernel function")
     }

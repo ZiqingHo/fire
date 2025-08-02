@@ -9,30 +9,33 @@
 \alias{rbf}
 \alias{polynomial}
 \alias{mercer}
+\alias{matern}
 \title{Kernel Functions for FIRE}
 \usage{
-fbm(X, Hurst = 0.5)
+fbm(X, Hurst = 0.5, std = FALSE)
 
-cfbm(X, Hurst = 0.5)
+cfbm(X, Hurst = 0.5, std = FALSE)
 
-cfbm_sd(X, Hurst = 0.5)
+kronecker_delta(X, center = FALSE, std = FALSE)
 
-kronecker_delta(X, center = F)
+rbf(X, lengthscale = 1, center = FALSE, std = FALSE)
 
-rbf(X, lengthscale = 1, center = F)
+polynomial(X, d = 1, offset = 0, center = FALSE, std = FALSE)
 
-polynomial(X, d = 1, offset = 0, center = F)
+mercer(X, delta = 1, max_terms = 1000, center = FALSE, std = FALSE)
 
-mercer(X, delta = 1, max_terms = 1000, center = F)
+matern(X, nu = 1.5, lengthscale = 1, sigma = 1, center = FALSE, std = FALSE)
 }
 \arguments{
 \item{X}{Input data (vector or matrix)}
 
 \item{Hurst}{Hurst parameter for fbm/cfbm (between 0 and 1)}
 
+\item{std}{Logical indicating whether to standardise the kernel matrix}
+
 \item{center}{Logical indicating whether to center the kernel matrix}
 
-\item{lengthscale}{Bandwidth parameter for RBF kernel}
+\item{lengthscale}{Bandwidth parameter}
 
 \item{d}{Degree of polynomial}
 
@@ -41,6 +44,10 @@ mercer(X, delta = 1, max_terms = 1000, center = F)
 \item{delta}{Smoothness parameter for Mercer kernel}
 
 \item{max_terms}{Maximum number of terms in Mercer series expansion}
+
+\item{nu}{Smoothness parameter (typical values: 0.5, 1.5, 2.5)}
+
+\item{sigma}{Scale parameter controlling the overall variance in Matern kernel}
 }
 \value{
 A symmetric positive definite Gram matrix of size n x n where n is the
@@ -60,6 +67,7 @@ A collection of kernel functions including:
   \item{\code{rbf}: Radial basis function (squared exponential) kernel}
   \item{\code{polynomial}: Polynomial kernel}
   \item{\code{mercer}: Mercer kernel with cosine basis}
+  \item{\code{matern}: Matern kernel}
 }
 }
 \examples{
@@ -69,9 +77,9 @@ X <- matrix(rnorm(4), ncol=2)
 # Different kernels
 fbm(X)
 cfbm(X)
-cfbm_sd(X)
 kronecker_delta(X)
 rbf(X)
 polynomial(X, d = 2, offset = 1)
 mercer(X)
+matern(X)
 }

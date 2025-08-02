@@ -54,6 +54,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
+  std <- attr(object, "std")
   os_type <- attr(object, "os_type")
   cores <- attr(object, "cores")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
@@ -75,7 +76,7 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
   G <- gmat(kernels = kernels,
             kernels_params = kernels_params,
             dat = dat_T,
-            center = center)
+            center = center, std = std)
 
   nmat <- Kronecker_norm_mat(X = X_train,
                              G = G,
@@ -165,6 +166,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
+  std <- attr(object, "std")
   os_type <- attr(object, "os_type")
   cores <- attr(object, "cores")
   sample_id <- attr(object, "sample_id")
@@ -175,7 +177,8 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   Index <- create_index_matrix(dat_T)
 
   # construct H matrix
-  G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
+  G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T,
+           center = center, std = std)
   nmat <- Kronecker_norm_mat(X = X_train,
                              G = G,
                              alpha = alpha_params,

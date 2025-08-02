@@ -9,6 +9,7 @@
 #'   \item{\code{rbf}: Radial basis function (squared exponential) kernel}
 #'   \item{\code{polynomial}: Polynomial kernel}
 #'   \item{\code{mercer}: Mercer kernel with cosine basis}
+#'   \item{\code{matern}: Matern kernel}
 #' }
 #'
 #' @name kernels_fire
@@ -18,6 +19,7 @@ NULL
 #' @rdname kernels_fire
 #' @param X Input data (vector or matrix)
 #' @param Hurst Hurst parameter for fbm/cfbm (between 0 and 1)
+#' @param std Logical indicating whether to standardise the kernel matrix
 #' @return A symmetric positive definite Gram matrix of size n x n where n is the
 #'   number of observations in X. The matrix has attributes including:
 #'   \itemize{
@@ -31,7 +33,7 @@ NULL
 #'
 #' # Different kernels
 #' fbm(X)
-fbm <- function(X, Hurst = 0.5) {
+fbm <- function(X, Hurst = 0.5, std = FALSE) {
   # convert vector into matrix if necessary
   if (is.vector(X)) {
     X <- matrix(X, ncol = 1)
@@ -79,9 +81,19 @@ fbm <- function(X, Hurst = 0.5) {
   # Gram matrix
   K <- -0.5 * (A - B - t(B))
 
-  attr(K, "kernel") <- "fbm"
-  attr(K, "parameters") <- list(Hurst = Hurst)
-  K
+  if(std){
+    ones <- matrix(1, N, N)
+    K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
+    K_std <- K_centered/(mean(diag(K_centered)))
+    attr(K_std, "kernel") <- "fbm (standardised)"
+    attr(K_std, "parameters") <- list(Hurst = Hurst)
+    K_std
+  }else{
+    attr(K, "kernel") <- "fbm"
+    attr(K, "parameters") <- list(Hurst = Hurst)
+    K
+  }
+
 }
 
 
@@ -89,7 +101,7 @@ fbm <- function(X, Hurst = 0.5) {
 #' @examples
 #' cfbm(X)
 #' @export
-cfbm <- function(X, Hurst = 0.5) {
+cfbm <- function(X, Hurst = 0.5, std = FALSE) {
   if (is.matrix(X)){
     N <- dim(X)[1]
   }else{
@@ -120,53 +132,24 @@ cfbm <- function(X, Hurst = 0.5) {
   rvec1 <- tcrossprod(rvec, rep(1, N)) # a matrix whose (i,k) entry is sum_j ||xi-xj||^2
   K <- (N^2 * A - N * rvec1 - N * t(rvec1) + s) / (-2* N^2)
 
-  attr(K, "kernel") <- "cfbm"
-  attr(K, "parameters") <- list(Hurst = Hurst)
-  K
+  if(std){
+    K_std <- K/(mean(diag(K)))
+    attr(K_std, "kernel") <- "cfbm (standardised)"
+    attr(K_std, "parameters") <- list(Hurst = Hurst)
+    K_std
+  }else{
+    attr(K, "kernel") <- "cfbm"
+    attr(K, "parameters") <- list(Hurst = Hurst)
+    K
+  }
+
 }
-
-
-#' @rdname kernels_fire
-#' @examples
-#' cfbm_sd(X)
-#' @export
-cfbm_sd <- function(X, Hurst = 0.5){
-  if(Hurst >1 || Hurst <= 0){
-    stop('Hurst must be (0,1]')
-  }
-  if(all(is.na(X))){
-    stop('X must contains at least one numeric value.')
-  }
-
-  numerator <- cfbm(X,Hurst)
-  if(is.matrix(X)){
-    N <- dim(X)[1]
-  }
-  if(is.vector(X)){
-    N = length(X)
-  }
-
-  cfbm_fourth <- function(X,Hurst=0.5){
-    Dmat <- (dist(X)^2)^Hurst # distance matrix t(xi-xj)%*%(xi-xj)
-    fourth <- 2*sum(Dmat)
-    return(fourth)
-  }
-
-  denominator <- cfbm_fourth(X,Hurst)/(2*N^2)
-
-  K <- numerator/denominator
-
-  attr(K, "kernel") <- "cfbm (standardized)"
-  attr(K, "parameters") <- list(Hurst = Hurst)
-  K
-}
-
 #' @rdname kernels_fire
 #' @param center Logical indicating whether to center the kernel matrix
 #' @examples
 #' kronecker_delta(X)
 #' @export
-kronecker_delta <- function(X, center = F){
+kronecker_delta <- function(X, center = FALSE, std = FALSE){
 
   # sample size
   N <- if(is.matrix(X)) dim(X)[1] else length(X)
@@ -192,15 +175,20 @@ kronecker_delta <- function(X, center = F){
     }
   }
 
-  if(center){
+  # Center and/or standardize if requested
+  if (center || std) {
     ones <- matrix(1, N, N)
-
-    # Centering operation:
-    # K_centered = K - 1/n K %*% J - 1/n J %*% K + 1/n² J %*% K %*% J
-    # where J is matrix of ones
     K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
-    attr(K_centered, "kernel") <- "kronecker_delta (centered)"
-    K_centered
+
+    if (std) {
+      # Standardize by the average of the diagonal elements
+      K_std <- K_centered / mean(diag(K_centered))
+      attr(K_std, "kernel") <- "kronecker delta (standardized)"
+      K_std
+    } else {
+      attr(K_centered, "kernel") <- "kronecker delta (centered)"
+      K_centered
+    }
   }else{
     attr(K, "kernel") <- "kronecker_delta"
     K
@@ -209,11 +197,11 @@ kronecker_delta <- function(X, center = F){
 
 
 #' @rdname kernels_fire
-#' @param lengthscale Bandwidth parameter for RBF kernel
+#' @param lengthscale Bandwidth parameter
 #' @examples
 #' rbf(X)
 #' @export
-rbf <- function(X, lengthscale = 1, center = F){
+rbf <- function(X, lengthscale = 1, center = FALSE, std = FALSE){
   if(all(is.na(X))){
     stop('X must contains numeric values.')
   }
@@ -240,19 +228,25 @@ rbf <- function(X, lengthscale = 1, center = F){
     }
   }
 
-  if(center){
+  # Center and/or standardize if requested
+  if (center || std) {
     ones <- matrix(1, N, N)
-
-    # Centering operation:
-    # K_centered = K - 1/n K %*% J - 1/n J %*% K + 1/n² J %*% K %*% J
-    # where J is matrix of ones
     K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
-    attr(K_centered, "kernel") <- "rbf (centered)"
-    attr(K_centered, "parameters") <- list(sigma = sigma)
-    K_centered
+
+    if (std) {
+      # Standardize by the average of the diagonal elements
+      K_std <- K_centered / mean(diag(K_centered))
+      attr(K_std, "kernel") <- "rbf (standardized)"
+      attr(K_std, "parameters") <- list(lengthscale = lengthscale)
+      K_std
+    } else {
+      attr(K_centered, "kernel") <- "rbf (centered)"
+      attr(K_centered, "parameters") <- list(lengthscale = lengthscale)
+      K_centered
+    }
   }else{
     attr(K, "kernel") <- "rbf"
-    attr(K, "parameters") <- list(sigma = sigma)
+    attr(K, "parameters") <- list(lengthscale = lengthscale)
     K
   }
 
@@ -264,7 +258,7 @@ rbf <- function(X, lengthscale = 1, center = F){
 #' @examples
 #' polynomial(X, d = 2, offset = 1)
 #' @export
-polynomial <- function(X, d = 1, offset = 0, center = F){
+polynomial <- function(X, d = 1, offset = 0, center = FALSE, std = FALSE){
   if(all(is.na(X))){
     stop('X must contains at least one numeric value.')
   }
@@ -292,16 +286,22 @@ polynomial <- function(X, d = 1, offset = 0, center = F){
     }
   }
 
-  if(center){
+  # Center and/or standardize if requested
+  if (center || std) {
     ones <- matrix(1, N, N)
-
-    # Centering operation:
-    # K_centered = K - 1/n K %*% J - 1/n J %*% K + 1/n² J %*% K %*% J
-    # where J is matrix of ones
     K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
-    attr(K_centered, "kernel") <- "polynomial (centered)"
-    attr(K_centered, "parameters") <- list(d = d, offset = offset)
-    K_centered
+
+    if (std) {
+      # Standardize by the average of the diagonal elements
+      K_std <- K_centered / mean(diag(K_centered))
+      attr(K_std, "kernel") <- "polynomial (standardized)"
+      attr(K_std, "parameters") <- list(d = d, offset = offset)
+      K_std
+    } else {
+      attr(K_centered, "kernel") <- "polynomial (centered)"
+      attr(K_centered, "parameters") <- list(d = d, offset = offset)
+      K_centered
+    }
   }else{
     attr(K, "kernel") <- "polynomial"
     attr(K, "parameters") <- list(d = d, offset = offset)
@@ -315,7 +315,7 @@ polynomial <- function(X, d = 1, offset = 0, center = F){
 #' @examples
 #' mercer(X)
 #' @export
-mercer <- function(X, delta = 1, max_terms = 1000, center = F) {
+mercer <- function(X, delta = 1, max_terms = 1000, center = FALSE, std = FALSE) {
   if(all(is.na(X))){
     stop('X must contains at least one numeric value.')
   }
@@ -365,19 +365,91 @@ mercer <- function(X, delta = 1, max_terms = 1000, center = F) {
       K[j,i] <- K[i,j]
     }
   }
-  ones <- matrix(1, N, N)
 
-  # Centering operation:
-  # K_centered = K - 1/n K %*% J - 1/n J %*% K + 1/n² J %*% K %*% J
-  # where J is matrix of ones
-  if(center){
+  # Center and/or standardize if requested
+  if (center || std) {
+    ones <- matrix(1, N, N)
     K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
-    attr(K_centered, "kernel") <- "mercer"
-    attr(K_centered, "parameters") <- list(delta = delta)
-    K_centered
+
+    if (std) {
+      # Standardize by the average of the diagonal elements
+      K_std <- K_centered / mean(diag(K_centered))
+      attr(K_std, "kernel") <- "mercer (standardized)"
+      attr(K_std, "parameters") <- list(delta = delta)
+      K_std
+    } else {
+      attr(K_centered, "kernel") <- "mercer (centered)"
+      attr(K_centered, "parameters") <- list(delta = delta)
+      K_centered
+    }
   }else{
-    attr(K, "kernel") <- "mercer (centered)"
+    attr(K, "kernel") <- "mercer"
     attr(K, "parameters") <- list(delta = delta)
     K
+  }
+}
+
+#' @rdname kernels_fire
+#' @param nu Smoothness parameter (typical values: 0.5, 1.5, 2.5)
+#' @param sigma Scale parameter controlling the overall variance in Matern kernel
+#' @examples
+#' matern(X)
+#' @export
+matern<- function(X, nu = 1.5, lengthscale = 1.0, sigma = 1.0, center = FALSE, std = FALSE) {
+  N <- if (is.matrix(X)) dim(X)[1] else length(X)
+
+  # Compute pairwise Euclidean distances
+  dists <- as.matrix(dist(X))
+  r <- dists / lengthscale
+
+  # Initialize kernel matrix
+  K <- matrix(0, nrow = N, ncol = N)
+
+  # Handle the r = 0 case separately to avoid NaNs in Bessel function
+  r[r == 0] <- 1e-10
+
+
+  # Handle special cases for common nu values (faster computation)
+  if (nu == 0.5) {
+    # Matern 1/2 kernel (equivalent to exponential kernel)
+    K <- sigma^2 * exp(-r)
+  } else if (nu == 1.5) {
+    # Matern 3/2 kernel
+    sqrt3_r <- sqrt(3) * r
+    K <- sigma^2 * (1 + sqrt3_r) * exp(-sqrt3_r)
+  } else if (nu == 2.5) {
+    # Matern 5/2 kernel
+    sqrt5_r <- sqrt(5) * r
+    K <- sigma^2 * (1 + sqrt5_r + (5 * r^2)/3) * exp(-sqrt5_r)
+  } else {
+    # General case using Bessel function
+    r[r == 0] <- 1e-10  # Avoid NaNs in Bessel function
+    const <- sigma^2 * (2^(1 - nu)) / gamma(nu)
+    scaled_r <- sqrt(2 * nu) * r
+    K <- const * (scaled_r^nu) * besselK(scaled_r, nu)
+  }
+  # Set the diagonal (originally r == 0) to sigma^2
+  diag(K) <- sigma^2
+
+  # Center and/or standardize if requested
+  if (center || std) {
+    ones <- matrix(1, N, N)
+    K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
+
+    if (std) {
+      # Standardize by the average of the diagonal elements
+      K_std <- K_centered / mean(diag(K_centered))
+      attr(K_std, "kernel") <- "mercer (standardized)"
+      attr(K_std, "parameters") <- list(nu = nu, lengthscale = lengthscale, sigma = sigma)
+      K_std
+       } else {
+      attr(K_centered, "kernel") <- "mercer (centered)"
+      attr(K_centered, "parameters") <- list(nu = nu, lengthscale = lengthscale, sigma = sigma)
+      K_centered
+      }
+  } else {
+    attr(K, "kernel") <- "matern"
+    attr(K, "parameters") <- list(nu = nu, lengthscale = lengthscale, sigma = sigma)
+    return(K)
   }
 }

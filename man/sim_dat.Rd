@@ -46,6 +46,7 @@ The \code{control} argument can include the following parameters:
   \item \code{constant_g}: Logical indicating whether to include constant kernel term in g (default: TRUE)
   \item \code{constant_h}: Logical indicating whether to include constant kernel term in h (default: FALSE)
   \item \code{center}: Whether to center the kernel matrices (default: FALSE)
+  \item \code{std}: Whether to standardise the kernel matrices (default: FALSE)
   \item \code{os_type}: Operating system type ('Apple' or 'Windows') (default: 'Apple')
   \item \code{cores}: Number of cores used in parallel computation (default: NULL)
 }

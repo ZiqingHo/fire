@@ -25,6 +25,7 @@
 #'   \item \code{constant_g}: Logical indicating whether to include constant kernel term in g (default: TRUE)
 #'   \item \code{constant_h}: Logical indicating whether to include constant kernel term in h (default: FALSE)
 #'   \item \code{center}: Whether to center the kernel matrices (default: FALSE)
+#'   \item \code{std}: Whether to standardise the kernel matrices (default: FALSE)
 #'   \item \code{os_type}: Operating system type ('Apple' or 'Windows') (default: 'Apple')
 #'   \item \code{cores}: Number of cores used in parallel computation (default: NULL)
 #' }
@@ -67,6 +68,7 @@ sim_dat <- function(N, Ntrain,
     constant_g = TRUE,
     constant_h = FALSE,
     center = FALSE,
+    std = FALSE,
     os_type = 'Apple',
     cores = NULL
   )
@@ -86,6 +88,7 @@ sim_dat <- function(N, Ntrain,
   constant_g <- con$constant_g
   constant_h <- con$constant_h
   center <- con$center
+  std <- con$std
   os_type <- con$os_type
   cores <- con$cores
 
@@ -111,7 +114,7 @@ sim_dat <- function(N, Ntrain,
     Index.T <- create_index_matrix(dat_T)
   }
 
-  Gmat.list <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
+  Gmat.list <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center, std = std)
 
   # Construct G matrix for arbitrary m dimensions
   if(m == 1){

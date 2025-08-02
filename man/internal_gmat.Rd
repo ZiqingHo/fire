@@ -5,7 +5,7 @@
 \alias{gmat}
 \title{Construct Kernel Gram Matrices}
 \usage{
-gmat(kernels, kernels_params, dat, center = FALSE)
+gmat(kernels, kernels_params, dat, center = FALSE, std = FALSE)
 }
 \arguments{
 \item{kernels}{List of kernel functions. The available kernels can be found in \code{\link{kernels_fire}}}
@@ -13,15 +13,18 @@ gmat(kernels, kernels_params, dat, center = FALSE)
 \item{kernels_params}{List of parameters for each kernel:
 \itemize{
   \item{For \code{cfbm}/\code{fbm}/\code{cfbm_sd}: Hurst parameter (numeric)}
-  \item{For \code{rbf}: sigma (numeric)}
+  \item{For \code{rbf}: lengthscale (numeric)}
   \item{For \code{polynomial}: degree `d` and offset (numeric vector length 2)}
   \item{For \code{kronecker_delta}: none (use NA)}
   \item{For \code{mercer}: delta parameter (numeric)}
+  \item{For \code{matern}: nu, lengthsalce and sigma (numeric vector length 3)}
   }}
 
 \item{dat}{List of data corresponding to each mode (one element per kernel)}
 
-\item{center}{Logical indicating whether to center the kernel matrices}
+\item{center}{Logical indicating whether to center the kernel matrix}
+
+\item{std}{Logical indicating whether to standardise the kernel matrix}
 }
 \value{
 List of Gram matrices corresponding to each kernel

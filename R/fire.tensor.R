@@ -14,6 +14,7 @@ fire.tensor <- function(X, Y, dat_T,
     constant_g = TRUE,
     constant_h = FALSE,
     center = FALSE,
+    std = TRUE,
     par_init = NULL,
     os_type = "Apple",
     cores = NULL,
@@ -30,6 +31,7 @@ fire.tensor <- function(X, Y, dat_T,
   constant_g = con$constant_g
   constant_h = con$constant_h
   center = con$center
+  std = con$std
   par_init = con$par_init
   os_type = con$os_type
   cores = con$cores
@@ -99,7 +101,7 @@ fire.tensor <- function(X, Y, dat_T,
   Index <- create_index_matrix(dat_T)
 
   # precompute kernel matrices G_m's
-  G <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
+  G <- gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center, std = std)
 
   if(is.null(par_init)){
     if(asymptote == F){
@@ -110,7 +112,7 @@ fire.tensor <- function(X, Y, dat_T,
     }else{
       pre_init_result = pre_initial(X = X, Y = Y, dat_T = dat_T,
                                     kernels = kernels, kernels_params = kernels_params,
-                                    G = G,
+                                    center = center, std = std, G = G,
                                     Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                     constant_g = constant_g, constant_h = constant_h,
                                     os_type = os_type, cores = cores,
@@ -387,6 +389,7 @@ fire.tensor <- function(X, Y, dat_T,
     constant_h = constant_h,
     dat_T = dat_T,
     center = center,
+    std = std,
     os_type = os_type,
     cores = cores,
     intercept = intercept,

@@ -12,6 +12,7 @@ pre_initial(
   kernels,
   kernels_params,
   center = FALSE,
+  std = TRUE,
   G = NULL,
   Index,
   kernel_iprior = "cfbm",
@@ -36,6 +37,8 @@ pre_initial(
 \item{kernels_params}{List of parameters for each kernel}
 
 \item{center}{Logical indicating whether to center the kernel matrices in \code{gmat}}
+
+\item{std}{Logical indicating whether to standardise the kernel matrices in \code{gmat}}
 
 \item{G}{List of kernel matrices from \code{gmat}}
 

@@ -53,6 +53,7 @@ fitted.fire_matrix <- function(object, ...) {
   constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
+  std <- attr(object, "std")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
 
   # Reconstruct dimensions and matrices
@@ -62,7 +63,7 @@ fitted.fire_matrix <- function(object, ...) {
   G <- gmat(kernels = kernels,
             kernels_params = kernels_params,
             dat = dat_T,
-            center = center)
+            center = center, std = std)
 
   nmat <- Kronecker_norm_mat(X = X,
                              G = G,
@@ -134,6 +135,7 @@ fitted.fire_tensor<- function(object, ...) {
   constant_h <- attr(object, "constant_h")
   dat_T <- attr(object, "dat_T")
   center <- attr(object, "center")
+  std <- attr(object, "std")
   os_type <- attr(object, "os_type")
   sample_id <- attr(object, "sample_id")
   intercept <- ifelse(is.null(attr(object, "intercept")), 0, attr(object, "intercept"))
@@ -145,7 +147,7 @@ fitted.fire_tensor<- function(object, ...) {
   G <- gmat(kernels = kernels,
             kernels_params = kernels_params,
             dat = dat_T,
-            center = center)
+            center = center, std = std)
 
   nmat <- Kronecker_norm_mat(X = X,
                              G = G,

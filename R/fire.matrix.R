@@ -12,6 +12,7 @@ fire.matrix <- function(X, Y, dat_T,
     maxiter = 200,
     stop.eps = 1e-3,
     center = FALSE,
+    std = TRUE,
     constant_h = FALSE,
     par_init = NULL,
     os_type = "Apple",
@@ -27,6 +28,7 @@ fire.matrix <- function(X, Y, dat_T,
   stop.eps = con$stop.eps
   constant_h = con$constant_h
   center = con$center
+  std = con$std
   par_init = con$par_init
   os_type = con$os_type
   cores = con$cores
@@ -75,10 +77,14 @@ fire.matrix <- function(X, Y, dat_T,
   d <- ncol(X)
   Index <- matrix(1:d, ncol = 1)
 
+  # precompute G
+  G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center, std = std)
+
   # If asymptote is TRUE, use pre_initial to get initial points
   if (asymptote) {
     pre_init_result = pre_initial(X = X, Y = Y, dat_T = dat_T,
                                   kernels = kernels, kernels_params = kernels_params,
+                                  center = center, std = std, G = G,
                                   Index = Index, kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                                   constant_g = constant_g, constant_h = constant_h,
                                   os_type = os_type, cores = cores,
@@ -111,8 +117,7 @@ fire.matrix <- function(X, Y, dat_T,
     loglik = noise_est = lambda_est = c()
     w_est = list()
 
-    # Precompute G and H.tilde
-    G = gmat(kernels = kernels, kernels_params = kernels_params, dat = dat_T, center = center)
+    # Precompute H.tilde
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = c(1), constant = constant_g,
                               Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
@@ -262,6 +267,7 @@ fire.matrix <- function(X, Y, dat_T,
     constant_h = constant_h,
     dat_T = dat_T,
     center = center,
+    std = std,
     os_type = os_type,
     cores = cores,
     intercept = intercept,

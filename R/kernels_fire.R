@@ -183,7 +183,7 @@ kronecker_delta <- function(X, center = FALSE, std = FALSE){
     if (std) {
       # Standardize by the average of the diagonal elements
       K_std <- K_centered / mean(diag(K_centered))
-      attr(K_std, "kernel") <- "kronecker delta (standardized)"
+      attr(K_std, "kernel") <- "kronecker delta (standardised)"
       K_std
     } else {
       attr(K_centered, "kernel") <- "kronecker delta (centered)"
@@ -236,7 +236,7 @@ rbf <- function(X, lengthscale = 1, center = FALSE, std = FALSE){
     if (std) {
       # Standardize by the average of the diagonal elements
       K_std <- K_centered / mean(diag(K_centered))
-      attr(K_std, "kernel") <- "rbf (standardized)"
+      attr(K_std, "kernel") <- "rbf (standardised)"
       attr(K_std, "parameters") <- list(lengthscale = lengthscale)
       K_std
     } else {
@@ -294,7 +294,7 @@ polynomial <- function(X, d = 1, offset = 0, center = FALSE, std = FALSE){
     if (std) {
       # Standardize by the average of the diagonal elements
       K_std <- K_centered / mean(diag(K_centered))
-      attr(K_std, "kernel") <- "polynomial (standardized)"
+      attr(K_std, "kernel") <- "polynomial (standardised)"
       attr(K_std, "parameters") <- list(d = d, offset = offset)
       K_std
     } else {
@@ -374,7 +374,7 @@ mercer <- function(X, delta = 1, max_terms = 1000, center = FALSE, std = FALSE) 
     if (std) {
       # Standardize by the average of the diagonal elements
       K_std <- K_centered / mean(diag(K_centered))
-      attr(K_std, "kernel") <- "mercer (standardized)"
+      attr(K_std, "kernel") <- "mercer (standardised)"
       attr(K_std, "parameters") <- list(delta = delta)
       K_std
     } else {
@@ -439,7 +439,7 @@ matern<- function(X, nu = 1.5, lengthscale = 1.0, sigma = 1.0, center = FALSE, s
     if (std) {
       # Standardize by the average of the diagonal elements
       K_std <- K_centered / mean(diag(K_centered))
-      attr(K_std, "kernel") <- "mercer (standardized)"
+      attr(K_std, "kernel") <- "mercer (standardised)"
       attr(K_std, "parameters") <- list(nu = nu, lengthscale = lengthscale, sigma = sigma)
       K_std
        } else {

@@ -285,31 +285,25 @@ fire.tensor <- function(X, Y, dat_T,
   # Run EM for all initial points
   # results = lapply(init_points, run_EM)
 
-  # Initialize results list and convergence flag
+  # Initialize results list
   results <- vector("list", length = length(init_points))
-  converged_flag <- FALSE
 
   # Run EM for initial points sequentially, stopping if convergence is achieved
   for (i in seq_along(init_points)) {
-    if (!converged_flag) {
-      results[[i]] <- run_EM(init_points[[i]])
+    results[[i]] <- run_EM(init_points[[i]])
 
-      # Check if this run converged (using the same convergence criteria as later in the code)
-      current_converged <- results[[i]]$niter < maxiter && abs(results[[i]]$diff.loglik) < stop.eps
+    # Check convergence (just for reporting, not for stopping)
+    current_converged <- results[[i]]$niter < maxiter && abs(results[[i]]$diff.loglik) < stop.eps
 
-      if (current_converged) {
-        converged_flag <- TRUE
-        if(is.null(par_init)){
-          if (i == 2) {
-            message("Convergence achieved with the 2nd set of initial points.")
-          } else {
-            message("Convergence achieved with the 1st set of initial points. Skipping the remaining sets of initial points.")
-          }
-        }else{
-          message("Convergence achieved with the initial points that you set.")
+    if (current_converged) {
+      if(is.null(par_init)) {
+        if (i == 2) {
+          message("Convergence achieved with the 2nd set of initial points.")
+        } else {
+          message("Convergence achieved with the 1st set of initial points.")
         }
-
-        break
+      } else {
+        message("Convergence achieved with the initial points that you set.")
       }
     }
   }
@@ -318,18 +312,20 @@ fire.tensor <- function(X, Y, dat_T,
   results <- results[!sapply(results, is.null)]
 
   # Select the best result based on convergence status and log-likelihood
-  if (length(results) == 2) {
-    # Check convergence status
-    conv2 <- results[[2]]$niter < maxiter && abs(results[[2]]$diff.loglik) < stop.eps
+  if (length(results) >= 2) {
+    # Check which runs converged
+    conv_status <- sapply(results, function(res) res$niter < maxiter && abs(res$diff.loglik) < stop.eps)
 
-    if (conv2) {
-      max_loglik_index <- 2  # Second converged (first didn't), so we pick it regardless of mloglik
+    if (any(conv_status)) {
+      # Among converged runs, pick the one with the highest log-likelihood
+      max_loglik_index <- which.max(sapply(results[conv_status], function(res) tail(res$mloglik, 1)))
+      max_loglik_index <- which(conv_status)[max_loglik_index]  # Map back to original index
     } else {
-      # Neither converged, pick the one with higher mloglik
-      max_loglik_index <- which.max(sapply(results, function(res) max(res$mloglik, na.rm = TRUE)))
+      # If none converged, pick the best log-likelihood among all
+      max_loglik_index <- which.max(sapply(results, function(res) tail(res$mloglik, 1)))
     }
   } else {
-    # Only one result (either first converged or only one init point)
+    # Only one result (either only one init point or all others NULL)
     max_loglik_index <- 1
   }
 

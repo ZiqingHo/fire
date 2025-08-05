@@ -18,6 +18,24 @@
 #' @param seed Random seed for reproducibility (default: 1)
 #' @param ... Additional arguments passed to methods
 #'
+#' @details
+#' The \code{control} argument can include the following parameters:
+#' \itemize{
+#'   \item{\code{scale}: Logical indicating whether to center the response (default TRUE)}
+#'   \item{\code{maxiter}: Maximum number of EM iterations (default 200)}
+#'   \item{\code{stop.eps}: Convergence tolerance (default 1e-3)}
+#'   \item{\code{constant_g}: Logical indicating whether to include constant kernel term in g (default TRUE)}
+#'   \item{\code{constant_h}: Logical indicating whether to include constant kernel term in h (default FALSE)}
+#'   \item{\code{center}: Logical indicating whether to center the kernel g (default FALSE)}
+#'   \item{\code{std}: Logical indicating whether to standardise the kernel g (default TRUE)}
+#'   \item{\code{par_init}: Optional list of initial parameter values (lambda, noise)}
+#'   \item{\code{os_type}: Operating system type for compatibility ("Apple" or "Windows", default "Apple")}
+#'   \item{\code{cores}: Number of cores for parallel computation (default: detectCores() - 1)}
+#'   \item{\code{asymptote}: Logical to use asymptotic initial values (default TRUE)}
+#'   \item{\code{sample_id}: Which mode contains samples (default 1)}
+#'   \item{\code{epsilon}: Small positive constant in initialisation of EM algorithm (default 1)}
+#' }
+#'
 #' @return A list containing:
 #'   - cv_results: Data frame with results for each fold
 #'   - mean_results: Vector of mean performance metrics across folds

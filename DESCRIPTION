@@ -23,7 +23,8 @@ Imports:
   cli,
   patchwork,
   crayon, 
-  ggplot2 (>= 3.4.0)
+  ggplot2 (>= 3.4.0),
+  caret
 Suggests: 
     spelling,
     testthat

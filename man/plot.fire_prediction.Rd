@@ -4,7 +4,7 @@
 \alias{plot.fire_prediction}
 \title{Plot for FIRE Predictions}
 \usage{
-\method{plot}{fire_prediction}(x, ...)
+\method{plot}{fire_prediction}(x, interval = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{fire_prediction} object}

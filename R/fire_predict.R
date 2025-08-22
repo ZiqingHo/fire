@@ -38,7 +38,8 @@ NULL
 #' @rdname predict.fire
 #' @method predict fire_matrix
 #' @export
-predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
+predict.fire_matrix <- function(object, newdata, Ynew = NULL,
+                                interval = FALSE, level = 0.05, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")
   Y_train <- attr(object, "original_response")
@@ -114,10 +115,44 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
 
   if(constant_h){
     Hcross.tilde <- 1 + Hcross.tilde
-
   }
   # Calculate predictions
   Ypred <- as.vector(intercept + lambda^2 * Hcross.tilde %*% w)
+
+  # Construct confidence band
+  if(interval){
+    noise <- tail(object$noise, 1)
+    z = qnorm(level/2)
+    sigma2 = noise^2
+    Hcross = lambda^2 * Hcross.tilde
+
+    # Generate Gram matrix
+    if (kernel_iprior == 'cfbm') {
+      if (is.null(iprior_param)) iprior_param <- 0.5
+      H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
+    } else if (kernel_iprior == 'rbf') {
+      if (is.null(iprior_param)) iprior_param <- 1
+      H.tilde <- rbf_rkhs_kron(nmat = nmat, lengthscale = iprior_param)
+    } else if (kernel_iprior == 'linear') {
+      H.tilde <- nmat + iprior_param
+    } else if (kernel_iprior == 'poly'){
+      H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
+    }
+
+    if(constant_h){
+      H.tilde <- 1 + H.tilde
+    }
+    H <- lambda^2 * H.tilde
+    n <- length(Y_train)
+    Psi <- diag(n)/sigma2
+    Vy <- H %*% H %*% Psi + Psi
+    Vy.inv <- solve(Vy)
+    Sigma.new <- (Hcross) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(Hcross) + sigma2
+    se <- sqrt(diag(Sigma.new))
+    upper <- Ypred + z * se
+    lower <- Ypred - z * se
+  }
+
 
   # Create comprehensive output object
   result <- structure(
@@ -132,6 +167,9 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
           rmse = sqrt(mean(test_residuals^2)),
           residuals = test_residuals
         )
+      },
+      CI = if(interval){
+        list(upper = upper, lower = lower, level = level)
       }
     ),
     class = c("fire_prediction", "list")
@@ -149,7 +187,8 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL, ...) {
 #' @rdname predict.fire
 #' @method predict fire_tensor
 #' @export
-predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
+predict.fire_tensor <- function(object, newdata, Ynew = NULL,
+                                interval = FALSE, level = 0.05, ...) {
   # Extract components from model object
   X_train <- attr(object, "training_data")
   Y_train <- attr(object, "original_response")
@@ -218,6 +257,40 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
   # Calculate predictions
   Ypred <- as.vector(intercept + tau^2 * Hcross.tilde %*% w)
 
+
+  if(interval){
+    noise <- tail(object$noise, 1)
+    z = qnorm(level/2)
+    sigma2 = noise^2
+    Hcross = tau^2 * Hcross.tilde
+
+    # Generate Gram matrix
+    if (kernel_iprior == 'cfbm') {
+      if (is.null(iprior_param)) iprior_param <- 0.5
+      H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
+    } else if (kernel_iprior == 'rbf') {
+      if (is.null(iprior_param)) iprior_param <- 1
+      H.tilde <- rbf_rkhs_kron(nmat = nmat, lengthscale = iprior_param)
+    } else if (kernel_iprior == 'linear') {
+      H.tilde <- nmat + iprior_param
+    } else if (kernel_iprior == 'poly'){
+      H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
+    }
+
+    if(constant_h){
+      H.tilde <- 1 + H.tilde
+    }
+    H <- tau^2 * H.tilde
+    n <- length(Y_train)
+    Psi <- diag(n)/sigma2
+    Vy <- H %*% H %*% Psi + Psi
+    Vy.inv <- solve(Vy)
+    Sigma.new <- (Hcross) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(Hcross) + sigma2
+    se <- sqrt(diag(Sigma.new))
+    upper <- Ypred + z * se
+    lower <- Ypred - z * se
+  }
+
   # Create comprehensive output object
   result <- structure(
     list(
@@ -231,7 +304,10 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL, ...) {
           rmse = sqrt(mean(test_residuals^2)),
           residuals = test_residuals
         )
-      }
+      },
+      CI = if(interval){
+          list(upper = upper, lower = lower, level = level)
+          }
     ),
     class = c("fire_prediction", "list")
   )

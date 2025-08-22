@@ -6,9 +6,9 @@
 \alias{predict.fire_tensor}
 \title{Predict Method for FIRE Models}
 \usage{
-\method{predict}{fire_matrix}(object, newdata, Ynew = NULL, ...)
+\method{predict}{fire_matrix}(object, newdata, Ynew = NULL, interval = FALSE, level = 0.05, ...)
 
-\method{predict}{fire_tensor}(object, newdata, Ynew = NULL, ...)
+\method{predict}{fire_tensor}(object, newdata, Ynew = NULL, interval = FALSE, level = 0.05, ...)
 }
 \arguments{
 \item{object}{A model object of class \code{fire_matrix} or \code{fire_tensor}.}

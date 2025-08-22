@@ -60,7 +60,7 @@ plot.fire_fitted <- function(x, ...) {
 #'
 #' @seealso \code{\link{fire}}, \code{\link{predict.fire}}
 #' @export
-plot.fire_prediction <- function(x, ...) {
+plot.fire_prediction <- function(x, interval = FALSE, ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required. Install with: install.packages('ggplot2')")
   }
@@ -68,7 +68,51 @@ plot.fire_prediction <- function(x, ...) {
     stop("Package 'patchwork' is required. Install with: install.packages('patchwork')")
   }
 
+
   if (!is.null(x$test_metrics)) {
+
+    if(interval){ # plot prediction interval plot
+      df <- data.frame(
+        Actual = x$y.actual,
+        Predicted = x$yhat,
+        upper = x$CI$upper,
+        lower = x$CI$lower
+      )
+      level <- x$CI$level
+      df <- df[order(df$Predicted), ]
+      df$Sample <- seq_len(nrow(df))
+
+      p <- ggplot2::ggplot(df, ggplot2::aes(x = Sample)) +
+        # Interval with caps
+        ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper, colour = "Interval"),
+                      width = 0.4, size = 0.5) +
+        # Actual value (solid circle)
+        ggplot2::geom_point(ggplot2::aes(y = Actual, colour = "Actual"), shape = 16, size = 2) +
+        ggplot2::scale_colour_manual(values = c("Interval" = "steelblue", "Actual" = "firebrick")) +
+        ggplot2::scale_x_continuous(
+          limits = c(0.5, max(df$Sample) + 0.5),          # start at 1, end at m
+          breaks = function(lims) {               # let R pick, but ensure 1 and integers
+            b <- scales::breaks_pretty()(lims)    # automatic nice spacing
+            b <- unique(c(1, b))                  # force a tick at 1
+            b <- as.integer(round(b))             # integer ticks only
+            b[b >= 1 & b <= max(df$Sample)]
+          },
+          labels = scales::label_number(accuracy = 1)
+        ) +
+        ggplot2::labs(
+          title = "Prediction Interval Plot",
+          x = "Sample",
+          y = "Value",
+          colour = NULL
+        ) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = 12),
+              legend.position = "bottom")
+      print(p)
+      invisible(p)
+    }else{
+
+
     # If test values were provided, plot actual vs predicted with residuals
     df <- data.frame(
       Actual = x$y.actual,
@@ -111,7 +155,7 @@ plot.fire_prediction <- function(x, ...) {
     p <- p1 + p2
     print(p)
     invisible(p)
-
+    }
   } else {
     # If no test values, show enhanced histogram
     warning("No test values provided - showing distribution of predictions")

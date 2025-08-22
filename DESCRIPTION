@@ -24,7 +24,8 @@ Imports:
   patchwork,
   crayon, 
   ggplot2 (>= 3.4.0),
-  caret
+  caret,
+  scales
 Suggests: 
     spelling,
     testthat

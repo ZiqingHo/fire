@@ -17,6 +17,10 @@
 
 \item{Ynew}{Optional true response values for test set evaluation.}
 
+\item{interval}{Logical indicating whether to compute the credibility intervals for the predicted values}
+
+\item{level}{Significance level for the intervals, between 0 and 1.}
+
 \item{...}{Not used.}
 }
 \value{
@@ -26,6 +30,7 @@ A list of class \code{fire_prediction} containing:
   \item \code{y.actual}: True values (if \code{Ynew} provided)
   \item \code{test_metrics}: RMSE and residuals (if \code{Ynew} provided)
   \item \code{model}: Reference to the original model
+  \item \code{CI}: A list with \code{upper}, \code{lower}, and \code{level} for intervals.
 }
 }
 \description{

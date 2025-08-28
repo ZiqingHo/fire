@@ -1,12 +1,16 @@
 #' Plot for Fitted FIRE Models
 #'
 #' @description
-#' Generates residuals vs fitted values plot for training data.
+#' Generates residuals vs fitted values plot for training data or plots a 1D slice of the
+#' fitted function with a credible band for a selected predictor, holding all
+#' other predictors at their column means.
 #'
-#' @param x A \code{fire_fitted} object
+#' @param x A \code{fire_fitted} object.
+#' @param interval Logical whether to plot a fitted curve with credible band.
+#' @param var The predictor to visualize when \code{interval = TRUE}.
 #' @param ... Not used
 #'
-#' @return Returns a single \code{ggplot} object showing residuals vs fitted values
+#' @return Returns a single \code{ggplot} object.
 #'
 #' @examples
 #' data(Manure)
@@ -18,7 +22,65 @@
 #'
 #' @seealso \code{\link{fire}}, \code{\link{fitted.fire}}
 #' @export
-plot.fire_fitted <- function(x, ...) {
+plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
+  # If per-variable bands are available
+  if (interval && !is.null(x$Bands)) {
+    band_names <- names(x$Bands)
+    d <- length(x$Bands)
+
+    # Resolve which variable to use
+    if (is.null(var)) {
+      j <- 1L
+    } else if (is.character(var)) {
+      if (is.null(band_names)) stop("x$Bands has no names; please use a numeric index for 'var'.")
+      j <- match(var, band_names)
+      if (is.na(j)) stop(sprintf("Variable '%s' not found in x$Bands.", var))
+    } else if (is.numeric(var) && length(var) == 1L) {
+      j <- as.integer(var)
+      if (j < 1L || j > d) stop(sprintf("'var' index out of range [1, %d].", d))
+    } else {
+      stop("Provide 'var' as a single name or index.")
+    }
+
+    b <- x$Bands[[j]]
+    if (is.null(b)) stop(sprintf("x$Bands[[%d]] is NULL.", j))
+
+    # Training X for scatter points at the chosen coordinate
+    X_train <- attr(x$model, "training_data")
+    var_label <- if (!is.null(band_names)) band_names[[j]] else paste0("X", j)
+    ci_lab <- if (!is.null(b$level)) paste0(round(100 * (1-b$level)), "% band") else "Confidence band"
+
+    # Data for band/curve (grid along variable j)
+    df_band <- data.frame(
+      X      = b$X.grid,
+      Y.grid = b$Ypred,
+      upper  = b$upper,
+      lower  = b$lower
+    )
+
+    # Points at training locations for the chosen variable
+    df_pts <- data.frame(
+      X = as.numeric(X_train[, j]),
+      Predicted = x$yhat
+    )
+
+    p <- ggplot2::ggplot(df_band, ggplot2::aes(x = X)) +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper),
+                           fill = "grey50", alpha = 0.2) +
+      ggplot2::geom_line(ggplot2::aes(y = Y.grid), linewidth = 0.9, colour = '#0072B2') +
+      ggplot2::geom_point(data = df_pts, ggplot2::aes(y = Predicted),
+                          alpha = 0.6, colour = 'black') +
+      ggplot2::labs(
+        x = var_label,
+        y = "y"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(plot.title = ggplot2::element_text(size = 12),
+                     legend.position = "none")
+
+    print(p)
+    return(invisible(p))
+  }else{
   # Create residuals vs fitted plot
   p <- ggplot2::ggplot(data.frame(Fitted = x$yhat, Residuals = x$residuals),
                        ggplot2::aes(x = Fitted, y = Residuals)) +
@@ -31,6 +93,7 @@ plot.fire_fitted <- function(x, ...) {
 
   print(p)
   invisible(p)
+  }
 }
 
 #' Plot for FIRE Predictions
@@ -38,8 +101,10 @@ plot.fire_fitted <- function(x, ...) {
 #' @description
 #' Generates residuals vs predicted and actual vs predicted plots when test response data is provided.
 #' Otherwise, generates the distribution of predicted values with density overlay.
+#' When \code{interval = TRUE}, it draws a prediction interval plot across samples.
 #'
 #' @param x A \code{fire_prediction} object
+#' @param interval Logical whether to draw prediction interval plot.
 #' @param ... Not used
 #'
 #' @return
@@ -48,6 +113,7 @@ plot.fire_fitted <- function(x, ...) {
 #'               residuals vs predicted and actual vs predicted plots
 #'    \item When no test response data is available: Returns a single \code{ggplot} object showing
 #'               the distribution of predicted values with density overlay
+#'    \item When \code{interval = TRUE}: Returns a prediction interval plot
 #'  }
 #' @examples
 #' data(Manure)

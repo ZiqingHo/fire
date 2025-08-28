@@ -6,6 +6,8 @@
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
 #' @param newdata New data for prediction.
 #' @param Ynew Optional true response values for test set evaluation.
+#' @param interval Logical indicating whether to compute the credibility intervals for the predicted values
+#' @param level Significance level for the intervals, between 0 and 1.
 #' @param ... Not used.
 #'
 #' @return A list of class \code{fire_prediction} containing:
@@ -14,6 +16,7 @@
 #'   \item \code{y.actual}: True values (if \code{Ynew} provided)
 #'   \item \code{test_metrics}: RMSE and residuals (if \code{Ynew} provided)
 #'   \item \code{model}: Reference to the original model
+#'   \item \code{CI}: A list with \code{upper}, \code{lower}, and \code{level} for intervals.
 #' }
 #'
 #' @seealso \code{\link{fire}}
@@ -122,9 +125,9 @@ predict.fire_matrix <- function(object, newdata, Ynew = NULL,
   # Construct confidence band
   if(interval){
     noise <- tail(object$noise, 1)
-    z = qnorm(level/2)
-    sigma2 = noise^2
-    Hcross = lambda^2 * Hcross.tilde
+    z <- qnorm(1 - level/2)
+    sigma2 <- noise^2
+    Hcross <- lambda^2 * Hcross.tilde
 
     # Generate Gram matrix
     if (kernel_iprior == 'cfbm') {
@@ -260,7 +263,7 @@ predict.fire_tensor <- function(object, newdata, Ynew = NULL,
 
   if(interval){
     noise <- tail(object$noise, 1)
-    z = qnorm(level/2)
+    z = qnorm(1 - level/2)
     sigma2 = noise^2
     Hcross = tau^2 * Hcross.tilde
 
@@ -342,6 +345,17 @@ print.fire_prediction <- function(x, ...) {
     cat(sprintf("Test RMSE: %.5f\n", x$test_metrics$rmse))
   }
 
+  if(!is.null(x$CI)){
+    lower <- x$CI$lower
+    upper <- x$CI$upper
+    result <- data.frame(lower, x$yhat, upper)
+    lower.name <- paste0(x$CI$level / 2 * 100, "%")
+    upper.name <- paste0((1 - x$CI$level / 2) * 100, "%")
+    names(result) <- c(lower.name, "Mean", upper.name)
+    index <- min(length(x$yhat), 6)
+    cat("\nPredicted values:\n")
+    print(result[seq_len(index),])
+  }else{
   if (length(x$yhat) > 6) {
     cat("\nFirst 6 predicted values:\n")
     print(head(x$yhat))
@@ -349,6 +363,7 @@ print.fire_prediction <- function(x, ...) {
   }else{
     cat("\nThe",length(x$yhat) , "predicted values:\n")
     print(head(x$yhat))
+    }
   }
   invisible(x)
 }

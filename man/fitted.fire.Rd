@@ -6,12 +6,18 @@
 \alias{fitted.fire_tensor}
 \title{Fitted Values for FIRE Models}
 \usage{
-\method{fitted}{fire_matrix}(object, ...)
+\method{fitted}{fire_matrix}(object, interval = FALSE, level = 0.05, n.grid = 100, ...)
 
-\method{fitted}{fire_tensor}(object, ...)
+\method{fitted}{fire_tensor}(object, interval = FALSE, level = 0.05, ...)
 }
 \arguments{
 \item{object}{A model object of class \code{fire_matrix} or \code{fire_tensor}.}
+
+\item{interval}{Logical indicating whether to compute credible band.}
+
+\item{level}{Significance level for the intervals, between 0 and 1.}
+
+\item{n.grid}{Number of grid points used to build credible band.}
 
 \item{...}{Not used.}
 }
@@ -23,6 +29,16 @@ A list of class \code{fire_fitted} containing:
   \item \code{residuals}: Model residuals
   \item \code{intercept}: Intercept value
   \item \code{model}: Reference to the original model object
+  \item \code{CI}: A list with \code{upper}, \code{lower}, and \code{level} for training-point intervals.
+  \item \code{Bands}: A list of length \eqn{d} (number of predictors). Each element \code{Bands[[j]]} is a list with:
+    \describe{
+      \item{\code{X.grid}}{Numeric vector of grid values for predictor \eqn{j}.}
+      \item{\code{Ypred}}{Fitted mean on the grid (others fixed at column means).}
+      \item{\code{upper}, \code{lower}}{Band limits on the grid.}
+      \item{\code{level}}{Significance level.}
+      \item{\code{fixed_at}}{Numeric vector of the column means used to fix the other predictors.}
+      \item{\code{var_index}}{Integer index \eqn{j} of the varied predictor.}
+    }
 }
 }
 \description{

@@ -4,8 +4,10 @@
 #' Computes fitted values for FIRE models with either matrix or tensor input data.
 #'
 #' @param object A model object of class \code{fire_matrix} or \code{fire_tensor}.
+#' @param interval Logical indicating whether to compute credible band.
+#' @param level Significance level for the intervals, between 0 and 1.
+#' @param n.grid Number of grid points used to build credible band.
 #' @param ... Not used.
-#'
 #' @return A list of class \code{fire_fitted} containing:
 #' \itemize{
 #'   \item \code{yhat}: Fitted values
@@ -13,6 +15,16 @@
 #'   \item \code{residuals}: Model residuals
 #'   \item \code{intercept}: Intercept value
 #'   \item \code{model}: Reference to the original model object
+#'   \item \code{CI}: A list with \code{upper}, \code{lower}, and \code{level} for training-point intervals.
+#'   \item \code{Bands}: A list of length \eqn{d} (number of predictors). Each element \code{Bands[[j]]} is a list with:
+#'     \describe{
+#'       \item{\code{X.grid}}{Numeric vector of grid values for predictor \eqn{j}.}
+#'       \item{\code{Ypred}}{Fitted mean on the grid (others fixed at column means).}
+#'       \item{\code{upper}, \code{lower}}{Band limits on the grid.}
+#'       \item{\code{level}}{Significance level.}
+#'       \item{\code{fixed_at}}{Numeric vector of the column means used to fix the other predictors.}
+#'       \item{\code{var_index}}{Integer index \eqn{j} of the varied predictor.}
+#'     }
 #' }
 #'
 #' @seealso \code{\link{fire}}
@@ -37,7 +49,7 @@ NULL
 #' @rdname fitted.fire
 #' @method fitted fire_matrix
 #' @export
-fitted.fire_matrix <- function(object, ...) {
+fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 100, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
   Y <- attr(object, "original_response")
@@ -99,6 +111,85 @@ fitted.fire_matrix <- function(object, ...) {
     residuals <- Y - Yfitted
   }
   rmse <- sqrt(mean(residuals^2))
+  Bands <- NULL
+  # Construct confidence band
+  if(interval){
+
+    noise <- tail(object$noise, 1)
+    z = qnorm(1 - level/2)
+    sigma2 = noise^2
+    H <- lambda^2 * H.tilde
+    n <- length(Y)
+    Psi <- diag(n)/sigma2
+    Vy <- H %*% H %*% Psi + Psi
+    Vy.inv <- solve(Vy)
+    Sigma.new <- (H) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(H)
+    se <- sqrt(diag(Sigma.new))
+    upper <- Yfitted + z * se
+    lower <- Yfitted - z * se
+
+    # Always fix other variables at column means
+    fix_at <- colMeans(as.matrix(X))
+
+    # Per-variable credible bands (vary j; others fixed at means)
+    Bands <- vector("list", d)
+    names(Bands) <- if (!is.null(colnames(X))) colnames(X) else paste0("X", 1:d)
+
+    for(j in 1:d){
+      xj.min <- min(X[, j])
+      xj.max <- max(X[, j])
+      xj.grid <- seq(from = xj.min, to = xj.max, length.out = n.grid)
+
+      X.grid <- matrix(rep(fix_at, each = n.grid), nrow = n.grid, byrow = FALSE)
+      X.grid[, j] <- xj.grid
+
+    nmat.cross <- Kronecker_norm_cross(Xtrain = X,
+                                       Xnew = X.grid,
+                                       G = G,
+                                       alpha = c(1),
+                                       constant = constant_g,
+                                       Index = Index,
+                                       os_type =  attr(object, "os_type"),
+                                       cores = attr(object, "cores"),
+                                       sample_id = 1)
+
+    # Generate cross kernel matrix
+    if (kernel_iprior == 'cfbm') {
+      if (is.null(iprior_param)) iprior_param <- 0.5
+      Hcross.tilde <- cfbm_rkhs_kron_cross(nmat = nmat,
+                                           nmat_cross = nmat.cross,
+                                           Hurst = iprior_param)
+    } else if (kernel_iprior == 'rbf') {
+      if (is.null(iprior_param)) iprior_param <- 1
+      Hcross.tilde <- rbf_rkhs_kron_cross(nmat_cross = nmat.cross,
+                                          lengthscale = iprior_param)
+    } else if (kernel_iprior == 'linear') {
+      Hcross.tilde <- nmat.cross + iprior_param
+    }else if (kernel_iprior == 'poly'){
+      Hcross.tilde <- (nmat.cross  + iprior_param[2])^iprior_param[1]
+    }
+
+    if(constant_h){
+      Hcross.tilde <- 1 + Hcross.tilde
+    }
+    # Calculate predictions
+    Hcross <- lambda^2 * Hcross.tilde
+
+    Ypred <- as.vector(intercept + Hcross %*% w)
+    Sigma.new <- (Hcross) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(Hcross) + sigma2
+    se.new <- sqrt(diag(Sigma.new))
+    Bands[[j]] <- list(
+      X.grid = xj.grid,
+      Ypred  = Ypred,
+      upper  = Ypred + z * se.new,
+      lower  = Ypred - z * se.new,
+      level  = level,
+      fixed_at = fix_at,   # recorded for reference (column means)
+      var_index = j
+    )
+
+  }
+  }
 
   # Create comprehensive output object
   result <- structure(
@@ -107,7 +198,11 @@ fitted.fire_matrix <- function(object, ...) {
       rmse = rmse,
       residuals = residuals,
       intercept = intercept,
-      model = object  # Include model reference
+      model = object,  # Include model reference
+      CI = if(interval){
+        list(upper = upper, lower = lower, level = level)
+      },
+      Bands = Bands
     ),
     class = c("fire_fitted", "list")
   )
@@ -118,7 +213,7 @@ fitted.fire_matrix <- function(object, ...) {
 #' @rdname fitted.fire
 #' @method fitted fire_tensor
 #' @export
-fitted.fire_tensor<- function(object, ...) {
+fitted.fire_tensor<- function(object,interval = FALSE, level = 0.05, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
   Y <- attr(object, "original_response")
@@ -184,6 +279,22 @@ fitted.fire_tensor<- function(object, ...) {
   }
   rmse <- sqrt(mean(residuals^2))
 
+  if(interval){
+
+    noise <- tail(object$noise, 1)
+    z = qnorm(1 - level/2)
+    sigma2 = noise^2
+    H <- lambda^2 * H.tilde
+    n <- length(Y)
+    Psi <- diag(n)/sigma2
+    Vy <- H %*% H %*% Psi + Psi
+    Vy.inv <- solve(Vy)
+    Sigma.new <- (H) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(H)
+    se <- sqrt(diag(Sigma.new))
+    upper <- Yfitted + z * se
+    lower <- Yfitted - z * se
+
+  }
   # Create comprehensive output object
   result <- structure(
     list(
@@ -191,7 +302,10 @@ fitted.fire_tensor<- function(object, ...) {
       rmse = rmse,
       residuals = residuals,
       intercept = intercept,
-      model = object  # Include model reference
+      model = object,  # Include model reference
+      CI = if(interval){
+        list(upper = upper, lower = lower, level = level)
+      }
     ),
     class = c("fire_fitted", "list")
   )
@@ -217,14 +331,27 @@ print.fire_fitted <- function(x, ...) {
   cat(sprintf("Training RMSE: %.5f\n", x$rmse))
   cat(sprintf("Intercept: %.4f\n", x$intercept))
 
-  if (length(x$yhat) > 6) {
-    cat("\nFirst 6 fitted values:\n")
-    print(head(x$yhat))
-    cat(sprintf("[... %d more values not shown]\n", length(x$yhat) - 6))
+  if(!is.null(x$CI)){
+    lower <- x$CI$lower
+    upper <- x$CI$upper
+    result <- data.frame(lower, x$yhat, upper)
+    lower.name <- paste0(x$CI$level / 2 * 100, "%")
+    upper.name <- paste0((1 - x$CI$level / 2) * 100, "%")
+    names(result) <- c(lower.name, "Mean", upper.name)
+    index <- min(length(x$yhat), 6)
+    cat("\nFitted values:\n")
+    print(result[seq_len(index),])
   }else{
-    cat("\nThe", length(x$yhat), "fitted values:\n")
-    print(head(x$yhat))
+    if (length(x$yhat) > 6) {
+      cat("\nFirst 6 fitted values:\n")
+      print(head(x$yhat))
+      cat(sprintf("[... %d more values not shown]\n", length(x$yhat) - 6))
+    }else{
+      cat("\nThe", length(x$yhat), "fitted values:\n")
+      print(head(x$yhat))
+    }
   }
+
   invisible(x)
 }
 

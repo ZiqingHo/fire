@@ -4,18 +4,24 @@
 \alias{plot.fire_fitted}
 \title{Plot for Fitted FIRE Models}
 \usage{
-\method{plot}{fire_fitted}(x, ...)
+\method{plot}{fire_fitted}(x, interval = FALSE, var = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{fire_fitted} object}
+\item{x}{A \code{fire_fitted} object.}
+
+\item{interval}{Logical whether to plot a fitted curve with credible band.}
+
+\item{var}{The predictor to visualize when \code{interval = TRUE}.}
 
 \item{...}{Not used}
 }
 \value{
-Returns a single \code{ggplot} object showing residuals vs fitted values
+Returns a single \code{ggplot} object.
 }
 \description{
-Generates residuals vs fitted values plot for training data.
+Generates residuals vs fitted values plot for training data or plots a 1D slice of the
+fitted function with a credible band for a selected predictor, holding all
+other predictors at their column means.
 }
 \examples{
 data(Manure)

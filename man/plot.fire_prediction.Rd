@@ -9,6 +9,8 @@
 \arguments{
 \item{x}{A \code{fire_prediction} object}
 
+\item{interval}{Logical whether to draw prediction interval plot.}
+
 \item{...}{Not used}
 }
 \value{
@@ -17,11 +19,13 @@
               residuals vs predicted and actual vs predicted plots
    \item When no test response data is available: Returns a single \code{ggplot} object showing
               the distribution of predicted values with density overlay
+   \item When \code{interval = TRUE}: Returns a prediction interval plot
  }
 }
 \description{
 Generates residuals vs predicted and actual vs predicted plots when test response data is provided.
 Otherwise, generates the distribution of predicted values with density overlay.
+When \code{interval = TRUE}, it draws a prediction interval plot across samples.
 }
 \examples{
 data(Manure)

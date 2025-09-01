@@ -7,6 +7,7 @@
 #' @param interval Logical indicating whether to compute credible band.
 #' @param level Significance level for the intervals, between 0 and 1.
 #' @param n.grid Number of grid points used to build credible band.
+#' @param fixed A list of named vectors `c(index = i, value = v)` used to fix variables when building bands. Variables not specified are fixed at their column means.
 #' @param ... Not used.
 #' @return A list of class \code{fire_fitted} containing:
 #' \itemize{
@@ -49,7 +50,8 @@ NULL
 #' @rdname fitted.fire
 #' @method fitted fire_matrix
 #' @export
-fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 100, ...) {
+fitted.fire_matrix <- function(object, interval = FALSE, level = 0.05, n.grid = 100,
+                               fixed = NULL, ...) {
   # Extract components from model object
   X <- attr(object, "training_data")
   Y <- attr(object, "original_response")
@@ -95,11 +97,11 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
     H.tilde <- rbf_rkhs_kron(nmat = nmat, lengthscale = iprior_param)
   } else if (kernel_iprior == 'linear') {
     H.tilde <- nmat + iprior_param
-  } else if (kernel_iprior == 'poly'){
+  } else if (kernel_iprior == 'poly') {
     H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
   }
 
-  if(constant_h){
+  if (constant_h) {
     H.tilde <- 1 + H.tilde
   }
 
@@ -112,12 +114,13 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
   }
   rmse <- sqrt(mean(residuals^2))
   Bands <- NULL
+
   # Construct confidence band
-  if(interval){
+  if (interval) {
 
     noise <- tail(object$noise, 1)
-    z = qnorm(1 - level/2)
-    sigma2 = noise^2
+    z <- qnorm(1 - level/2)
+    sigma2 <- noise^2
     H <- lambda^2 * H.tilde
     n <- length(Y)
     Psi <- diag(n)/sigma2
@@ -128,14 +131,36 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
     upper <- Yfitted + z * se
     lower <- Yfitted - z * se
 
-    # Always fix other variables at column means
+    # Baseline: fix others at column means, then override with user 'fixed'
     fix_at <- colMeans(as.matrix(X))
 
-    # Per-variable credible bands (vary j; others fixed at means)
+    if (!is.null(fixed)) {
+      if (!is.list(fixed)) stop("'fixed' must be a list of named vectors like c(index=2, value=2).")
+
+      for (el in fixed) {
+        if (!is.atomic(el) || is.null(names(el))) {
+          stop("Each element of 'fixed' must be a named vector like c(index=2, value=2).")
+        }
+        if (is.null(el[["index"]]) || is.null(el[["value"]])) {
+          stop("Each element of 'fixed' must contain names 'index' and 'value'.")
+        }
+
+        idx <- as.integer(el[["index"]])
+        val <- as.numeric(el[["value"]])
+
+        if (is.na(idx) || idx < 1 || idx > d) {
+          stop(sprintf("'fixed' index %s is out of bounds [1, %d].", as.character(el[["index"]]), d))
+        }
+
+        fix_at[idx] <- val
+      }
+    }
+
+    # Per-variable credible bands (vary j; others fixed at fix_at)
     Bands <- vector("list", d)
     names(Bands) <- if (!is.null(colnames(X))) colnames(X) else paste0("X", 1:d)
 
-    for(j in 1:d){
+    for (j in 1:d) {
       xj.min <- min(X[, j])
       xj.max <- max(X[, j])
       xj.grid <- seq(from = xj.min, to = xj.max, length.out = n.grid)
@@ -143,52 +168,53 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
       X.grid <- matrix(rep(fix_at, each = n.grid), nrow = n.grid, byrow = FALSE)
       X.grid[, j] <- xj.grid
 
-    nmat.cross <- Kronecker_norm_cross(Xtrain = X,
-                                       Xnew = X.grid,
-                                       G = G,
-                                       alpha = c(1),
-                                       constant = constant_g,
-                                       Index = Index,
-                                       os_type =  attr(object, "os_type"),
-                                       cores = attr(object, "cores"),
-                                       sample_id = 1)
+      nmat.cross <- Kronecker_norm_cross(Xtrain = X,
+                                         Xnew = X.grid,
+                                         G = G,
+                                         alpha = c(1),
+                                         constant = constant_g,
+                                         Index = Index,
+                                         os_type =  attr(object, "os_type"),
+                                         cores = attr(object, "cores"),
+                                         sample_id = 1)
 
-    # Generate cross kernel matrix
-    if (kernel_iprior == 'cfbm') {
-      if (is.null(iprior_param)) iprior_param <- 0.5
-      Hcross.tilde <- cfbm_rkhs_kron_cross(nmat = nmat,
-                                           nmat_cross = nmat.cross,
-                                           Hurst = iprior_param)
-    } else if (kernel_iprior == 'rbf') {
-      if (is.null(iprior_param)) iprior_param <- 1
-      Hcross.tilde <- rbf_rkhs_kron_cross(nmat_cross = nmat.cross,
-                                          lengthscale = iprior_param)
-    } else if (kernel_iprior == 'linear') {
-      Hcross.tilde <- nmat.cross + iprior_param
-    }else if (kernel_iprior == 'poly'){
-      Hcross.tilde <- (nmat.cross  + iprior_param[2])^iprior_param[1]
+      # Generate cross kernel matrix
+      if (kernel_iprior == 'cfbm') {
+        if (is.null(iprior_param)) iprior_param <- 0.5
+        Hcross.tilde <- cfbm_rkhs_kron_cross(nmat = nmat,
+                                             nmat_cross = nmat.cross,
+                                             Hurst = iprior_param)
+      } else if (kernel_iprior == 'rbf') {
+        if (is.null(iprior_param)) iprior_param <- 1
+        Hcross.tilde <- rbf_rkhs_kron_cross(nmat_cross = nmat.cross,
+                                            lengthscale = iprior_param)
+      } else if (kernel_iprior == 'linear') {
+        Hcross.tilde <- nmat.cross + iprior_param
+      } else if (kernel_iprior == 'poly') {
+        Hcross.tilde <- (nmat.cross + iprior_param[2])^iprior_param[1]
+      }
+
+      if (constant_h) {
+        Hcross.tilde <- 1 + Hcross.tilde
+      }
+
+      # Calculate predictions
+      Hcross <- lambda^2 * Hcross.tilde
+      Ypred <- as.vector(intercept + Hcross %*% w)
+
+      Sigma.new <- (Hcross) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(Hcross) + sigma2
+      se.new <- sqrt(diag(Sigma.new))
+
+      Bands[[j]] <- list(
+        X.grid   = xj.grid,
+        Ypred    = Ypred,
+        upper    = Ypred + z * se.new,
+        lower    = Ypred - z * se.new,
+        level    = level,
+        fixed_at = fix_at,   # record actual fixed values used
+        var_index = j
+      )
     }
-
-    if(constant_h){
-      Hcross.tilde <- 1 + Hcross.tilde
-    }
-    # Calculate predictions
-    Hcross <- lambda^2 * Hcross.tilde
-
-    Ypred <- as.vector(intercept + Hcross %*% w)
-    Sigma.new <- (Hcross) %*% (Psi - Psi %*% H %*% Vy.inv %*% t(H) %*% Psi) %*% t(Hcross) + sigma2
-    se.new <- sqrt(diag(Sigma.new))
-    Bands[[j]] <- list(
-      X.grid = xj.grid,
-      Ypred  = Ypred,
-      upper  = Ypred + z * se.new,
-      lower  = Ypred - z * se.new,
-      level  = level,
-      fixed_at = fix_at,   # recorded for reference (column means)
-      var_index = j
-    )
-
-  }
   }
 
   # Create comprehensive output object
@@ -199,7 +225,7 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
       residuals = residuals,
       intercept = intercept,
       model = object,  # Include model reference
-      CI = if(interval){
+      CI = if (interval) {
         list(upper = upper, lower = lower, level = level)
       },
       Bands = Bands
@@ -209,6 +235,7 @@ fitted.fire_matrix <- function(object,interval = FALSE, level = 0.05, n.grid = 1
 
   return(result)
 }
+
 
 #' @rdname fitted.fire
 #' @method fitted fire_tensor

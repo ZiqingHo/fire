@@ -6,7 +6,7 @@
 \alias{fitted.fire_tensor}
 \title{Fitted Values for FIRE Models}
 \usage{
-\method{fitted}{fire_matrix}(object, interval = FALSE, level = 0.05, n.grid = 100, ...)
+\method{fitted}{fire_matrix}(object, interval = FALSE, level = 0.05, n.grid = 100, fixed = NULL, ...)
 
 \method{fitted}{fire_tensor}(object, interval = FALSE, level = 0.05, ...)
 }
@@ -18,6 +18,8 @@
 \item{level}{Significance level for the intervals, between 0 and 1.}
 
 \item{n.grid}{Number of grid points used to build credible band.}
+
+\item{fixed}{A list of named vectors `c(index = i, value = v)` used to fix variables when building bands. Variables not specified are fixed at their column means.}
 
 \item{...}{Not used.}
 }

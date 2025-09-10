@@ -24,6 +24,27 @@
 #' @export
 plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
   # If per-variable bands are available
+  # ---------- FT-like theme helper ----------
+  theme_ft <- function(base_size = 12, base_family = "") {
+    ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
+      ggplot2::theme(
+        plot.background  = ggplot2::element_rect(fill = "white", colour = NA), # FT paper
+        panel.background = ggplot2::element_rect(fill = "white", colour = NA),
+        panel.grid.major.x = ggplot2::element_blank(),
+        panel.grid.minor.x = ggplot2::element_blank(),
+        panel.grid.minor.y = ggplot2::element_blank(),
+        panel.grid.major.y = ggplot2::element_line(linewidth = 0.4, colour = "#d7d2cb"),
+        axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 8)),
+        axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 8)),
+        axis.text = ggplot2::element_text(colour = "#3b3b3b"),
+        plot.title = ggplot2::element_text(face = "bold", size = base_size + 2, colour = "#1a1a1a"),
+        plot.subtitle = ggplot2::element_text(size = base_size, colour = "#555"),
+        plot.caption = ggplot2::element_text(size = base_size - 2, colour = "#6b6b6b", margin = ggplot2::margin(t = 6)),
+        legend.position = "none"
+      )
+  }
+
+  # ---------- Replace your interval branch with this ----------
   if (interval && !is.null(x$Bands)) {
     band_names <- names(x$Bands)
     d <- length(x$Bands)
@@ -48,7 +69,7 @@ plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
     # Training X for scatter points at the chosen coordinate
     X_train <- attr(x$model, "training_data")
     var_label <- if (!is.null(band_names)) band_names[[j]] else paste0("X", j)
-    ci_lab <- if (!is.null(b$level)) paste0(round(100 * (1-b$level)), "% band") else "Confidence band"
+    ci_lab <- if (!is.null(b$level)) paste0(round(100 * (1 - b$level)), "% band") else "Confidence band"
 
     # Data for band/curve (grid along variable j)
     df_band <- data.frame(
@@ -64,23 +85,44 @@ plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
       Predicted = x$yhat
     )
 
+    # Palette & styling
+    line_col   <- "#0f5499"  # calm FT blue
+    point_col  <- "#2b2b2b"  # dark neutral grey
+    ribbon_col <- "#0f5499"  # same hue as line, lighter via alpha
+
+    # Build plot
     p <- ggplot2::ggplot(df_band, ggplot2::aes(x = X)) +
-      ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper),
-                           fill = "grey50", alpha = 0.2) +
-      ggplot2::geom_line(ggplot2::aes(y = Y.grid), linewidth = 0.9, colour = '#0072B2') +
-      ggplot2::geom_point(data = df_pts, ggplot2::aes(y = Predicted),
-                          alpha = 0.6, colour = 'black') +
-      ggplot2::labs(
-        x = var_label,
-        y = "y"
+      ggplot2::geom_ribbon(
+        ggplot2::aes(ymin = lower, ymax = upper),
+        fill = ribbon_col, alpha = 0.12
       ) +
-      ggplot2::theme_minimal() +
-      ggplot2::theme(plot.title = ggplot2::element_text(size = 12),
-                     legend.position = "none")
+      ggplot2::geom_line(
+        ggplot2::aes(y = Y.grid),
+        linewidth = 1.0, colour = line_col
+      ) +
+      ggplot2::geom_point(
+        data = df_pts,
+        ggplot2::aes(y = Predicted),
+        size = 2, alpha = 0.65, colour = point_col, stroke = 0
+      ) +
+      ggplot2::labs(
+        title = paste0(var_label, ": Partial effect with ", ci_lab),
+        x = var_label,
+        y = "Predicted y",
+        caption = "Shaded area shows uncertainty; line is the estimated partial effect."
+      ) +
+      theme_ft()
+
+    # Optional: tidy numeric labels if 'scales' is available
+    if (requireNamespace("scales", quietly = TRUE)) {
+      p <- p + ggplot2::scale_x_continuous(labels = scales::label_number())
+      p <- p + ggplot2::scale_y_continuous(labels = scales::label_number())
+    }
 
     print(p)
     return(invisible(p))
-  }else{
+  }
+  else{
   # Create residuals vs fitted plot
   p <- ggplot2::ggplot(data.frame(Fitted = x$yhat, Residuals = x$residuals),
                        ggplot2::aes(x = Fitted, y = Residuals)) +

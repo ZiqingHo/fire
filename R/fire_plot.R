@@ -23,7 +23,6 @@
 #' @seealso \code{\link{fire}}, \code{\link{fitted.fire}}
 #' @export
 plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
-  # If per-variable bands are available
   # ---------- FT-like theme helper ----------
   theme_ft <- function(base_size = 12, base_family = "") {
     ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
@@ -43,8 +42,7 @@ plot.fire_fitted <- function(x, interval = FALSE, var = NULL, ...) {
         legend.position = "none"
       )
   }
-
-  # ---------- Replace your interval branch with this ----------
+  # If per-variable bands are available
   if (interval && !is.null(x$Bands)) {
     band_names <- names(x$Bands)
     d <- length(x$Bands)

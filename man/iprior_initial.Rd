@@ -22,7 +22,10 @@ pre_initial(
   os_type = "Apple",
   cores = NULL,
   sample_id = 1,
-  epsilon = 1e-06
+  epsilon = 1e-06,
+  is.classification = FALSE,
+  num_class = NULL,
+  kernel_class = NULL
 )
 }
 \arguments{
@@ -59,6 +62,12 @@ pre_initial(
 \item{sample_id}{Which mode represents samples, either the 1st or the last mode}
 
 \item{epsilon}{Small positive constant in initialisation of EM algorithm}
+
+\item{is.classification}{Logical indicating whether it is classification problem}
+
+\item{num_class}{Number of classes}
+
+\item{kernel_class}{Kernel function for class}
 }
 \value{
 List containing two vectors of the initial values for EM algorithm:

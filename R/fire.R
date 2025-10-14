@@ -44,6 +44,8 @@
 #'   \item \code{\link{fire.tensor}} for \code{array} or \code{list} inputs
 #' }
 #'
+#' @return An \code{fire_matrix} or \code{fire_tensor} object. The \code{print()} and \code{summary()} methods display the model information.
+#'
 #' @seealso \code{\link{kernels_fire}}, \code{\link{Manure}}, \code{\link{Housing}}
 #'
 #' @examples

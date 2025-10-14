@@ -119,6 +119,9 @@ fire(
 
 \item{...}{Additional arguments passed to methods}
 }
+\value{
+An \code{fire_matrix} or \code{fire_tensor} object. The \code{print()} and \code{summary()} methods display the model information.
+}
 \description{
 A function to perform functional regression using I-priors with Reproducing Kernel Hilbert Space (RKHS) norm.
 The FIRE model parameters are estimated using an EM algorithm.

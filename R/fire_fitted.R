@@ -300,7 +300,7 @@ fitted.fire_tensor<- function(object,interval = FALSE, level = 0.05, ...) {
   # Calculate fitted values and metrics
   Yfitted <- as.vector(intercept + tau^2 * H.tilde %*% w)
   if (intercept != 0) {
-    residuals <- Y - Yfitted + intercept  # Y stored is centered using mean(Y)
+    residuals <- Y + intercept - Yfitted  # Y stored is centered using mean(Y)
   } else {
     residuals <- Y - Yfitted
   }

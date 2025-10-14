@@ -29,6 +29,6 @@ Imports:
 Suggests: 
     spelling,
     testthat
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://github.com/ZiqingHo/fire
 BugReports: https://github.com/ZiqingHo/fire/issues

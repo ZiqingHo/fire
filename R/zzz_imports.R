@@ -2,5 +2,5 @@
 #' @importFrom stats dist optim rnorm sigma density
 #' @importFrom utils head setTxtProgressBar tail txtProgressBar
 #' @importFrom patchwork plot_layout
-#' @importFrom stats qnorm
+#' @importFrom stats qnorm model.matrix
 NULL

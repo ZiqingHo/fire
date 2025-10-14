@@ -21,6 +21,9 @@
 #' @param cores Number of cores for parallel computation (default: detectCores() - 1)
 #' @param sample_id Which mode represents samples, either the 1st or the last mode
 #' @param epsilon Small positive constant in initialisation of EM algorithm
+#' @param is.classification Logical indicating whether it is classification problem
+#' @param num_class Number of classes
+#' @param kernel_class Kernel function for class
 #'
 #' @return List containing two vectors of the initial values for EM algorithm:
 #' \itemize{
@@ -62,7 +65,8 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE, st
                         G = NULL,
                         Index, kernel_iprior = 'cfbm', iprior_param = NULL,
                         constant_g = TRUE, constant_h = FALSE, os_type = "Apple", cores = NULL, sample_id = 1,
-                        epsilon = 1e-6) {
+                        epsilon = 1e-6,
+                        is.classification = FALSE, num_class = NULL, kernel_class = NULL) {
 
   m <- length(kernels)
   N <- length(Y)
@@ -103,9 +107,19 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE, st
   }
 
   if(constant_h){
-    H.tilde = 1 + H.tilde
+    H.tilde <- 1 + H.tilde
   }
 
+  if(is.classification){
+    if(kernel_class == 'identity'){
+      H.group <- diag(num_class)
+    }else if(kernel_class == 'centred identity'){
+      H.group <- diag(num_class) - matrix(1/num_class, num_class, num_class)
+    }else if(is.matrix(kernel_class)){
+      H.group <- kernel_class
+    }
+    H.tilde <- kronecker(H.tilde, H.group)
+  }
   # Eigendecomposition
   eigen.Htilde <- eigen(H.tilde, symmetric = TRUE)
   U <- eigen.Htilde$values

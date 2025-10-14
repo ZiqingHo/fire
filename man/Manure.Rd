@@ -26,8 +26,8 @@ Combined near-infrared spectra and chemical composition measurements of cattle a
 data(Manure)
 }
 \references{
-Gogé, F., Thuriès, L., Fouad, Y., Damay, N., Davrieux, F., Moussard, G., ... & Morvan, T. (2021).
-Dataset of chemical and near-infrared spectroscopy measurements of fresh and dried poultry and cattle manure.
+Gogé, F., Thuriès, L., Fouad, Y., Damay, N., Davrieux, F., Moussard, G. & Le, R., Caroline & Trupin-Maudemain, Sèverine and Valè, Matthieu & Morvan, T. (2021).
+Dataset of Chemical and Near-Infrared Spectroscopy Measurements of Fresh and Dried Poultry and Cattle Manure.
 \emph{Data in Brief}, 34, 106647. \doi{10.1016/j.dib.2020.106647}
 }
 \keyword{datasets}

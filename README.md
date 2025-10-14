@@ -25,7 +25,7 @@ Key features include:
 - Built-in cross-validation (`fire_cv`)  
 - S3 methods for `print()`, `summary()`, `fitted()`, `predict()`, and
   `plot()`  
-- Example datasets: **Manure** and **Housing**
+- Example datasets: **Manure**, **Housing** and **Sugar**
 
 ## Installation
 

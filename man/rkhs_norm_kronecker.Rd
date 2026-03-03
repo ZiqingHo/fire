@@ -15,7 +15,8 @@ rkhs_norm_kron(
   constant = TRUE,
   Index = NULL,
   Ginv = NULL,
-  validate = FALSE
+  validate = FALSE,
+  tol = 1e-12
 )
 
 Kronecker_norm_mat(
@@ -28,7 +29,8 @@ Kronecker_norm_mat(
   os_type = "Apple",
   cores = NULL,
   sample_id = 1,
-  validate = FALSE
+  validate = FALSE,
+  tol = 1e-12
 )
 
 Kronecker_norm_cross(
@@ -42,7 +44,8 @@ Kronecker_norm_cross(
   os_type = "Apple",
   cores = NULL,
   sample_id = 1,
-  validate = FALSE
+  validate = FALSE,
+  tol = 1e-12
 )
 }
 \arguments{

@@ -58,12 +58,21 @@ NULL
 #' @rdname rkhs_norm_kronecker
 #' @export
 rkhs_norm_kron <- function(X, Y = NULL, G_list, L_inv = NULL, constant = TRUE, Index = NULL, Ginv = NULL,
-                           validate = FALSE) {
+                           validate = FALSE, tol = 1e-12) {
   # number of modes
   if(is.vector(X)){
     m = 1
   }else{
     m = length(G_list)/2
+  }
+
+  for(i in 1:m){
+    Qi_name = paste0("Q", i)
+    if(!is.null(G_list[[Qi_name]])){
+      Qi = G_list[[Qi_name]]
+      Qi[abs(Qi) < tol] = 0
+      G_list[[Qi_name]] <- Qi
+    }
   }
 
   if(validate){
@@ -193,7 +202,7 @@ rkhs_norm_kron <- function(X, Y = NULL, G_list, L_inv = NULL, constant = TRUE, I
 #' @export
 Kronecker_norm_mat <- function(X, G, alpha, constant = TRUE, Index = NULL, G_list = NULL,
                                os_type = "Apple", cores = NULL,
-                               sample_id = 1, validate = FALSE) {
+                               sample_id = 1, validate = FALSE, tol = 1e-12) {
 
   if(validate){
   if (is.matrix(X) && length(G) != 1) {
@@ -243,9 +252,9 @@ Kronecker_norm_mat <- function(X, G, alpha, constant = TRUE, Index = NULL, G_lis
     norms <- numeric(N_sample)
     for(j in i:N_sample) {
       if(m == 1) {
-        norms[j] <- rkhs_norm_kron(X = X[i,], Y = X[j,], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv)
+        norms[j] <- rkhs_norm_kron(X = X[i,], Y = X[j,], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
       } else {
-        norms[j] <- rkhs_norm_kron(X = X[[i]], Y = X[[j]], Index = Index , G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL)
+        norms[j] <- rkhs_norm_kron(X = X[[i]], Y = X[[j]], Index = Index , G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL, tol = tol)
       }
     }
     return(norms)
@@ -280,7 +289,7 @@ Kronecker_norm_mat <- function(X, G, alpha, constant = TRUE, Index = NULL, G_lis
 #' @export
 Kronecker_norm_cross <- function(Xtrain, Xnew, G, alpha, constant = TRUE, Index = NULL,
                                  G_list = NULL, os_type = "Apple", cores = NULL,
-                                 sample_id = 1, validate = FALSE) {
+                                 sample_id = 1, validate = FALSE, tol = 1e-12) {
 
   if(validate){
   if (is.matrix(Xtrain) && length(G) != 1) {
@@ -332,9 +341,9 @@ Kronecker_norm_cross <- function(Xtrain, Xnew, G, alpha, constant = TRUE, Index 
     norms <- numeric(Ntrain)
     for(j in 1:Ntrain) {
       if(m == 1) {
-        norms[j] <- rkhs_norm_kron(X = Xnew[i,], Y = Xtrain[j,], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv)
+        norms[j] <- rkhs_norm_kron(X = Xnew[i,], Y = Xtrain[j,], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
       } else {
-        norms[j] <- rkhs_norm_kron(X = Xnew[[i]], Y = Xtrain[[j]], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL)
+        norms[j] <- rkhs_norm_kron(X = Xnew[[i]], Y = Xtrain[[j]], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL, tol = tol)
       }
     }
     return(norms)

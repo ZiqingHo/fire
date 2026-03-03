@@ -18,7 +18,8 @@ fire.matrix <- function(X, Y, dat_T,
     os_type = "Apple",
     cores = NULL,
     asymptote = TRUE,
-    epsilon = 1
+    epsilon = 1,
+    tol = 1e-12
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control
@@ -34,6 +35,7 @@ fire.matrix <- function(X, Y, dat_T,
   cores = con$cores
   asymptote = con$asymptote
   epsilon = con$epsilon
+  tol = con$tol
 
   # Input validation
   if (!is.matrix(X)) stop("X must be a matrix")
@@ -120,7 +122,7 @@ fire.matrix <- function(X, Y, dat_T,
     # Precompute H.tilde
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = c(1), constant = constant_g,
-                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
+                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1, tol = tol)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
       H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
@@ -155,7 +157,7 @@ fire.matrix <- function(X, Y, dat_T,
                   H.tilde = H.tilde,
                   Index = Index,
                   W = W, w = w, constant_g = constant_g, constant_h = constant_h,
-                  os_type = os_type, cores = cores,
+                  os_type = os_type, cores = cores, tol = tol,
                   method = 'L-BFGS-B',
                   control = list(maxit = 2))
 
@@ -287,7 +289,7 @@ fire.matrix <- function(X, Y, dat_T,
 Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
                         kernel_iprior, iprior_param, lambda, noise,
                         H.tilde = NULL, Index, W, w, constant_g = TRUE, constant_h = FALSE,
-                        os_type = "Apple", cores = NULL) {
+                        os_type = "Apple", cores = NULL, tol = 1e-12) {
 
   # sample size
   N = length(Y)
@@ -296,7 +298,7 @@ Qfun_matrix <- function(X, Y, dat_T, G, kernels, kernels_params,
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = c(1), constant = constant_g,
-                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1)
+                              Index = Index,  os_type = os_type, cores = cores, sample_id = 1, tol = tol)
     # Generate Gram matrix based on I-prior kernel choice
     if (kernel_iprior == 'cfbm') {
       if (is.null(iprior_param)) {

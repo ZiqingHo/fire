@@ -7,7 +7,7 @@
 \alias{kron_mv}
 \title{Internal Kronecker RKHS Norm Utilities}
 \usage{
-Kronecker_inv_helper(G, alpha, constant = TRUE)
+Kronecker_inv_helper(G, alpha, constant = TRUE, tol = 1e-06)
 
 Lambda_inv(L)
 

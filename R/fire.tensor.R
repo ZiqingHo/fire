@@ -20,7 +20,8 @@ fire.tensor <- function(X, Y, dat_T,
     cores = NULL,
     asymptote = TRUE,
     sample_id = 1,
-    epsilon = 1
+    epsilon = 1,
+    tol = 1e-12
   )
   # Override defaults with user-supplied control parameters
   con[names(control)] <- control
@@ -38,6 +39,7 @@ fire.tensor <- function(X, Y, dat_T,
   asymptote = con$asymptote
   sample_id = con$sample_id
   epsilon = con$epsilon
+  tol = con$tol
 
   input_type <- ifelse(is.list(X), 'list', 'array')
 
@@ -152,7 +154,7 @@ fire.tensor <- function(X, Y, dat_T,
 
         nmat = Kronecker_norm_mat(X = X, G = G,
                                   alpha = alpha, constant = constant_g,
-                                  Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
+                                  Index = Index, os_type = os_type, cores = cores, sample_id = sample_id, tol = tol)
 
         # Generate Gram matrix based on I-prior kernel choice
         if (kernel_iprior == 'cfbm') {
@@ -160,8 +162,10 @@ fire.tensor <- function(X, Y, dat_T,
         } else if (kernel_iprior == 'rbf') {
           H.tilde <- rbf_rkhs_kron(nmat = nmat, lengthscale = iprior_param)
         } else if (kernel_iprior == 'linear') {
+          nmat <- as.matrix(nmat)
           H.tilde <- nmat + iprior_param
         }else if (kernel_iprior == 'poly'){
+          nmat <- as.matrix(nmat)
           H.tilde <- (nmat + iprior_param[2])^iprior_param[1]
         } else {
           stop(paste("Unsupported kernel_iprior:", kernel_iprior,
@@ -191,7 +195,7 @@ fire.tensor <- function(X, Y, dat_T,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   tau = tau, noise = noise,
                   Index = Index, W = W, w = w, constant_g = constant_g, constant_h = constant_h,
-                  os_type = os_type, cores = cores, sample_id = sample_id,
+                  os_type = os_type, cores = cores, sample_id = sample_id, tol = tol,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
 
@@ -200,7 +204,7 @@ fire.tensor <- function(X, Y, dat_T,
       alpha = rep(alpha_init, length(kernels))
       nmat = Kronecker_norm_mat(X = X, G = G,
                                 alpha = alpha, constant = constant_g,
-                                Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
+                                Index = Index, os_type = os_type, cores = cores, sample_id = sample_id, tol = tol)
 
       # Generate Gram matrix based on I-prior kernel choice
       if (kernel_iprior == 'cfbm') {
@@ -224,7 +228,7 @@ fire.tensor <- function(X, Y, dat_T,
                   kernel_iprior = kernel_iprior, iprior_param = iprior_param,
                   noise = noise, alpha = alpha_init, H.tilde = H.tilde,
                   Index = Index, W = W, w = w, constant_g = constant_g, constant_h = constant_h,
-                  os_type = os_type, cores = cores, sample_id = sample_id,
+                  os_type = os_type, cores = cores, sample_id = sample_id, tol = tol,
                   method = 'L-BFGS-B', lower = 1e-3, upper = 1e4,
                   control = list(maxit = 2))
       tau = tau_est[niter+1] = res$par
@@ -411,7 +415,7 @@ Qfun_tensor <- function(X, Y, dat_T,
                         tau, noise, alpha,
                         H.tilde = NULL, Index, W, w, constant_g = TRUE, constant_h = FALSE,
                         os_type = "Apple", cores = 1,
-                        sample_id = 1){
+                        sample_id = 1, tol = 1e-12){
 
   # sample size
   N = length(Y)
@@ -422,7 +426,7 @@ Qfun_tensor <- function(X, Y, dat_T,
   if(is.null(H.tilde)){
     nmat = Kronecker_norm_mat(X = X, G = G,
                               alpha = alpha, constant = constant_g,
-                              Index = Index, os_type = os_type, cores = cores, sample_id = sample_id)
+                              Index = Index, os_type = os_type, cores = cores, sample_id = sample_id, tol = tol)
     if (kernel_iprior == 'cfbm') {
       H.tilde <- cfbm_rkhs_kron(nmat = nmat, Hurst = iprior_param)
     } else if (kernel_iprior == 'rbf') {

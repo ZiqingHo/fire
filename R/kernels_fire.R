@@ -83,7 +83,7 @@ fbm <- function(X, Hurst = 0.5, std = FALSE) {
   if(std){
     ones <- matrix(1, N, N)
     K_centered <- K - (ones %*% K)/N - (K %*% ones)/N + (ones %*% K %*% ones)/(N^2)
-    K_std <- K_centered/(mean(diag(K_centered)))
+    K_std <- K_centered/sqrt(mean(diag(K_centered)))
     attr(K_std, "kernel") <- "fbm (standardised)"
     attr(K_std, "parameters") <- list(Hurst = Hurst)
     K_std
@@ -132,7 +132,7 @@ cfbm <- function(X, Hurst = 0.5, std = FALSE) {
   K <- (N^2 * A - N * rvec1 - N * t(rvec1) + s) / (-2* N^2)
 
   if(std){
-    K_std <- K/(mean(diag(K)))
+    K_std <- K/sqrt(mean(diag(K)))
     attr(K_std, "kernel") <- "cfbm (standardised)"
     attr(K_std, "parameters") <- list(Hurst = Hurst)
     K_std
@@ -181,7 +181,7 @@ kronecker_delta <- function(X, center = FALSE, std = FALSE){
 
     if (std) {
       # Standardize by the average of the diagonal elements
-      K_std <- K_centered / mean(diag(K_centered))
+      K_std <- K_centered / sqrt(mean(diag(K_centered)))
       attr(K_std, "kernel") <- "kronecker delta (standardised)"
       K_std
     } else {
@@ -234,7 +234,7 @@ rbf <- function(X, lengthscale = 1, center = FALSE, std = FALSE){
 
     if (std) {
       # Standardize by the average of the diagonal elements
-      K_std <- K_centered / mean(diag(K_centered))
+      K_std <- K_centered / sqrt(mean(diag(K_centered)))
       attr(K_std, "kernel") <- "rbf (standardised)"
       attr(K_std, "parameters") <- list(lengthscale = lengthscale)
       K_std
@@ -292,7 +292,7 @@ polynomial <- function(X, d = 1, offset = 0, center = FALSE, std = FALSE){
 
     if (std) {
       # Standardize by the average of the diagonal elements
-      K_std <- K_centered / mean(diag(K_centered))
+      K_std <- K_centered / sqrt(mean(diag(K_centered)))
       attr(K_std, "kernel") <- "polynomial (standardised)"
       attr(K_std, "parameters") <- list(d = d, offset = offset)
       K_std
@@ -372,7 +372,7 @@ mercer <- function(X, delta = 1, max_terms = 1000, center = FALSE, std = FALSE) 
 
     if (std) {
       # Standardize by the average of the diagonal elements
-      K_std <- K_centered / mean(diag(K_centered))
+      K_std <- K_centered / sqrt(mean(diag(K_centered)))
       attr(K_std, "kernel") <- "mercer (standardised)"
       attr(K_std, "parameters") <- list(delta = delta)
       K_std
@@ -437,7 +437,7 @@ matern<- function(X, nu = 1.5, lengthscale = 1.0, sigma = 1.0, center = FALSE, s
 
     if (std) {
       # Standardize by the average of the diagonal elements
-      K_std <- K_centered / mean(diag(K_centered))
+      K_std <- K_centered / sqrt(mean(diag(K_centered)))
       attr(K_std, "kernel") <- "mercer (standardised)"
       attr(K_std, "parameters") <- list(nu = nu, lengthscale = lengthscale, sigma = sigma)
       K_std

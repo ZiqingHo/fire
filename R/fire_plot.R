@@ -191,7 +191,7 @@ plot.fire_prediction <- function(x, interval = FALSE, ...) {
       p <- ggplot2::ggplot(df, ggplot2::aes(x = Sample)) +
         # Interval with caps
         ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper, colour = "Interval"),
-                      width = 0.4, size = 0.5) +
+                      width = 0.4, linewidth = 0.5) +
         # Actual value (solid circle)
         ggplot2::geom_point(ggplot2::aes(y = Actual, colour = "Actual"), shape = 16, size = 2) +
         ggplot2::scale_colour_manual(values = c("Interval" = "steelblue", "Actual" = "firebrick")) +

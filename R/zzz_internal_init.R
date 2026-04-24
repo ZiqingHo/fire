@@ -125,6 +125,10 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE, st
   U <- eigen.Htilde$values
   V <- eigen.Htilde$vectors
 
+  # Filter near-zero eigenvalues before division to avoid numerical instability.
+  # Eigenvalues below this threshold are floating-point noise, not true eigenvalues.
+  # This follows the same convention as MASS::ginv().
+  # Without this, results differ across platforms (Mac Accelerate vs Linux LAPACK) due to tiny differences in how near-singular matrices are handled.
   tol <- max(abs(U)) * length(Y) * .Machine$double.eps
   keep <- U > tol
   # Compute initial parameter estimates

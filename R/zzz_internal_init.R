@@ -125,10 +125,12 @@ pre_initial <- function(X, Y, dat_T, kernels, kernels_params, center = FALSE, st
   U <- eigen.Htilde$values
   V <- eigen.Htilde$vectors
 
+  tol <- max(abs(U)) * length(Y) * .Machine$double.eps
+  keep <- U > tol
   # Compute initial parameter estimates
   vt.y <- crossprod(V, Y)
-  lambda.tilde <- sqrt((1/N) * sum((vt.y^2) / U^2))
-  sigma <- sqrt((1/N) * sum(vt.y^2))
+  lambda.tilde <- sqrt((1/N) * sum((vt.y[keep]^2) / U[keep]^2))
+  sigma <- sqrt((1/N) * sum(vt.y[keep]^2))
   if(is.null(epsilon)){
     epsilon = min(lambda.tilde,sigma)/10
   }

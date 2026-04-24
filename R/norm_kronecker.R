@@ -252,7 +252,7 @@ Kronecker_norm_mat <- function(X, G, alpha, constant = TRUE, Index = NULL, G_lis
     norms <- numeric(N_sample)
     for(j in i:N_sample) {
       if(m == 1) {
-        norms[j] <- rkhs_norm_kron(X = as.vector(X[i,]), Y = as.vector(X[j,]), Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
+        norms[j] <- rkhs_norm_kron(X = as.numeric(X[i,]), Y = as.numeric(X[j,]), Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
       } else {
         norms[j] <- rkhs_norm_kron(X = X[[i]], Y = X[[j]], Index = Index , G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL, tol = tol)
       }
@@ -341,7 +341,7 @@ Kronecker_norm_cross <- function(Xtrain, Xnew, G, alpha, constant = TRUE, Index 
     norms <- numeric(Ntrain)
     for(j in 1:Ntrain) {
       if(m == 1) {
-        norms[j] <- rkhs_norm_kron(X = as.vector(Xnew[i,]), Y = as.vector(Xtrain[j,]), Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
+        norms[j] <- rkhs_norm_kron(X = as.numeric(Xnew[i,]), Y = as.numeric(Xtrain[j,]), Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = Ginv, tol = tol)
       } else {
         norms[j] <- rkhs_norm_kron(X = Xnew[[i]], Y = Xtrain[[j]], Index = Index, G_list = G_list, L_inv = L_inv, constant = constant, Ginv = NULL, tol = tol)
       }

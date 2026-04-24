@@ -445,7 +445,7 @@ Qfun_tensor <- function(X, Y, dat_T,
   }
 
   H = tau^2 * H.tilde
-  H.eigen = eigen(H)
+  H.eigen = eigen(H, symmetric = T)
   U = H.eigen$values
   V = H.eigen$vectors
   d = (U^2)/(noise^2) + noise^2 #eigenvalues of V_y

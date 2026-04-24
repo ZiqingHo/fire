@@ -29,3 +29,4 @@ doc/           # Built documentation (if not needed)
 .quarto
 fire_workflow.tex
 .Rd2pdf*
+.positai

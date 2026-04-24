@@ -10,3 +10,5 @@
 ^\.httr-oauth$
 ^README\.Rmd$
 ^fire_converged\.txt$
+^\.positai$
+^\.claude$
